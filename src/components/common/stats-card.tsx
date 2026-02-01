@@ -24,20 +24,20 @@ export function StatsCard({
 }: StatsCardProps) {
   return (
     <Card className={cn('', className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 md:p-6">
+        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground truncate">
           {title}
         </CardTitle>
-        {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+        {Icon && <Icon className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground flex-shrink-0" />}
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+      <CardContent className="p-4 md:p-6 pt-0">
+        <div className="text-xl md:text-2xl font-bold">{value}</div>
         {(description || trend) && (
           <div className="flex items-center gap-1 mt-1">
             {trend && (
               <span
                 className={cn(
-                  'text-xs font-medium',
+                  'text-[10px] md:text-xs font-medium',
                   trend.isPositive ? 'text-green-600' : 'text-red-600'
                 )}
               >
@@ -46,7 +46,7 @@ export function StatsCard({
               </span>
             )}
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">{description}</p>
             )}
           </div>
         )}

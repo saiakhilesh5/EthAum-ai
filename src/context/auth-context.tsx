@@ -19,7 +19,7 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   signUp: (email: string, password: string, fullName: string, userType: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string, expectedUserType?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Sign in function
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, expectedUserType?: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -132,6 +132,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) return { error };
+
+      // Validate user type if expected type is provided
+      if (expectedUserType && data.user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('user_type')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile && profile.user_type !== expectedUserType) {
+          await supabase.auth.signOut();
+          return { 
+            error: { 
+              message: `This email is registered as a ${profile.user_type}. Please use the correct login option.` 
+            } 
+          };
+        }
+      }
 
       return { error: null };
     } catch (error) {

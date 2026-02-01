@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { useUser } from '@src/hooks/use-user';
 import {
   Rocket,
@@ -23,6 +24,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  Presentation,
+  Scale,
+  FileText,
+  Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@src/context/auth-context';
@@ -53,6 +58,18 @@ const startupNavItems = [
     href: '/matchmaking',
     icon: Handshake,
   },
+  {
+    title: 'Pitch Analyzer',
+    href: '/pitch-analyzer',
+    icon: Presentation,
+    badge: 'AI',
+  },
+  {
+    title: 'Deal Predictor',
+    href: '/deal-predictor',
+    icon: Sparkles,
+    badge: 'AI',
+  },
 ];
 
 const enterpriseNavItems = [
@@ -70,6 +87,24 @@ const enterpriseNavItems = [
     title: 'My Matches',
     href: '/matchmaking',
     icon: Handshake,
+  },
+  {
+    title: 'Compare Tool',
+    href: '/compare',
+    icon: Scale,
+    badge: 'AI',
+  },
+  {
+    title: 'Executive Briefs',
+    href: '/executive-brief',
+    icon: FileText,
+    badge: 'AI',
+  },
+  {
+    title: 'Deal Predictor',
+    href: '/deal-predictor',
+    icon: Sparkles,
+    badge: 'AI',
   },
   {
     title: 'Trending',
@@ -176,7 +211,17 @@ export function Sidebar({ className }: SidebarProps) {
                 title={isCollapsed ? item.title : undefined}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                {!isCollapsed && <span>{item.title}</span>}
+                {!isCollapsed && (
+                  <span className="flex-1">{item.title}</span>
+                )}
+                {!isCollapsed && item.badge && (
+                  <Badge 
+                    variant={isActive ? 'secondary' : 'default'} 
+                    className="text-[10px] px-1.5 py-0 h-4"
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
               </Link>
             );
           })}

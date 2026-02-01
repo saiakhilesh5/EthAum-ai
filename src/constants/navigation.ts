@@ -9,6 +9,11 @@ import {
   Compass,
   Building2,
   TrendingUp,
+  FileText,
+  Scale,
+  Sparkles,
+  Presentation,
+  Zap,
 } from 'lucide-react';
 
 export const STARTUP_NAV_ITEMS = [
@@ -38,6 +43,18 @@ export const STARTUP_NAV_ITEMS = [
     icon: Handshake,
   },
   {
+    title: 'Pitch Analyzer',
+    href: '/pitch-analyzer',
+    icon: Presentation,
+    badge: 'AI',
+  },
+  {
+    title: 'Deal Predictor',
+    href: '/deal-predictor',
+    icon: Zap,
+    badge: 'AI',
+  },
+  {
     title: 'Profile',
     href: '/profile',
     icon: User,
@@ -64,6 +81,24 @@ export const ENTERPRISE_NAV_ITEMS = [
     title: 'Matches',
     href: '/matchmaking',
     icon: Handshake,
+  },
+  {
+    title: 'Compare Tool',
+    href: '/compare',
+    icon: Scale,
+    badge: 'AI',
+  },
+  {
+    title: 'Executive Briefs',
+    href: '/executive-brief',
+    icon: FileText,
+    badge: 'AI',
+  },
+  {
+    title: 'Deal Predictor',
+    href: '/deal-predictor',
+    icon: Zap,
+    badge: 'AI',
   },
   {
     title: 'Trending',

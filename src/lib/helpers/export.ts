@@ -1,0 +1,381 @@
+// Export utilities for PDF and CSV generation
+
+import { format } from 'date-fns';
+
+interface ExportColumn {
+  key: string;
+  label: string;
+  format?: (value: any) => string;
+}
+
+// CSV Export
+export function exportToCSV<T extends Record<string, any>>(
+  data: T[],
+  columns: ExportColumn[],
+  filename: string
+): void {
+  if (data.length === 0) {
+    console.warn('No data to export');
+    return;
+  }
+
+  // Create header row
+  const header = columns.map((col) => `"${col.label}"`).join(',');
+
+  // Create data rows
+  const rows = data.map((item) =>
+    columns
+      .map((col) => {
+        const value = item[col.key];
+        const formatted = col.format ? col.format(value) : String(value ?? '');
+        // Escape quotes and wrap in quotes
+        return `"${formatted.replace(/"/g, '""')}"`;
+      })
+      .join(',')
+  );
+
+  const csv = [header, ...rows].join('\n');
+  downloadFile(csv, `${filename}.csv`, 'text/csv;charset=utf-8;');
+}
+
+// JSON Export
+export function exportToJSON<T>(data: T[], filename: string): void {
+  const json = JSON.stringify(data, null, 2);
+  downloadFile(json, `${filename}.json`, 'application/json');
+}
+
+// PDF Export (simplified HTML-to-PDF approach)
+export async function exportToPDF(
+  title: string,
+  content: string,
+  filename: string
+): Promise<void> {
+  // Create a printable HTML document
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    throw new Error('Failed to open print window. Check popup blocker.');
+  }
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #111;
+          }
+          h2 {
+            font-size: 18px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: #333;
+          }
+          h3 {
+            font-size: 14px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            color: #555;
+          }
+          p {
+            margin-bottom: 12px;
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #7c3aed;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+          }
+          .date {
+            color: #666;
+            font-size: 14px;
+          }
+          .section {
+            margin-bottom: 24px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+          }
+          th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+          }
+          tr:nth-child(even) {
+            background-color: #fafafa;
+          }
+          .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+          }
+          .badge-success { background-color: #dcfce7; color: #166534; }
+          .badge-warning { background-color: #fef3c7; color: #92400e; }
+          .badge-danger { background-color: #fee2e2; color: #991b1b; }
+          .badge-info { background-color: #dbeafe; color: #1e40af; }
+          .metric {
+            display: inline-block;
+            text-align: center;
+            padding: 16px;
+            margin: 8px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            min-width: 120px;
+          }
+          .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #7c3aed;
+          }
+          .metric-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+          }
+          .footer {
+            margin-top: 40px;
+            padding-top: 16px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+          }
+          @media print {
+            body { padding: 20px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${title}</h1>
+          <span class="date">Generated: ${format(new Date(), 'PPP p')}</span>
+        </div>
+        ${content}
+        <div class="footer">
+          <p>Generated by EthAum.ai - The Enterprise-Startup Intelligence Platform</p>
+        </div>
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
+
+// Helper function to download files
+function downloadFile(content: string, filename: string, mimeType: string): void {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Specific export functions for EthAum data
+
+export function exportStartupsToCSV(startups: any[]): void {
+  const columns: ExportColumn[] = [
+    { key: 'name', label: 'Name' },
+    { key: 'tagline', label: 'Tagline' },
+    { key: 'industry', label: 'Industry' },
+    { key: 'stage', label: 'Stage' },
+    { key: 'trust_score', label: 'Trust Score', format: (v) => v?.toFixed(1) ?? 'N/A' },
+    { key: 'founded_year', label: 'Founded' },
+    { key: 'team_size', label: 'Team Size' },
+    { key: 'created_at', label: 'Added Date', format: (v) => v ? format(new Date(v), 'yyyy-MM-dd') : '' },
+  ];
+
+  exportToCSV(startups, columns, `ethaum-startups-${format(new Date(), 'yyyy-MM-dd')}`);
+}
+
+export function exportReviewsToCSV(reviews: any[]): void {
+  const columns: ExportColumn[] = [
+    { key: 'startup_name', label: 'Startup' },
+    { key: 'overall_rating', label: 'Rating' },
+    { key: 'title', label: 'Title' },
+    { key: 'pros', label: 'Pros' },
+    { key: 'cons', label: 'Cons' },
+    { key: 'verified', label: 'Verified', format: (v) => v ? 'Yes' : 'No' },
+    { key: 'created_at', label: 'Date', format: (v) => v ? format(new Date(v), 'yyyy-MM-dd') : '' },
+  ];
+
+  exportToCSV(reviews, columns, `ethaum-reviews-${format(new Date(), 'yyyy-MM-dd')}`);
+}
+
+export function exportAnalyticsToCSV(data: any[]): void {
+  const columns: ExportColumn[] = [
+    { key: 'date', label: 'Date', format: (v) => v ? format(new Date(v), 'yyyy-MM-dd') : '' },
+    { key: 'views', label: 'Views' },
+    { key: 'upvotes', label: 'Upvotes' },
+    { key: 'reviews', label: 'Reviews' },
+    { key: 'matches', label: 'Matches' },
+  ];
+
+  exportToCSV(data, columns, `ethaum-analytics-${format(new Date(), 'yyyy-MM-dd')}`);
+}
+
+// Report PDF generator
+export async function generateStartupReport(startup: any): Promise<void> {
+  const content = `
+    <div class="section">
+      <h2>Company Overview</h2>
+      <p><strong>Tagline:</strong> ${startup.tagline || 'N/A'}</p>
+      <p><strong>Industry:</strong> ${startup.industry || 'N/A'}</p>
+      <p><strong>Stage:</strong> ${startup.stage || 'N/A'}</p>
+      <p><strong>Founded:</strong> ${startup.founded_year || 'N/A'}</p>
+      <p><strong>Team Size:</strong> ${startup.team_size || 'N/A'}</p>
+      ${startup.description ? `<p>${startup.description}</p>` : ''}
+    </div>
+
+    <div class="section">
+      <h2>Trust Score</h2>
+      <div class="metric">
+        <div class="metric-value">${startup.trust_score?.toFixed(1) || 'N/A'}</div>
+        <div class="metric-label">Overall Score</div>
+      </div>
+    </div>
+
+    ${startup.stats ? `
+    <div class="section">
+      <h2>Performance Metrics</h2>
+      <div style="display: flex; flex-wrap: wrap;">
+        <div class="metric">
+          <div class="metric-value">${startup.stats.total_views || 0}</div>
+          <div class="metric-label">Total Views</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">${startup.stats.total_upvotes || 0}</div>
+          <div class="metric-label">Upvotes</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">${startup.stats.total_reviews || 0}</div>
+          <div class="metric-label">Reviews</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">${startup.stats.avg_rating?.toFixed(1) || 'N/A'}</div>
+          <div class="metric-label">Avg Rating</div>
+        </div>
+      </div>
+    </div>
+    ` : ''}
+
+    ${startup.recent_reviews?.length > 0 ? `
+    <div class="section">
+      <h2>Recent Reviews</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rating</th>
+            <th>Title</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${startup.recent_reviews.slice(0, 5).map((r: any) => `
+            <tr>
+              <td>${r.overall_rating}/5</td>
+              <td>${r.title || 'No title'}</td>
+              <td>${r.created_at ? format(new Date(r.created_at), 'PP') : 'N/A'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ` : ''}
+  `;
+
+  await exportToPDF(
+    `${startup.name} - Startup Report`,
+    content,
+    `${startup.slug || startup.name.toLowerCase().replace(/\s+/g, '-')}-report`
+  );
+}
+
+// Match report PDF generator
+export async function generateMatchReport(matches: any[]): Promise<void> {
+  const content = `
+    <div class="section">
+      <h2>AI Matchmaking Results</h2>
+      <p>Total Matches: ${matches.length}</p>
+    </div>
+
+    <div class="section">
+      <h2>Top Matches</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Startup</th>
+            <th>Match Score</th>
+            <th>Industry</th>
+            <th>Stage</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${matches.slice(0, 10).map((match: any) => `
+            <tr>
+              <td>${match.startup?.name || 'Unknown'}</td>
+              <td>
+                <span class="badge ${match.score >= 80 ? 'badge-success' : match.score >= 60 ? 'badge-warning' : 'badge-info'}">
+                  ${match.score}%
+                </span>
+              </td>
+              <td>${match.startup?.industry || 'N/A'}</td>
+              <td>${match.startup?.stage || 'N/A'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    ${matches[0]?.reasoning ? `
+    <div class="section">
+      <h2>Match Analysis</h2>
+      ${matches.slice(0, 3).map((match: any) => `
+        <h3>${match.startup?.name || 'Unknown'}</h3>
+        <p>${match.reasoning}</p>
+      `).join('')}
+    </div>
+    ` : ''}
+  `;
+
+  await exportToPDF(
+    'AI Matchmaking Report',
+    content,
+    `matchmaking-report-${format(new Date(), 'yyyy-MM-dd')}`
+  );
+}

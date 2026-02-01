@@ -22,9 +22,12 @@ import {
   LogOut,
   Menu,
   X,
+  Search,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { NotificationCenter } from '@src/components/common/notification-center';
+import { KeyboardShortcutsModal } from '@src/components/common/keyboard-shortcuts-modal';
 
 const publicNavItems = [
   { title: 'Explore', href: '/explore' },
@@ -78,11 +81,28 @@ export function Header() {
         </nav>
 
         {/* Auth Buttons / User Menu */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          {/* Search Button (Ctrl+K) */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="hidden sm:flex items-center gap-2 text-muted-foreground"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-search'))}
+          >
+            <Search className="h-4 w-4" />
+            <span className="text-xs">Search</span>
+            <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
+              ⌘K
+            </kbd>
+          </Button>
+
           {isLoading ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
           ) : isAuthenticated && profile ? (
-            <DropdownMenu>
+            <div className="flex items-center gap-2">
+              <NotificationCenter />
+              <KeyboardShortcutsModal />
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -142,6 +162,7 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           ) : (
             <div className="hidden md:flex items-center space-x-2">
               <Button variant="ghost" asChild>

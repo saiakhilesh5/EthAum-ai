@@ -5,6 +5,8 @@ import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
 import { StatsCard } from '@src/components/common/stats-card';
 import { ProfileCompletionBanner } from '@src/components/dashboard';
+import ActivityFeed from '@src/components/common/activity-feed';
+import TrustScore from '@src/components/common/trust-score';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +23,10 @@ import {
   Zap,
   Target,
   Award,
+  Sparkles,
+  Presentation,
+  Scale,
+  FileText,
 } from 'lucide-react';
 
 interface DashboardData {
@@ -132,12 +138,12 @@ export default function DashboardPage() {
 
   if (userLoading || isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
         <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-24 w-full" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Skeleton className="h-20 md:h-24 w-full" />
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-32" />
+            <Skeleton key={i} className="h-24 md:h-32" />
           ))}
         </div>
       </div>
@@ -182,14 +188,14 @@ export default function DashboardPage() {
   const { percentage, missingSteps } = calculateProfileCompletion();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-6">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">
             Welcome back, {profile?.full_name?.split(' ')[0]}! 👋
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Here's what's happening with your {isStartup ? 'startup' : 'account'} today.
           </p>
         </div>
@@ -258,7 +264,7 @@ export default function DashboardPage() {
 
       {/* Stats Grid - Only show if profile exists */}
       {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {isStartup && (
             <>
               <StatsCard
@@ -462,6 +468,115 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* AI Features Showcase */}
+      {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
+        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              AI-Powered Tools
+            </CardTitle>
+            <CardDescription>Exclusive features to accelerate your growth</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {isStartup && (
+                <>
+                  <Link href="/pitch-analyzer" className="group">
+                    <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Presentation className="w-5 h-5 text-primary" />
+                        </div>
+                        <Badge variant="secondary">AI</Badge>
+                      </div>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">Pitch Analyzer</h3>
+                      <p className="text-sm text-muted-foreground">Get AI feedback on your pitch deck</p>
+                    </div>
+                  </Link>
+                  <Link href="/deal-predictor" className="group">
+                    <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Zap className="w-5 h-5 text-primary" />
+                        </div>
+                        <Badge variant="secondary">AI</Badge>
+                      </div>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">Deal Predictor</h3>
+                      <p className="text-sm text-muted-foreground">Predict partnership success rates</p>
+                    </div>
+                  </Link>
+                  <Link href="/insights" className="group">
+                    <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <TrendingUp className="w-5 h-5 text-primary" />
+                        </div>
+                        <Badge variant="secondary">AI</Badge>
+                      </div>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">Startup DNA</h3>
+                      <p className="text-sm text-muted-foreground">Visualize your startup profile</p>
+                    </div>
+                  </Link>
+                </>
+              )}
+              {isEnterprise && (
+                <>
+                  <Link href="/compare" className="group">
+                    <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Scale className="w-5 h-5 text-primary" />
+                        </div>
+                        <Badge variant="secondary">AI</Badge>
+                      </div>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">Compare Tool</h3>
+                      <p className="text-sm text-muted-foreground">AI-powered startup comparison</p>
+                    </div>
+                  </Link>
+                  <Link href="/executive-brief" className="group">
+                    <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <FileText className="w-5 h-5 text-primary" />
+                        </div>
+                        <Badge variant="secondary">AI</Badge>
+                      </div>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">Executive Briefs</h3>
+                      <p className="text-sm text-muted-foreground">Generate investment reports</p>
+                    </div>
+                  </Link>
+                  <Link href="/deal-predictor" className="group">
+                    <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Zap className="w-5 h-5 text-primary" />
+                        </div>
+                        <Badge variant="secondary">AI</Badge>
+                      </div>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">Deal Predictor</h3>
+                      <p className="text-sm text-muted-foreground">Predict partnership success rates</p>
+                    </div>
+                  </Link>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Activity Feed & Trust Score */}
+      {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <ActivityFeed compact maxItems={8} />
+          </div>
+          <div>
+            <TrustScore startupId={dashboardData?.startupData?.id} />
+          </div>
         </div>
       )}
     </div>
