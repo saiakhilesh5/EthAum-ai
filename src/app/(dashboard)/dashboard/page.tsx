@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
+import { DEMO_MODE, DEMO_STARTUPS, DEMO_LAUNCHES, DEMO_REVIEWS, DEMO_MATCHES, DEMO_ENTERPRISES } from '@src/lib/demo-data';
 import { StatsCard } from '@src/components/common/stats-card';
 import { ProfileCompletionBanner } from '@src/components/dashboard';
 import ActivityFeed from '@src/components/common/activity-feed';
@@ -48,21 +49,41 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      if (!user) return;
+      if (!user && !DEMO_MODE) return;
 
       try {
+        // Use demo data if DEMO_MODE is enabled
+        if (DEMO_MODE) {
+          const demoStartup = DEMO_STARTUPS[0];
+          const demoEnterprise = DEMO_ENTERPRISES[0];
+          
+          setDashboardData({
+            hasStartupProfile: true,
+            hasEnterpriseProfile: true,
+            startupData: demoStartup,
+            enterpriseData: demoEnterprise,
+            launchesCount: DEMO_LAUNCHES.length,
+            reviewsCount: DEMO_REVIEWS.length,
+            matchesCount: DEMO_MATCHES.length,
+            recentLaunches: DEMO_LAUNCHES.slice(0, 3),
+            recentReviews: DEMO_REVIEWS.slice(0, 3),
+          });
+          setIsLoading(false);
+          return;
+        }
+
         // Check for startup profile
         const { data: startupData } = await supabase
           .from('startups')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', user!.id)
           .single();
 
         // Check for enterprise profile
         const { data: enterpriseData } = await supabase
           .from('enterprises')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', user!.id)
           .single();
 
         // Get counts based on profile type

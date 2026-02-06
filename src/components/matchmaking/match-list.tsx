@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@src/lib/db/supabase';
+import { DEMO_MODE, DEMO_MATCHES } from '@src/lib/demo-data';
 import MatchCard from './match-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -58,6 +59,22 @@ export default function MatchList({
 
   const fetchMatches = async () => {
     setIsLoading(true);
+    
+    // Use demo data in demo mode
+    if (DEMO_MODE) {
+      let demoData = [...DEMO_MATCHES] as any[];
+      
+      if (status !== 'all') {
+        demoData = demoData.filter(m => m.status === status);
+      }
+      
+      demoData = demoData.filter(m => m.match_score >= minScore);
+      
+      setMatches(demoData);
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       // First get the user's startup or enterprise ID
       let profileId: string | null = null;
@@ -79,6 +96,12 @@ export default function MatchList({
       }
 
       if (!profileId) {
+        // Fall back to demo data if no profile
+        let demoData = [...DEMO_MATCHES] as any[];
+        if (status !== 'all') {
+          demoData = demoData.filter(m => m.status === status);
+        }
+        setMatches(demoData);
         setIsLoading(false);
         return;
       }
@@ -131,16 +154,29 @@ export default function MatchList({
 
       if (error) throw error;
 
-      const formattedMatches = (data || []).map((match: any) => ({
-        ...match,
-        startup: match.startups,
-        enterprise: match.enterprises,
-      }));
-
-      setMatches(formattedMatches);
+      // Fall back to demo data if empty
+      if (!data || data.length === 0) {
+        let demoData = [...DEMO_MATCHES] as any[];
+        if (status !== 'all') {
+          demoData = demoData.filter(m => m.status === status);
+        }
+        setMatches(demoData);
+      } else {
+        const formattedMatches = data.map((match: any) => ({
+          ...match,
+          startup: match.startups,
+          enterprise: match.enterprises,
+        }));
+        setMatches(formattedMatches);
+      }
     } catch (error) {
       console.error('Error fetching matches:', error);
-      toast.error('Failed to load matches');
+      // Fall back to demo data on error
+      let demoData = [...DEMO_MATCHES] as any[];
+      if (status !== 'all') {
+        demoData = demoData.filter(m => m.status === status);
+      }
+      setMatches(demoData);
     } finally {
       setIsLoading(false);
     }

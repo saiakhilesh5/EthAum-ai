@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabase } from '@src/lib/db/supabase';
+import { DEMO_MODE, DEMO_STARTUPS, DEMO_LAUNCHES, DEMO_REVIEWS, DEMO_CREDIBILITY_SCORE } from '@src/lib/demo-data';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -106,6 +107,23 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
   }, [resolvedParams.id]);
 
   const fetchStartup = async () => {
+    // Check for demo data first
+    if (DEMO_MODE) {
+      const demoStartup = DEMO_STARTUPS.find(s => s.slug === resolvedParams.id || s.id === resolvedParams.id);
+      if (demoStartup) {
+        setStartup(demoStartup as any);
+        setLaunches(DEMO_LAUNCHES.filter(l => l.startup_id === demoStartup.id) as any[]);
+        setReviews(DEMO_REVIEWS.filter(r => r.startup_id === demoStartup.id).map(r => ({
+          ...r,
+          users: { full_name: r.reviewer.full_name, avatar_url: r.reviewer.avatar_url },
+          enterprises: { company_name: r.reviewer.company },
+        })) as any[]);
+        setCredibility(DEMO_CREDIBILITY_SCORE);
+        setIsLoading(false);
+        return;
+      }
+    }
+
     try {
       // Fetch startup details
       const { data: startupData, error: startupError } = await supabase
@@ -115,6 +133,20 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
         .single();
 
       if (startupError || !startupData) {
+        // Try to find in demo data as fallback
+        const demoStartup = DEMO_STARTUPS.find(s => s.slug === resolvedParams.id || s.id === resolvedParams.id);
+        if (demoStartup) {
+          setStartup(demoStartup as any);
+          setLaunches(DEMO_LAUNCHES.filter(l => l.startup_id === demoStartup.id) as any[]);
+          setReviews(DEMO_REVIEWS.filter(r => r.startup_id === demoStartup.id).map(r => ({
+            ...r,
+            users: { full_name: r.reviewer.full_name, avatar_url: r.reviewer.avatar_url },
+            enterprises: { company_name: r.reviewer.company },
+          })) as any[]);
+          setCredibility(DEMO_CREDIBILITY_SCORE);
+          setIsLoading(false);
+          return;
+        }
         notFound();
         return;
       }
@@ -159,9 +191,13 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
         .eq('startup_id', startupData.id)
         .single();
 
-      setCredibility(credibilityData);
+      setCredibility(credibilityData || DEMO_CREDIBILITY_SCORE);
     } catch (error) {
       console.error('Error fetching startup:', error);
+      // Fall back to demo data
+      const demoStartup = DEMO_STARTUPS[0];
+      setStartup(demoStartup as any);
+      setCredibility(DEMO_CREDIBILITY_SCORE);
     } finally {
       setIsLoading(false);
     }

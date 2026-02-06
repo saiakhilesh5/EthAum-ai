@@ -6,13 +6,12 @@
 
 **The AI-powered marketplace connecting enterprises with verified startups**
 
-[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Visit%20Site-success?style=for-the-badge)](https://ethaum-ai.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com/)
 
-[🌐 Live Demo](https://ethaum-ai.vercel.app) • [📖 Features](#-features) • [🚀 Deploy](#-deployment-guide)
+[📖 Features](#-features) • [🚀 Deploy](#-deployment-guide)
 
 </div>
 
@@ -484,7 +483,7 @@ Showcase your EthAum trust score on your website:
 ```html
 <div id="ethaum-trust-badge-YOUR_STARTUP_ID"></div>
 <script 
-  src="https://ethaum-ai.vercel.app/embed/widget.js" 
+  src="https://YOUR_DEPLOYED_URL/embed/widget.js" 
   data-startup-id="YOUR_STARTUP_ID"
   data-theme="light"
   data-size="md"
@@ -495,9 +494,9 @@ Showcase your EthAum trust score on your website:
 ### Option 2: Image Badge
 
 ```html
-<a href="https://ethaum-ai.vercel.app/startups/YOUR_SLUG">
+<a href="https://YOUR_DEPLOYED_URL/startups/YOUR_SLUG">
   <img 
-    src="https://ethaum-ai.vercel.app/api/badge/YOUR_ID" 
+    src="https://YOUR_DEPLOYED_URL/api/badge/YOUR_ID" 
     alt="EthAum Trust Score" 
   />
 </a>
@@ -506,14 +505,14 @@ Showcase your EthAum trust score on your website:
 ### Option 3: Markdown (for GitHub README)
 
 ```markdown
-[![EthAum Trust Score](https://ethaum-ai.vercel.app/api/badge/YOUR_ID)](https://ethaum-ai.vercel.app/startups/YOUR_SLUG)
+[![EthAum Trust Score](https://YOUR_DEPLOYED_URL/api/badge/YOUR_ID)](https://YOUR_DEPLOYED_URL/startups/YOUR_SLUG)
 ```
 
 ### Option 4: React Component
 
 ```jsx
 <iframe
-  src="https://ethaum-ai.vercel.app/embed/trust-badge/YOUR_ID"
+  src="https://YOUR_DEPLOYED_URL/embed/trust-badge/YOUR_ID"
   width="200"
   height="60"
   frameBorder="0"

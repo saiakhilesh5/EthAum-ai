@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@src/lib/db/supabase';
+import { DEMO_MODE, DEMO_REVIEWS } from '@src/lib/demo-data';
 import ReviewCard from './review-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -71,6 +72,58 @@ export default function ReviewList({
     const offset = (currentPage - 1) * limit;
 
     try {
+      // Use demo data if DEMO_MODE is enabled
+      if (DEMO_MODE) {
+        let demoReviews = DEMO_REVIEWS.map(review => ({
+          ...review,
+          user: {
+            full_name: review.reviewer.full_name,
+            avatar_url: review.reviewer.avatar_url,
+            job_title: review.reviewer.role,
+          },
+          enterprise: review.reviewer.company ? {
+            company_name: review.reviewer.company,
+            industry: 'Technology',
+          } : null,
+        }));
+
+        // Apply rating filter
+        if (filterRating !== 'all') {
+          demoReviews = demoReviews.filter(r => r.overall_rating === parseInt(filterRating));
+        }
+
+        // Apply sorting
+        switch (sortBy) {
+          case 'newest':
+            demoReviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            break;
+          case 'oldest':
+            demoReviews.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            break;
+          case 'highest':
+            demoReviews.sort((a, b) => b.overall_rating - a.overall_rating);
+            break;
+          case 'lowest':
+            demoReviews.sort((a, b) => a.overall_rating - b.overall_rating);
+            break;
+          case 'helpful':
+            demoReviews.sort((a, b) => b.helpful_count - a.helpful_count);
+            break;
+        }
+
+        const paginatedReviews = demoReviews.slice(offset, offset + limit);
+        
+        if (reset) {
+          setReviews(paginatedReviews as any[]);
+        } else {
+          setReviews([...reviews, ...paginatedReviews] as any[]);
+        }
+
+        setHasMore(paginatedReviews.length === limit);
+        setIsLoading(false);
+        return;
+      }
+
       let query = supabase
         .from('reviews')
         .select(`
