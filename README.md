@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![EthAum.ai](https://img.shields.io/badge/EthAum.ai-Enterprise%20Startup%20Intelligence-7c3aed?style=for-the-badge&logo=rocket&logoColor=white)
+![EthAum.ai](hhttps://ethaum-gdudjs824-saiakhilesh5s-projects.vercel.app)
 
 **The AI-powered marketplace connecting enterprises with verified startups**
 
