@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![EthAum.ai](hhttps://ethaum-gdudjs824-saiakhilesh5s-projects.vercel.app)
+![EthAum.ai](https://ethaum-gdudjs824-saiakhilesh5s-projects.vercel.app/)
 
 **The AI-powered marketplace connecting enterprises with verified startups**
 
