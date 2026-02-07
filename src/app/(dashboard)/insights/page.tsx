@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_STARTUPS, DEMO_CREDIBILITY_SCORE, DEMO_TRENDS, DEMO_ACTIVITIES } from '@src/lib/demo-data';
 import {
   CredibilityWidget,
   TrendingChart,
@@ -48,14 +47,7 @@ export default function InsightsPage() {
   }, [user]);
 
   const fetchData = async () => {
-    if (!user) return;
-
-    // Use demo data in demo mode
-    if (DEMO_MODE) {
-      setStartup(DEMO_STARTUPS[0]);
-      setCredibility(DEMO_CREDIBILITY_SCORE);
-      setTrendData(DEMO_TRENDS);
-      setActivities(DEMO_ACTIVITIES);
+    if (!user) {
       setIsLoading(false);
       return;
     }
@@ -70,21 +62,12 @@ export default function InsightsPage() {
 
       if (startupError && startupError.code !== 'PGRST116') {
         console.error('Error fetching startup:', startupError);
-        // Fall back to demo data
-        setStartup(DEMO_STARTUPS[0]);
-        setCredibility(DEMO_CREDIBILITY_SCORE);
-        setTrendData(DEMO_TRENDS);
-        setActivities(DEMO_ACTIVITIES);
         setIsLoading(false);
         return;
       }
 
       if (!startupData) {
-        // Fall back to demo data if no startup
-        setStartup(DEMO_STARTUPS[0]);
-        setCredibility(DEMO_CREDIBILITY_SCORE);
-        setTrendData(DEMO_TRENDS);
-        setActivities(DEMO_ACTIVITIES);
+        // No startup found
         setIsLoading(false);
         return;
       }
@@ -98,8 +81,14 @@ export default function InsightsPage() {
         .eq('startup_id', startupData.id)
         .single();
 
-      // Use demo credibility if none found
-      setCredibility(credData || DEMO_CREDIBILITY_SCORE);
+      // Use credibility data or generate default
+      setCredibility(credData || {
+        overall_score: startupData.credibility_score || 0,
+        review_quality: 0,
+        engagement_level: 0,
+        verification_status: 0,
+        consistency_score: 0,
+      });
 
       // Generate mock trend data (in production, this would come from analytics)
       const now = new Date();

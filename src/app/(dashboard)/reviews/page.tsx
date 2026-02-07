@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_STARTUPS, DEMO_REVIEWS } from '@src/lib/demo-data';
 import { ReviewList, ReviewStats, ReviewForm } from '@src/components/reviews';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,82 +70,22 @@ export default function ReviewsPage() {
   }, [user]);
 
   const fetchStartupData = async () => {
-    if (!user && !DEMO_MODE) return;
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      // Use demo data if DEMO_MODE is enabled
-      if (DEMO_MODE) {
-        const demoStartup = DEMO_STARTUPS[0]; // CloudScale AI
-        setStartup({
-          id: demoStartup.id,
-          name: demoStartup.name,
-          logo_url: demoStartup.logo_url,
-          total_reviews: demoStartup.total_reviews,
-          credibility_score: demoStartup.credibility_score,
-        });
-
-        // Calculate demo review summary
-        const demoReviews = DEMO_REVIEWS;
-        if (demoReviews.length > 0) {
-          const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-          let totalOverall = 0;
-          let totalEase = 0;
-          let totalValue = 0;
-          let totalSupport = 0;
-          let totalFeatures = 0;
-          let totalRecommend = 0;
-
-          demoReviews.forEach((review) => {
-            distribution[review.overall_rating as keyof typeof distribution]++;
-            totalOverall += review.overall_rating;
-            totalEase += review.ease_of_use_rating || 0;
-            totalValue += review.value_for_money_rating || 0;
-            totalSupport += review.customer_support_rating || 0;
-            totalFeatures += review.features_rating || 0;
-            totalRecommend += review.recommend_likelihood || 5;
-          });
-
-          const count = demoReviews.length;
-          setReviewSummary({
-            averageRating: totalOverall / count,
-            totalReviews: count,
-            ratingDistribution: distribution,
-            categoryRatings: {
-              easeOfUse: totalEase / count,
-              valueForMoney: totalValue / count,
-              customerSupport: totalSupport / count,
-              features: totalFeatures / count,
-            },
-            recommendationRate: Math.round((totalRecommend / count) * 10),
-          });
-        }
-
-        setPendingReviews(1);
-        setIsLoading(false);
-        return;
-      }
-
       // Fetch startup from database
       const { data: startupData, error: startupError } = await supabase
         .from('startups')
         .select('id, name, logo_url, total_reviews, credibility_score')
-        .eq('user_id', user!.id)
+        .eq('user_id', user.id)
         .single();
 
       if (startupError) {
         if (startupError.code !== 'PGRST116') {
           console.error('Error fetching startup:', startupError);
-        }
-        // Fallback to demo data on error
-        if (DEMO_MODE) {
-          const demoStartup = DEMO_STARTUPS[0];
-          setStartup({
-            id: demoStartup.id,
-            name: demoStartup.name,
-            logo_url: demoStartup.logo_url,
-            total_reviews: demoStartup.total_reviews,
-            credibility_score: demoStartup.credibility_score,
-          });
         }
         setIsLoading(false);
         return;

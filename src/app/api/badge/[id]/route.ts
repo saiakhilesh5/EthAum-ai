@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DEMO_STARTUPS } from '@src/lib/demo-data';
+import { createServerSupabaseClient } from '@src/lib/db/supabase-server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const supabase = await createServerSupabaseClient();
 
-  // Try to find the startup by ID
-  let startup = DEMO_STARTUPS.find(s => s.id === id);
-  
-  // If not found by ID, try by slug/name
-  if (!startup) {
-    startup = DEMO_STARTUPS.find(s => 
-      s.name.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase()
-    );
-  }
+  // Try to find the startup by ID or slug from database
+  const { data: startup } = await supabase
+    .from('startups')
+    .select('name, credibility_score, is_verified')
+    .or(`id.eq.${id},slug.eq.${id}`)
+    .single();
 
   // Default values if startup not found
   const name = startup?.name || 'Your Startup';

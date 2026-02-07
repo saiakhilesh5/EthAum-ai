@@ -3,7 +3,7 @@
 
 // When true: Always fetch from database first, fall back to demo if empty
 // When false: Only use database data, no demo fallback
-export const DEMO_MODE = true; // Enable demo fallback for empty database
+export const DEMO_MODE = false; // Disabled - all data now comes from database
 
 // Demo Startups
 export const DEMO_STARTUPS = [

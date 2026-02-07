@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_STARTUPS } from '@src/lib/demo-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -100,44 +99,15 @@ export default function ExplorePage() {
 
       const { data, error } = await query.limit(20);
 
-      // Use real data if available, otherwise fall back to demo
-      if (!error && data && data.length > 0) {
+      // Use real data from database
+      if (!error && data) {
         setStartups(data);
-      } else if (DEMO_MODE) {
-        // Fall back to demo data if database is empty
-        let demoData = [...DEMO_STARTUPS] as any[];
-        
-        if (industryFilter !== 'all') {
-          demoData = demoData.filter(s => s.industry === industryFilter);
-        }
-        if (stageFilter !== 'all') {
-          demoData = demoData.filter(s => s.stage === stageFilter);
-        }
-        
-        switch (sortBy) {
-          case 'credibility':
-            demoData.sort((a, b) => b.credibility_score - a.credibility_score);
-            break;
-          case 'reviews':
-            demoData.sort((a, b) => b.total_reviews - a.total_reviews);
-            break;
-          case 'upvotes':
-            demoData.sort((a, b) => b.total_upvotes - a.total_upvotes);
-            break;
-        }
-        
-        setStartups(demoData);
       } else {
         setStartups([]);
       }
     } catch (error) {
       console.error('Error fetching startups:', error);
-      // Fall back to demo data on error if DEMO_MODE enabled
-      if (DEMO_MODE) {
-        setStartups(DEMO_STARTUPS as any[]);
-      } else {
-        setStartups([]);
-      }
+      setStartups([]);
     } finally {
       setIsLoading(false);
     }
@@ -151,17 +121,13 @@ export default function ExplorePage() {
         .eq('is_featured', true)
         .limit(5);
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setFeaturedStartups(data);
-      } else if (DEMO_MODE) {
-        setFeaturedStartups(DEMO_STARTUPS.filter(s => s.is_featured) as any[]);
       } else {
         setFeaturedStartups([]);
       }
     } catch {
-      if (DEMO_MODE) {
-        setFeaturedStartups(DEMO_STARTUPS.filter(s => s.is_featured) as any[]);
-      }
+      setFeaturedStartups([]);
     }
   };
 
@@ -173,19 +139,13 @@ export default function ExplorePage() {
         .order('total_upvotes', { ascending: false })
         .limit(5);
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setTrendingStartups(data);
-      } else if (DEMO_MODE) {
-        const sorted = [...DEMO_STARTUPS].sort((a, b) => b.total_upvotes - a.total_upvotes);
-        setTrendingStartups(sorted.slice(0, 5) as any[]);
       } else {
         setTrendingStartups([]);
       }
     } catch {
-      if (DEMO_MODE) {
-        const sorted = [...DEMO_STARTUPS].sort((a, b) => b.total_upvotes - a.total_upvotes);
-        setTrendingStartups(sorted.slice(0, 5) as any[]);
-      }
+      setTrendingStartups([]);
     }
   };
 

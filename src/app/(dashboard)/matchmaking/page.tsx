@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_MATCHES } from '@src/lib/demo-data';
 import { MatchList, MatchFilters, FilterState } from '@src/components/matchmaking';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,18 +49,7 @@ export default function MatchmakingPage() {
   }, [user]);
 
   const determineUserType = async () => {
-    if (!user) return;
-
-    // In demo mode, default to enterprise for better demo experience
-    if (DEMO_MODE) {
-      setUserType('enterprise');
-      setProfileId('demo-enterprise-1');
-      setStats({
-        total: DEMO_MATCHES.length,
-        pending: DEMO_MATCHES.filter(m => m.status === 'pending').length,
-        interested: DEMO_MATCHES.filter(m => m.status === 'interested').length,
-        connected: DEMO_MATCHES.filter(m => m.status === 'connected').length,
-      });
+    if (!user) {
       setIsLoading(false);
       return;
     }
@@ -93,28 +81,9 @@ export default function MatchmakingPage() {
         setUserType('enterprise');
         setProfileId(enterprise.id);
         await fetchStats(enterprise.id, 'enterprise');
-      } else {
-        // Fall back to demo mode if no profile
-        setUserType('enterprise');
-        setProfileId('demo-enterprise-1');
-        setStats({
-          total: DEMO_MATCHES.length,
-          pending: DEMO_MATCHES.filter(m => m.status === 'pending').length,
-          interested: DEMO_MATCHES.filter(m => m.status === 'interested').length,
-          connected: DEMO_MATCHES.filter(m => m.status === 'connected').length,
-        });
       }
     } catch (error) {
       console.error('Error determining user type:', error);
-      // Fall back to demo data
-      setUserType('enterprise');
-      setProfileId('demo-enterprise-1');
-      setStats({
-        total: DEMO_MATCHES.length,
-        pending: DEMO_MATCHES.filter(m => m.status === 'pending').length,
-        interested: DEMO_MATCHES.filter(m => m.status === 'interested').length,
-        connected: DEMO_MATCHES.filter(m => m.status === 'connected').length,
-      });
     } finally {
       setIsLoading(false);
     }

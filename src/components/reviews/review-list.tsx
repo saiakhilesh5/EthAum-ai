@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_REVIEWS } from '@src/lib/demo-data';
 import ReviewCard from './review-card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -121,8 +120,8 @@ export default function ReviewList({
 
       const { data, error } = await query;
 
-      // Use real data if available
-      if (!error && data && data.length > 0) {
+      // Use data from database
+      if (!error && data) {
         const formattedReviews = data.map((review: any) => ({
           ...review,
           user: review.users || { full_name: 'Anonymous', avatar_url: null },
@@ -135,77 +134,13 @@ export default function ReviewList({
           setReviews([...reviews, ...formattedReviews]);
         }
         setHasMore(formattedReviews.length === limit);
-      } else if (DEMO_MODE) {
-        // Fall back to demo data if database is empty
-        let demoReviews = DEMO_REVIEWS.map(review => ({
-          ...review,
-          user: {
-            full_name: review.reviewer.full_name,
-            avatar_url: review.reviewer.avatar_url,
-            job_title: review.reviewer.role,
-          },
-          enterprise: review.reviewer.company ? {
-            company_name: review.reviewer.company,
-            industry: 'Technology',
-          } : null,
-        }));
-
-        // Apply rating filter
-        if (filterRating !== 'all') {
-          demoReviews = demoReviews.filter(r => r.overall_rating === parseInt(filterRating));
-        }
-
-        // Apply sorting
-        switch (sortBy) {
-          case 'newest':
-            demoReviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-            break;
-          case 'oldest':
-            demoReviews.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-            break;
-          case 'highest':
-            demoReviews.sort((a, b) => b.overall_rating - a.overall_rating);
-            break;
-          case 'lowest':
-            demoReviews.sort((a, b) => a.overall_rating - b.overall_rating);
-            break;
-          case 'helpful':
-            demoReviews.sort((a, b) => b.helpful_count - a.helpful_count);
-            break;
-        }
-
-        const paginatedReviews = demoReviews.slice(offset, offset + limit);
-        
-        if (reset) {
-          setReviews(paginatedReviews as any[]);
-        } else {
-          setReviews([...reviews, ...paginatedReviews] as any[]);
-        }
-        setHasMore(paginatedReviews.length === limit);
       } else {
         setReviews([]);
         setHasMore(false);
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      // Fall back to demo data on error if DEMO_MODE enabled
-      if (DEMO_MODE) {
-        const demoReviews = DEMO_REVIEWS.map(review => ({
-          ...review,
-          user: {
-            full_name: review.reviewer.full_name,
-            avatar_url: review.reviewer.avatar_url,
-            job_title: review.reviewer.role,
-          },
-          enterprise: review.reviewer.company ? {
-            company_name: review.reviewer.company,
-            industry: 'Technology',
-          } : null,
-        }));
-        setReviews(demoReviews as any[]);
-      } else {
-        setReviews([]);
-      }
+      setReviews([]);
     } finally {
       setIsLoading(false);
     }

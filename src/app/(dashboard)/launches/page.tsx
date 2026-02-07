@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_LAUNCHES } from '@src/lib/demo-data';
 import { LaunchList } from '@src/components/launches';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,16 +25,6 @@ export default function LaunchesPage() {
   }, []);
 
   const fetchStats = async () => {
-    // Use demo stats in demo mode
-    if (DEMO_MODE) {
-      setStats({
-        totalLaunches: DEMO_LAUNCHES.length,
-        totalUpvotes: DEMO_LAUNCHES.reduce((acc, l) => acc + l.upvote_count, 0),
-        featuredCount: DEMO_LAUNCHES.filter(l => l.is_featured).length,
-      });
-      return;
-    }
-
     try {
       const { count: totalLaunches } = await supabase
         .from('launches')
@@ -55,27 +44,17 @@ export default function LaunchesPage() {
         .eq('status', 'live')
         .eq('is_featured', true);
 
-      // Fall back to demo data if empty
-      if (totalLaunches === 0) {
-        setStats({
-          totalLaunches: DEMO_LAUNCHES.length,
-          totalUpvotes: DEMO_LAUNCHES.reduce((acc, l) => acc + l.upvote_count, 0),
-          featuredCount: DEMO_LAUNCHES.filter(l => l.is_featured).length,
-        });
-      } else {
-        setStats({
-          totalLaunches: totalLaunches || 0,
-          totalUpvotes,
-          featuredCount: featuredCount || 0,
-        });
-      }
+      setStats({
+        totalLaunches: totalLaunches || 0,
+        totalUpvotes,
+        featuredCount: featuredCount || 0,
+      });
     } catch (error) {
       console.error('Error fetching stats:', error);
-      // Fall back to demo data on error
       setStats({
-        totalLaunches: DEMO_LAUNCHES.length,
-        totalUpvotes: DEMO_LAUNCHES.reduce((acc, l) => acc + l.upvote_count, 0),
-        featuredCount: DEMO_LAUNCHES.filter(l => l.is_featured).length,
+        totalLaunches: 0,
+        totalUpvotes: 0,
+        featuredCount: 0,
       });
     }
   };

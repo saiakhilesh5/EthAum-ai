@@ -5,7 +5,6 @@ import { LaunchCard } from './launch-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@src/lib/db/supabase';
 import { useUser } from '@src/hooks/use-user';
-import { DEMO_MODE, DEMO_LAUNCHES } from '@src/lib/demo-data';
 
 interface LaunchListProps {
   filter?: 'today' | 'week' | 'month' | 'all';
@@ -24,7 +23,7 @@ export function LaunchList({ filter = 'all', limit, showRank = true }: LaunchLis
   }, [filter, limit]);
 
   useEffect(() => {
-    if (user && !DEMO_MODE) {
+    if (user) {
       fetchUserUpvotes();
     }
   }, [user, launches]);
@@ -73,39 +72,15 @@ export function LaunchList({ filter = 'all', limit, showRank = true }: LaunchLis
 
       if (error) throw error;
       
-      // Use real data if available, otherwise fall back to demo data
-      if (data && data.length > 0) {
+      // Use data from database
+      if (data) {
         setLaunches(data);
-      } else if (DEMO_MODE) {
-        // Fall back to demo data if database is empty
-        let demoData = [...DEMO_LAUNCHES];
-        
-        // Apply date filters for demo
-        const now = new Date();
-        if (filter === 'today') {
-          const today = new Date(now.setHours(0, 0, 0, 0));
-          demoData = demoData.filter(l => new Date(l.launch_date) >= today);
-        } else if (filter === 'week') {
-          const weekAgo = new Date(now.setDate(now.getDate() - 7));
-          demoData = demoData.filter(l => new Date(l.launch_date) >= weekAgo);
-        }
-        
-        if (limit) {
-          demoData = demoData.slice(0, limit);
-        }
-        
-        setLaunches(demoData);
       } else {
         setLaunches([]);
       }
     } catch (error) {
       console.error('Error fetching launches:', error);
-      // Fall back to demo data on error if DEMO_MODE is enabled
-      if (DEMO_MODE) {
-        setLaunches(DEMO_LAUNCHES);
-      } else {
-        setLaunches([]);
-      }
+      setLaunches([]);
     } finally {
       setIsLoading(false);
     }

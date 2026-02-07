@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_STARTUPS, DEMO_LAUNCHES, DEMO_REVIEWS, DEMO_MATCHES, DEMO_ENTERPRISES } from '@src/lib/demo-data';
 import { StatsCard } from '@src/components/common/stats-card';
 import { ProfileCompletionBanner } from '@src/components/dashboard';
 import ActivityFeed from '@src/components/common/activity-feed';
@@ -49,7 +48,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      if (!user && !DEMO_MODE) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         // If user is logged in, always try to fetch real data first
@@ -116,84 +118,32 @@ export default function DashboardPage() {
             matchesCount = mCount || 0;
           }
 
-          // If user has no profile yet and DEMO_MODE is on, show demo data
-          if (!startupData && !enterpriseData && DEMO_MODE) {
-            const demoStartup = DEMO_STARTUPS[0];
-            const demoEnterprise = DEMO_ENTERPRISES[0];
-            
-            setDashboardData({
-              hasStartupProfile: true,
-              hasEnterpriseProfile: true,
-              startupData: demoStartup,
-              enterpriseData: demoEnterprise,
-              launchesCount: DEMO_LAUNCHES.length,
-              reviewsCount: DEMO_REVIEWS.length,
-              matchesCount: DEMO_MATCHES.length,
-              recentLaunches: DEMO_LAUNCHES.slice(0, 3),
-              recentReviews: DEMO_REVIEWS.slice(0, 3),
-            });
-          } else {
-            setDashboardData({
-              hasStartupProfile: !!startupData,
-              hasEnterpriseProfile: !!enterpriseData,
-              startupData,
-              enterpriseData,
-              launchesCount,
-              reviewsCount,
-              matchesCount,
-              recentLaunches,
-              recentReviews,
-            });
-          }
-          setIsLoading(false);
-          return;
-        }
-
-        // If no user but DEMO_MODE is enabled, show demo data
-        if (DEMO_MODE) {
-          const demoStartup = DEMO_STARTUPS[0];
-          const demoEnterprise = DEMO_ENTERPRISES[0];
-          
+          // Set dashboard data for user
           setDashboardData({
-            hasStartupProfile: true,
-            hasEnterpriseProfile: true,
-            startupData: demoStartup,
-            enterpriseData: demoEnterprise,
-            launchesCount: DEMO_LAUNCHES.length,
-            reviewsCount: DEMO_REVIEWS.length,
-            matchesCount: DEMO_MATCHES.length,
-            recentLaunches: DEMO_LAUNCHES.slice(0, 3),
-            recentReviews: DEMO_REVIEWS.slice(0, 3),
+            hasStartupProfile: !!startupData,
+            hasEnterpriseProfile: !!enterpriseData,
+            startupData,
+            enterpriseData,
+            launchesCount,
+            reviewsCount,
+            matchesCount,
+            recentLaunches,
+            recentReviews,
           });
           setIsLoading(false);
           return;
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        // Fall back to demo data on error if DEMO_MODE enabled
-        if (DEMO_MODE) {
-          const demoStartup = DEMO_STARTUPS[0];
-          const demoEnterprise = DEMO_ENTERPRISES[0];
-          
-          setDashboardData({
-            hasStartupProfile: true,
-            hasEnterpriseProfile: true,
-            startupData: demoStartup,
-            enterpriseData: demoEnterprise,
-            launchesCount: DEMO_LAUNCHES.length,
-            reviewsCount: DEMO_REVIEWS.length,
-            matchesCount: DEMO_MATCHES.length,
-            recentLaunches: DEMO_LAUNCHES.slice(0, 3),
-            recentReviews: DEMO_REVIEWS.slice(0, 3),
-          });
-        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (user || DEMO_MODE) {
+    if (user) {
       fetchDashboardData();
+    } else {
+      setIsLoading(false);
     }
   }, [user]);
 

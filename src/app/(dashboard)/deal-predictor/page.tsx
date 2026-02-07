@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_STARTUPS, DEMO_ENTERPRISES } from '@src/lib/demo-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -92,48 +91,14 @@ export default function DealPredictorPage() {
   }, [user]);
 
   const fetchUserData = async () => {
-    if (!user && !DEMO_MODE) return;
+    if (!user) return;
 
     try {
-      // Use demo data if DEMO_MODE is enabled
-      if (DEMO_MODE) {
-        setUserType('enterprise');
-        const demoEnterprise = DEMO_ENTERPRISES[0];
-        setUserProfile({
-          id: demoEnterprise.id,
-          company_name: demoEnterprise.company_name,
-          logo_url: demoEnterprise.logo_url,
-          industry: demoEnterprise.industry,
-          company_size: demoEnterprise.company_size,
-          headquarters: demoEnterprise.headquarters,
-          looking_for: demoEnterprise.looking_for,
-          budget_range: demoEnterprise.budget_range,
-        });
-        
-        // Set demo startups as potential partners
-        setPotentialPartners(DEMO_STARTUPS.map(s => ({
-          id: s.id,
-          name: s.name,
-          tagline: s.tagline,
-          logo_url: s.logo_url,
-          industry: s.industry,
-          stage: s.stage,
-          arr_range: s.arr_range,
-          team_size: s.team_size,
-          headquarters: s.headquarters,
-          credibility_score: s.credibility_score,
-          tech_stack: s.tech_stack,
-          use_cases: s.use_cases,
-        })));
-        setIsLoading(false);
-        return;
-      }
-
       // Check startup
       const { data: startup } = await supabase
         .from('startups')
         .select('*')
-        .eq('user_id', user!.id)
+        .eq('user_id', user.id)
         .single();
 
       if (startup) {
@@ -151,7 +116,7 @@ export default function DealPredictorPage() {
         const { data: enterprise } = await supabase
           .from('enterprises')
           .select('*')
-          .eq('user_id', user!.id)
+          .eq('user_id', user.id)
           .single();
 
         if (enterprise) {

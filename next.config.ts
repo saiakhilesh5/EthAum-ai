@@ -95,6 +95,11 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+
+  // Set turbopack root to fix lockfile warning
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;

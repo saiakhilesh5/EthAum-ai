@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_MATCHES } from '@src/lib/demo-data';
 import MatchCard from './match-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -82,17 +81,8 @@ export default function MatchList({
       }
 
       if (!profileId) {
-        // Fall back to demo data if no profile and DEMO_MODE enabled
-        if (DEMO_MODE) {
-          let demoData = [...DEMO_MATCHES] as any[];
-          if (status !== 'all') {
-            demoData = demoData.filter(m => m.status === status);
-          }
-          demoData = demoData.filter(m => m.match_score >= minScore);
-          setMatches(demoData);
-        } else {
-          setMatches([]);
-        }
+        // No profile found
+        setMatches([]);
         setIsLoading(false);
         return;
       }
@@ -145,37 +135,20 @@ export default function MatchList({
 
       if (error) throw error;
 
-      // Use real data if available, otherwise fall back to demo
-      if (data && data.length > 0) {
+      // Use data from database
+      if (data) {
         const formattedMatches = data.map((match: any) => ({
           ...match,
           startup: match.startups,
           enterprise: match.enterprises,
         }));
         setMatches(formattedMatches);
-      } else if (DEMO_MODE) {
-        // Fall back to demo data if empty
-        let demoData = [...DEMO_MATCHES] as any[];
-        if (status !== 'all') {
-          demoData = demoData.filter(m => m.status === status);
-        }
-        demoData = demoData.filter(m => m.match_score >= minScore);
-        setMatches(demoData);
       } else {
         setMatches([]);
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
-      // Fall back to demo data on error if DEMO_MODE enabled
-      if (DEMO_MODE) {
-        let demoData = [...DEMO_MATCHES] as any[];
-        if (status !== 'all') {
-          demoData = demoData.filter(m => m.status === status);
-        }
-        setMatches(demoData);
-      } else {
-        setMatches([]);
-      }
+      setMatches([]);
     } finally {
       setIsLoading(false);
     }

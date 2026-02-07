@@ -4,7 +4,6 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabase } from '@src/lib/db/supabase';
-import { DEMO_MODE, DEMO_STARTUPS, DEMO_LAUNCHES, DEMO_REVIEWS, DEMO_CREDIBILITY_SCORE } from '@src/lib/demo-data';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -63,8 +62,8 @@ interface Launch {
   id: string;
   title: string;
   tagline: string;
-  total_upvotes: number;
-  launched_at: string;
+  upvote_count: number;
+  launch_date: string;
   is_featured: boolean;
 }
 
@@ -107,46 +106,15 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
   }, [resolvedParams.id]);
 
   const fetchStartup = async () => {
-    // Check for demo data first
-    if (DEMO_MODE) {
-      const demoStartup = DEMO_STARTUPS.find(s => s.slug === resolvedParams.id || s.id === resolvedParams.id);
-      if (demoStartup) {
-        setStartup(demoStartup as any);
-        setLaunches(DEMO_LAUNCHES.filter(l => l.startup_id === demoStartup.id) as any[]);
-        setReviews(DEMO_REVIEWS.filter(r => r.startup_id === demoStartup.id).map(r => ({
-          ...r,
-          users: { full_name: r.reviewer.full_name, avatar_url: r.reviewer.avatar_url },
-          enterprises: { company_name: r.reviewer.company },
-        })) as any[]);
-        setCredibility(DEMO_CREDIBILITY_SCORE);
-        setIsLoading(false);
-        return;
-      }
-    }
-
     try {
       // Fetch startup details
       const { data: startupData, error: startupError } = await supabase
         .from('startups')
         .select('*')
-        .eq('slug', resolvedParams.id)
+        .or(`slug.eq.${resolvedParams.id},id.eq.${resolvedParams.id}`)
         .single();
 
       if (startupError || !startupData) {
-        // Try to find in demo data as fallback
-        const demoStartup = DEMO_STARTUPS.find(s => s.slug === resolvedParams.id || s.id === resolvedParams.id);
-        if (demoStartup) {
-          setStartup(demoStartup as any);
-          setLaunches(DEMO_LAUNCHES.filter(l => l.startup_id === demoStartup.id) as any[]);
-          setReviews(DEMO_REVIEWS.filter(r => r.startup_id === demoStartup.id).map(r => ({
-            ...r,
-            users: { full_name: r.reviewer.full_name, avatar_url: r.reviewer.avatar_url },
-            enterprises: { company_name: r.reviewer.company },
-          })) as any[]);
-          setCredibility(DEMO_CREDIBILITY_SCORE);
-          setIsLoading(false);
-          return;
-        }
         notFound();
         return;
       }
@@ -156,9 +124,9 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
       // Fetch launches
       const { data: launchesData } = await supabase
         .from('launches')
-        .select('id, title, tagline, total_upvotes, launched_at, is_featured')
+        .select('id, title, tagline, upvote_count, launch_date, is_featured')
         .eq('startup_id', startupData.id)
-        .order('launched_at', { ascending: false })
+        .order('launch_date', { ascending: false })
         .limit(5);
 
       setLaunches(launchesData || []);
@@ -174,9 +142,7 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
           pros,
           cons,
           is_verified,
-          created_at,
-          users (full_name, avatar_url),
-          enterprises (company_name)
+          created_at
         `)
         .eq('startup_id', startupData.id)
         .order('created_at', { ascending: false })
@@ -184,20 +150,17 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
 
       setReviews((reviewsData as unknown as Review[]) || []);
 
-      // Fetch credibility score
-      const { data: credibilityData } = await supabase
-        .from('credibility_scores')
-        .select('*')
-        .eq('startup_id', startupData.id)
-        .single();
-
-      setCredibility(credibilityData || DEMO_CREDIBILITY_SCORE);
+      // Calculate credibility score from startup data
+      setCredibility({
+        overall_score: startupData.credibility_score || 75,
+        review_score: Math.min(100, (startupData.total_reviews || 0) * 5 + 50),
+        verification_score: startupData.is_verified ? 100 : 50,
+        engagement_score: Math.min(100, (startupData.total_upvotes || 0) / 5 + 40),
+        longevity_score: 70,
+      });
     } catch (error) {
       console.error('Error fetching startup:', error);
-      // Fall back to demo data
-      const demoStartup = DEMO_STARTUPS[0];
-      setStartup(demoStartup as any);
-      setCredibility(DEMO_CREDIBILITY_SCORE);
+      notFound();
     } finally {
       setIsLoading(false);
     }
@@ -442,13 +405,13 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
                                 </div>
                                 <p className="text-sm text-muted-foreground">{launch.tagline}</p>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                  Launched {new Date(launch.launched_at).toLocaleDateString()}
+                                  Launched {new Date(launch.launch_date).toLocaleDateString()}
                                 </p>
                               </div>
                               <div className="text-center">
                                 <div className="flex items-center gap-1 text-primary">
                                   <ThumbsUp className="w-5 h-5" />
-                                  <span className="font-bold">{launch.total_upvotes}</span>
+                                  <span className="font-bold">{launch.upvote_count}</span>
                                 </div>
                               </div>
                             </div>
