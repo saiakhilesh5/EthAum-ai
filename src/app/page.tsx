@@ -239,38 +239,38 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-16 md:py-24">
+        <section className="relative overflow-hidden py-10 sm:py-16 md:py-24">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
-          <div className="container relative">
+          <div className="container relative px-4 sm:px-6">
             <div className="mx-auto max-w-4xl text-center">
-              <Badge variant="secondary" className="mb-4">
+              <Badge variant="secondary" className="mb-3 sm:mb-4 text-xs sm:text-sm">
                 <Zap className="mr-1 h-3 w-3" />
                 Replacing Gartner/G2 with AI
               </Badge>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
                 AI Credibility Scoring for{' '}
                 <span className="text-primary">Enterprise-Ready Startups</span>
               </h1>
-              <p className="mt-6 text-base text-muted-foreground md:text-lg max-w-2xl mx-auto">
+              <p className="mt-4 sm:mt-6 text-sm sm:text-base text-muted-foreground md:text-lg max-w-2xl mx-auto px-2">
                 Launch products → Collect verified reviews → Build AI credibility score → 
-                Get matched with enterprise buyers. The complete journey from startup to enterprise deal.
+                Get matched with enterprise buyers.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button size="lg" asChild>
+              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0">
+                <Button size="lg" className="w-full sm:w-auto" asChild>
                   <Link href="/demo">
                     <Play className="mr-2 h-4 w-4" />
                     Try Interactive Demo
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
                   <Link href="/register/startup">
                     Launch Your Startup
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">
-                <Shield className="inline w-4 h-4 mr-1" />
+              <p className="mt-4 text-xs sm:text-sm text-muted-foreground">
+                <Shield className="inline w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 AI-powered credibility • Real-time validation • Enterprise matchmaking
               </p>
             </div>
@@ -278,13 +278,15 @@ export default function HomePage() {
         </section>
 
         {/* Demo Banner */}
-        <section className="py-4 bg-gradient-to-r from-purple-600 via-pink-500 to-red-500">
-          <div className="container">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-white">
-              <Sparkles className="w-5 h-5 animate-pulse" />
-              <p className="text-lg font-semibold text-center">
-                🎉 NEW: Try our interactive demo - No signup required!
-              </p>
+        <section className="py-3 sm:py-4 bg-gradient-to-r from-purple-600 via-pink-500 to-red-500">
+          <div className="container px-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-white">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+                <p className="text-sm sm:text-lg font-semibold text-center">
+                  🎉 Try our interactive demo!
+                </p>
+              </div>
               <Button size="sm" variant="secondary" asChild>
                 <Link href="/demo">Launch Demo →</Link>
               </Button>
@@ -293,24 +295,25 @@ export default function HomePage() {
         </section>
 
         {/* Video & Demo CTA Section */}
-        <section className="py-8 border-y bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
-          <div className="container">
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-              <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">See It In Action</h3>
-                <Button size="lg" variant="default" asChild>
+        <section className="py-6 sm:py-8 border-y bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+          <div className="container px-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+              <div className="text-center w-full sm:w-auto">
+                <h3 className="text-base sm:text-xl font-semibold mb-2">See It In Action</h3>
+                <Button size="default" className="w-full sm:w-auto" variant="default" asChild>
                   <a href="https://youtu.be/YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer">
-                    <Play className="mr-2 h-5 w-5" />
+                    <Play className="mr-2 h-4 w-4" />
                     Watch 2-Min Demo
                   </a>
                 </Button>
               </div>
-              <div className="hidden md:block w-px h-16 bg-border" />
-              <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">Try It Yourself</h3>
-                <Button size="lg" variant="outline" asChild>
+              <div className="hidden sm:block w-px h-12 bg-border" />
+              <div className="block sm:hidden w-full h-px bg-border" />
+              <div className="text-center w-full sm:w-auto">
+                <h3 className="text-base sm:text-xl font-semibold mb-2">Try It Yourself</h3>
+                <Button size="default" className="w-full sm:w-auto" variant="outline" asChild>
                   <Link href="/demo">
-                    <Sparkles className="mr-2 h-5 w-5" />
+                    <Sparkles className="mr-2 h-4 w-4" />
                     Interactive Demo
                   </Link>
                 </Button>
@@ -320,62 +323,58 @@ export default function HomePage() {
         </section>
 
         {/* Journey Section */}
-        <section className="border-y bg-primary/5 py-12">
-          <div className="container">
-            <div className="text-center mb-8">
-              <Badge variant="outline" className="mb-4">The EthAum Journey</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">From Launch to Enterprise Deal</h2>
+        <section className="border-y bg-primary/5 py-8 sm:py-12">
+          <div className="container px-4">
+            <div className="text-center mb-6 sm:mb-8">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs">The EthAum Journey</Badge>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">From Launch to Enterprise Deal</h2>
             </div>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">1</div>
-                <Rocket className="w-6 h-6 mt-3 text-primary" />
-                <p className="font-semibold mt-2">Launch</p>
-                <p className="text-xs text-muted-foreground">Product launches</p>
+            <div className="flex flex-row flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-8">
+              <div className="flex flex-col items-center text-center w-16 sm:w-20">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-primary text-white flex items-center justify-center text-lg sm:text-xl md:text-2xl font-bold">1</div>
+                <Rocket className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mt-2 text-primary" />
+                <p className="font-semibold mt-1 text-xs sm:text-sm md:text-base">Launch</p>
               </div>
-              <ArrowRight className="hidden md:block w-8 h-8 text-primary" />
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">2</div>
-                <Star className="w-6 h-6 mt-3 text-yellow-500" />
-                <p className="font-semibold mt-2">Reviews</p>
-                <p className="text-xs text-muted-foreground">Verified feedback</p>
+              <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary flex-shrink-0" />
+              <div className="flex flex-col items-center text-center w-16 sm:w-20">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-primary text-white flex items-center justify-center text-lg sm:text-xl md:text-2xl font-bold">2</div>
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mt-2 text-yellow-500" />
+                <p className="font-semibold mt-1 text-xs sm:text-sm md:text-base">Reviews</p>
               </div>
-              <ArrowRight className="hidden md:block w-8 h-8 text-primary" />
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">3</div>
-                <BarChart3 className="w-6 h-6 mt-3 text-green-500" />
-                <p className="font-semibold mt-2">Credibility</p>
-                <p className="text-xs text-muted-foreground">AI-computed score</p>
+              <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary flex-shrink-0" />
+              <div className="flex flex-col items-center text-center w-16 sm:w-20">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-primary text-white flex items-center justify-center text-lg sm:text-xl md:text-2xl font-bold">3</div>
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mt-2 text-green-500" />
+                <p className="font-semibold mt-1 text-xs sm:text-sm md:text-base">Score</p>
               </div>
-              <ArrowRight className="hidden md:block w-8 h-8 text-primary" />
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-green-500 text-white flex items-center justify-center text-2xl font-bold">4</div>
-                <Handshake className="w-6 h-6 mt-3 text-purple-500" />
-                <p className="font-semibold mt-2">Enterprise Deal</p>
-                <p className="text-xs text-muted-foreground">AI matchmaking</p>
+              <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary flex-shrink-0" />
+              <div className="flex flex-col items-center text-center w-16 sm:w-20">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-green-500 text-white flex items-center justify-center text-lg sm:text-xl md:text-2xl font-bold">4</div>
+                <Handshake className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mt-2 text-purple-500" />
+                <p className="font-semibold mt-1 text-xs sm:text-sm md:text-base">Deal</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* LIVE: Trending Launches Section */}
-        <section className="py-12 md:py-16">
-          <div className="container">
-            <div className="flex items-center justify-between mb-8">
+        <section className="py-8 sm:py-12 md:py-16">
+          <div className="container px-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge className="bg-red-500 text-white animate-pulse">🔴 LIVE</Badge>
-                  <h2 className="text-2xl md:text-3xl font-bold">Trending Launches Today</h2>
+                <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                  <Badge className="bg-red-500 text-white animate-pulse text-xs">🔴 LIVE</Badge>
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Trending Launches</h2>
                 </div>
-                <p className="text-muted-foreground">Real startups getting real traction right now</p>
+                <p className="text-sm text-muted-foreground">Real startups getting real traction</p>
               </div>
-              <Button variant="outline" asChild>
+              <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
                 <Link href="/explore">View All</Link>
               </Button>
             </div>
             
             {loading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {[1, 2, 3].map((i) => (
                   <Card key={i}>
                     <CardContent className="p-6">
@@ -392,25 +391,25 @@ export default function HomePage() {
                 ))}
               </div>
             ) : homeData?.launches && homeData.launches.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {homeData.launches.slice(0, 3).map((launch, index) => (
                   <Card key={launch.id} className="hover:shadow-lg transition-all group">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="text-4xl">{index === 0 ? '🚀' : index === 1 ? '⚡' : '🔥'}</div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold group-hover:text-primary transition-colors">{launch.title}</h3>
-                            {launch.is_featured && <Badge className="bg-yellow-500 text-white text-xs">Featured</Badge>}
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="text-2xl sm:text-4xl">{index === 0 ? '🚀' : index === 1 ? '⚡' : '🔥'}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold text-sm sm:text-base group-hover:text-primary transition-colors truncate">{launch.title}</h3>
+                            {launch.is_featured && <Badge className="bg-yellow-500 text-white text-[10px] sm:text-xs">Featured</Badge>}
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">{launch.tagline}</p>
-                          <div className="flex items-center gap-4 mt-4">
-                            <span className="flex items-center gap-1 text-primary font-semibold">
-                              <ThumbsUp className="w-4 h-4" />
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">{launch.tagline}</p>
+                          <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
+                            <span className="flex items-center gap-1 text-primary font-semibold text-sm">
+                              <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4" />
                               {index === 0 ? liveUpvotes : launch.upvote_count}
                             </span>
-                            <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                              <MessageSquare className="w-4 h-4" />
+                            <span className="flex items-center gap-1 text-muted-foreground text-xs sm:text-sm">
+                              <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
                               {launch.comment_count}
                             </span>
                           </div>
@@ -434,36 +433,36 @@ export default function HomePage() {
         </section>
 
         {/* LIVE: Activity Feed + Top Startups */}
-        <section className="py-12 bg-muted/30">
-          <div className="container">
-            <div className="grid lg:grid-cols-3 gap-8">
+        <section className="py-8 sm:py-12 bg-muted/30">
+          <div className="container px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {/* Live Activity Feed */}
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 order-2 lg:order-1">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                       Live Activity
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {recentActivity.map((activity, i) => (
-                      <div key={i} className="flex items-start gap-3 text-sm">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  <CardContent className="space-y-3 sm:space-y-4">
+                    {recentActivity.slice(0, 4).map((activity, i) => (
+                      <div key={i} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm">
+                        <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                           activity.type === 'upvote' ? 'bg-green-100 text-green-600' :
                           activity.type === 'review' ? 'bg-yellow-100 text-yellow-600' :
                           activity.type === 'match' ? 'bg-purple-100 text-purple-600' :
                           'bg-blue-100 text-blue-600'
                         }`}>
-                          {activity.type === 'upvote' && <ThumbsUp className="w-4 h-4" />}
-                          {activity.type === 'review' && <Star className="w-4 h-4" />}
-                          {activity.type === 'match' && <Handshake className="w-4 h-4" />}
-                          {activity.type === 'launch' && <Rocket className="w-4 h-4" />}
+                          {activity.type === 'upvote' && <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4" />}
+                          {activity.type === 'review' && <Star className="w-3 h-3 sm:w-4 sm:h-4" />}
+                          {activity.type === 'match' && <Handshake className="w-3 h-3 sm:w-4 sm:h-4" />}
+                          {activity.type === 'launch' && <Rocket className="w-3 h-3 sm:w-4 sm:h-4" />}
                         </div>
-                        <div className="flex-1">
-                          <p><span className="font-medium">{activity.user}</span> {activity.action} <span className="text-primary">{activity.target}</span></p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {activity.time}
+                        <div className="flex-1 min-w-0">
+                          <p className="truncate"><span className="font-medium">{activity.user}</span> {activity.action} <span className="text-primary">{activity.target}</span></p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> {activity.time}
                           </p>
                         </div>
                       </div>
@@ -473,72 +472,71 @@ export default function HomePage() {
               </div>
 
               {/* Top Rated Startups */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 order-1 lg:order-2">
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Award className="w-5 h-5 text-yellow-500" />
-                      Top Rated Enterprise-Ready Startups
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+                      Top Enterprise-Ready Startups
                     </CardTitle>
-                    <CardDescription>Highest credibility scores this month</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">Highest credibility scores this month</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {loading ? (
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {[1, 2, 3, 4, 5].map((i) => (
-                          <div key={i} className="flex items-center gap-4 p-3">
-                            <Skeleton className="w-8 h-8 rounded-full" />
-                            <Skeleton className="w-10 h-10 rounded-full" />
-                            <div className="flex-1 space-y-2">
-                              <Skeleton className="h-4 w-1/3" />
-                              <Skeleton className="h-3 w-2/3" />
+                          <div key={i} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3">
+                            <Skeleton className="w-6 h-6 sm:w-8 sm:h-8 rounded-full" />
+                            <Skeleton className="w-8 h-8 sm:w-10 sm:h-10 rounded-full" />
+                            <div className="flex-1 space-y-1 sm:space-y-2">
+                              <Skeleton className="h-3 sm:h-4 w-1/3" />
+                              <Skeleton className="h-2 sm:h-3 w-2/3" />
                             </div>
-                            <Skeleton className="h-6 w-16" />
+                            <Skeleton className="h-5 sm:h-6 w-12 sm:w-16" />
                           </div>
                         ))}
                       </div>
                     ) : homeData?.startups && homeData.startups.length > 0 ? (
-                      <div className="space-y-4">
-                        {homeData.startups.map((startup, index) => (
-                          <div key={startup.id} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
+                      <div className="space-y-2 sm:space-y-4">
+                        {homeData.startups.slice(0, 5).map((startup, index) => (
+                          <div key={startup.id} className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                            <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-white text-xs sm:text-sm flex-shrink-0 ${
                               index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-amber-600' : 'bg-primary'
                             }`}>
                               {index + 1}
                             </div>
-                            <Avatar className="h-10 w-10">
+                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                               <AvatarImage src={startup.logo_url || ''} />
-                              <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                              <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs sm:text-sm">
                                 {startup.name.substring(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{startup.name}</p>
-                                {startup.is_verified && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1 sm:gap-2">
+                                <p className="font-medium text-sm sm:text-base truncate">{startup.name}</p>
+                                {startup.is_verified && <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />}
                               </div>
-                              <p className="text-sm text-muted-foreground">{startup.tagline}</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground truncate">{startup.tagline}</p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-right flex-shrink-0">
                               <div className="flex items-center gap-1">
-                                <Shield className="w-4 h-4 text-green-500" />
-                                <span className="font-bold text-green-600">{startup.credibility_score}</span>
+                                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+                                <span className="font-bold text-green-600 text-sm sm:text-base">{startup.credibility_score}</span>
                               </div>
-                              <p className="text-xs text-muted-foreground">Credibility</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8">
-                        <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No startups registered yet.</p>
-                        <Button className="mt-4" asChild>
+                      <div className="text-center py-6 sm:py-8">
+                        <Users className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+                        <p className="text-sm sm:text-base text-muted-foreground">No startups registered yet.</p>
+                        <Button className="mt-3 sm:mt-4" size="sm" asChild>
                           <Link href="/register/startup">Be the First</Link>
                         </Button>
                       </div>
                     )}
-                    <Button variant="outline" className="w-full mt-4" asChild>
+                    <Button variant="outline" className="w-full mt-3 sm:mt-4" size="sm" asChild>
                       <Link href="/explore">Explore All Startups</Link>
                     </Button>
                   </CardContent>
@@ -551,34 +549,34 @@ export default function HomePage() {
         {/* Competitor Comparison Table */}
         <section className="py-12 md:py-16">
           <div className="container">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 md:mb-12">
               <Badge variant="outline" className="mb-4">Why EthAum.ai</Badge>
               <h2 className="text-2xl md:text-3xl font-bold">EthAum.ai vs. Competitors</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
                 The only platform combining Product Hunt launches, G2 reviews, Gartner insights, and AppSumo deals
               </p>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <table className="w-full border-collapse min-w-[640px]">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-4 font-medium">Feature</th>
-                    <th className="p-4 text-center bg-primary/10 font-bold text-primary">EthAum.ai</th>
-                    <th className="p-4 text-center">Product Hunt</th>
-                    <th className="p-4 text-center">G2</th>
-                    <th className="p-4 text-center">Gartner</th>
-                    <th className="p-4 text-center">AppSumo</th>
+                    <th className="text-left p-3 md:p-4 font-medium text-sm">Feature</th>
+                    <th className="p-3 md:p-4 text-center bg-primary/10 font-bold text-primary text-sm">EthAum.ai</th>
+                    <th className="p-3 md:p-4 text-center text-sm">Product Hunt</th>
+                    <th className="p-3 md:p-4 text-center text-sm">G2</th>
+                    <th className="p-3 md:p-4 text-center text-sm">Gartner</th>
+                    <th className="p-3 md:p-4 text-center text-sm">AppSumo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {competitorComparison.map((row) => (
                     <tr key={row.feature} className="border-b hover:bg-muted/30">
-                      <td className="p-4 font-medium">{row.feature}</td>
-                      <td className="p-4 text-center bg-primary/5">{renderCheckmark(row.ethaum)}</td>
-                      <td className="p-4 text-center">{renderCheckmark(row.productHunt)}</td>
-                      <td className="p-4 text-center">{renderCheckmark(row.g2)}</td>
-                      <td className="p-4 text-center">{renderCheckmark(row.gartner)}</td>
-                      <td className="p-4 text-center">{renderCheckmark(row.appsumo)}</td>
+                      <td className="p-3 md:p-4 font-medium text-sm">{row.feature}</td>
+                      <td className="p-3 md:p-4 text-center bg-primary/5">{renderCheckmark(row.ethaum)}</td>
+                      <td className="p-3 md:p-4 text-center">{renderCheckmark(row.productHunt)}</td>
+                      <td className="p-3 md:p-4 text-center">{renderCheckmark(row.g2)}</td>
+                      <td className="p-3 md:p-4 text-center">{renderCheckmark(row.gartner)}</td>
+                      <td className="p-3 md:p-4 text-center">{renderCheckmark(row.appsumo)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -869,13 +867,13 @@ export default function HomePage() {
                     <div className="text-2xl font-bold text-primary">{homeData?.stats.total_enterprises || 0}+</div>
                     <div className="text-xs text-muted-foreground">Enterprise Buyers</div>
                   </Card>
-                  <Card className="p-4 text-center bg-white/50 dark:bg-white/5">
-                    <div className="text-2xl font-bold text-primary">{homeData?.stats.total_matches || 0}+</div>
-                    <div className="text-xs text-muted-foreground">AI Matches</div>
+                  <Card className="p-3 sm:p-4 text-center bg-white/50 dark:bg-white/5">
+                    <div className="text-xl sm:text-2xl font-bold text-primary">{homeData?.stats.total_matches || 0}+</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">AI Matches</div>
                   </Card>
-                  <Card className="p-4 text-center bg-white/50 dark:bg-white/5 col-span-2 md:col-span-1">
-                    <div className="text-2xl font-bold text-green-500">{homeData?.stats.platform_growth || '+0%'}</div>
-                    <div className="text-xs text-muted-foreground">Growth This Quarter</div>
+                  <Card className="p-3 sm:p-4 text-center bg-white/50 dark:bg-white/5 col-span-2 sm:col-span-1">
+                    <div className="text-xl sm:text-2xl font-bold text-green-500">{homeData?.stats.platform_growth || '+0%'}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">Growth This Quarter</div>
                   </Card>
                 </>
               )}
@@ -884,28 +882,30 @@ export default function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-primary text-primary-foreground">
-          <div className="container text-center">
-            <h2 className="text-2xl md:text-3xl font-bold">Ready to Launch Your Startup?</h2>
-            <p className="mt-4 text-lg opacity-90 max-w-2xl mx-auto">
-              Join hundreds of startups already growing with EthAum.ai. Get started in minutes, no credit card required.
+        <section className="py-10 sm:py-16 bg-primary text-primary-foreground">
+          <div className="container px-4 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Ready to Launch Your Startup?</h2>
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg opacity-90 max-w-2xl mx-auto">
+              Join hundreds of startups growing with EthAum.ai. Get started in minutes.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" variant="secondary" asChild>
+            <div className="mt-6 sm:mt-8 flex flex-col items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto" asChild>
                 <Link href="/demo">
                   <Play className="mr-2 h-4 w-4" />
                   Try Demo First
                 </Link>
               </Button>
-              <Button size="lg" variant="secondary" asChild>
-                <Link href="/register/startup">
-                  I&apos;m a Startup
-                  <Rocket className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-                <Link href="/register/enterprise">I&apos;m an Enterprise Buyer</Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+                <Button size="lg" variant="secondary" className="w-full sm:w-auto" asChild>
+                  <Link href="/register/startup">
+                    I&apos;m a Startup
+                    <Rocket className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+                  <Link href="/register/enterprise">I&apos;m an Enterprise</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

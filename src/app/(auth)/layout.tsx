@@ -20,26 +20,26 @@ export default function AuthLayout({
         </Link>
 
         <div className="space-y-6">
-          <h1 className="text-4xl font-bold text-primary-foreground">
+          <h1 className="text-3xl lg:text-4xl font-bold text-primary-foreground">
             Launch, Validate & Grow Your Startup
           </h1>
-          <p className="text-lg text-primary-foreground/80">
+          <p className="text-base lg:text-lg text-primary-foreground/80">
             Join the AI-powered marketplace trusted by hundreds of Series A to D
             startups. Get discovered by enterprise buyers, collect verified
             reviews, and accelerate your growth.
           </p>
-          <div className="flex items-center space-x-8 text-primary-foreground/80">
+          <div className="flex items-center justify-start space-x-6 lg:space-x-8 text-primary-foreground/80">
             <div>
-              <div className="text-3xl font-bold text-primary-foreground">500+</div>
-              <div className="text-sm">Startups</div>
+              <div className="text-2xl lg:text-3xl font-bold text-primary-foreground">500+</div>
+              <div className="text-xs lg:text-sm">Startups</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary-foreground">10K+</div>
-              <div className="text-sm">Reviews</div>
+              <div className="text-2xl lg:text-3xl font-bold text-primary-foreground">10K+</div>
+              <div className="text-xs lg:text-sm">Reviews</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary-foreground">$2.5M+</div>
-              <div className="text-sm">Deals Made</div>
+              <div className="text-2xl lg:text-3xl font-bold text-primary-foreground">$2.5M+</div>
+              <div className="text-xs lg:text-sm">Deals Made</div>
             </div>
           </div>
         </div>

@@ -30,8 +30,8 @@ const footerLinks = {
 export function Footer() {
   return (
     <footer className="border-t bg-background">
-      <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="container py-8 md:py-12 lg:py-16">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 md:gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
@@ -115,11 +115,11 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-center">
+          <p className="text-xs md:text-sm text-muted-foreground">
             © {new Date().getFullYear()} EthAum.ai. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs md:text-sm text-muted-foreground">
             Built with ❤️ for the startup ecosystem
           </p>
         </div>
