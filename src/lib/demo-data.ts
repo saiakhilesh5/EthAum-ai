@@ -422,6 +422,29 @@ export const DEMO_AI_INSIGHTS = {
       { theme: 'Features', sentiment: 0.78, mentions: 28 },
     ],
   },
+  market_position: {
+    quadrant: 'Leader',
+    analysis: 'Based on our AI analysis of 500+ enterprise SaaS companies, NeuralFlow AI positions in the Leader quadrant with strong market presence and high growth trajectory.',
+    market_readiness: 92,
+    growth_potential: 88,
+  },
+  deal_predictor: {
+    probability: 84,
+    time_to_close: '45-60 days',
+    confidence: 92,
+    estimated_value: 125000,
+    key_factors: [
+      { factor: 'Enterprise Interest', score: 95, trend: 'up' },
+      { factor: 'Review Sentiment', score: 87, trend: 'stable' },
+      { factor: 'Market Timing', score: 82, trend: 'up' },
+    ],
+  },
+  recommendations: [
+    { action: 'Add more case studies', impact: 'Enterprise buyers value proven results - high impact on credibility', priority: 'high' },
+    { action: 'Improve response time', impact: 'Current avg: 4hrs, target: 2hrs - moderate impact on reviews', priority: 'medium' },
+    { action: 'Launch a new feature update', impact: 'Keep momentum with regular releases - builds engagement', priority: 'low' },
+    { action: 'Request more verified reviews', impact: 'Target 5 more from F500 customers - high impact on score', priority: 'high' },
+  ],
 };
 
 // Demo Credibility Score
@@ -437,6 +460,7 @@ export const DEMO_CREDIBILITY_SCORE = {
     engagement: { score: 82, weight: 0.25, description: 'Active community engagement' },
     longevity: { score: 88, weight: 0.15, description: 'Consistent growth over 2 years' },
   },
+  ai_recommendation: 'Your credibility score is excellent! Focus on collecting 10 more verified enterprise reviews to break into the 90+ range and unlock premium matchmaking.',
   improvements: [
     'Get 10 more verified reviews to boost review score',
     'Increase launch frequency to improve engagement',

@@ -30,6 +30,10 @@ import {
   BarChart3,
   ChevronRight,
   Sparkles,
+  Trophy,
+  Medal,
+  Crown,
+  Flame,
 } from 'lucide-react';
 
 interface Startup {
@@ -324,6 +328,112 @@ export default function ExplorePage() {
             </div>
           </div>
         )}
+
+        {/* Leaderboard Section */}
+        <div className="mb-8 md:mb-12 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl p-6">
+          <h2 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-2">
+            <Trophy className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
+            Weekly Leaderboard
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
+              <Flame className="w-3 h-3 mr-1" />
+              Hot
+            </Badge>
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Top Credibility */}
+            <Card className="bg-white/80 dark:bg-background/80 backdrop-blur">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Medal className="w-4 h-4 text-green-500" />
+                  Highest Credibility Score
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {[...startups].sort((a, b) => b.credibility_score - a.credibility_score).slice(0, 3).map((startup, index) => (
+                  <Link key={startup.id} href={`/startups/${startup.slug}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
+                      index === 0 ? 'bg-yellow-500 text-white' : 
+                      index === 1 ? 'bg-gray-400 text-white' : 
+                      'bg-amber-600 text-white'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={startup.logo_url || ''} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                        {startup.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-sm flex-1 truncate">{startup.name}</span>
+                    <Badge className="bg-green-500 text-white text-xs">{startup.credibility_score}</Badge>
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Most Reviews */}
+            <Card className="bg-white/80 dark:bg-background/80 backdrop-blur">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  Most Reviewed
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {[...startups].sort((a, b) => b.total_reviews - a.total_reviews).slice(0, 3).map((startup, index) => (
+                  <Link key={startup.id} href={`/startups/${startup.slug}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
+                      index === 0 ? 'bg-yellow-500 text-white' : 
+                      index === 1 ? 'bg-gray-400 text-white' : 
+                      'bg-amber-600 text-white'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={startup.logo_url || ''} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                        {startup.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-sm flex-1 truncate">{startup.name}</span>
+                    <Badge variant="outline" className="text-xs">{startup.total_reviews} reviews</Badge>
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Trending Upvotes */}
+            <Card className="bg-white/80 dark:bg-background/80 backdrop-blur">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  Trending Upvotes
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {[...startups].sort((a, b) => b.total_upvotes - a.total_upvotes).slice(0, 3).map((startup, index) => (
+                  <Link key={startup.id} href={`/startups/${startup.slug}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
+                      index === 0 ? 'bg-yellow-500 text-white' : 
+                      index === 1 ? 'bg-gray-400 text-white' : 
+                      'bg-amber-600 text-white'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={startup.logo_url || ''} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                        {startup.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-sm flex-1 truncate">{startup.name}</span>
+                    <Badge variant="outline" className="text-xs">▲ {startup.total_upvotes}</Badge>
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
         {/* Filters */}
         <div className="flex flex-col gap-3 md:gap-4 mb-6 md:mb-8">
