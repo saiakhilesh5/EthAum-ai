@@ -257,15 +257,15 @@ export default function HomePage() {
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="lg" asChild>
-                  <Link href="/register/startup">
-                    Launch Your Startup
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Link href="/demo">
+                    <Play className="mr-2 h-4 w-4" />
+                    Try Interactive Demo
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/explore">
-                    <Play className="mr-2 h-4 w-4" />
-                    Explore Startups
+                  <Link href="/register/startup">
+                    Launch Your Startup
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -273,6 +273,48 @@ export default function HomePage() {
                 <Shield className="inline w-4 h-4 mr-1" />
                 AI-powered credibility • Real-time validation • Enterprise matchmaking
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Demo Banner */}
+        <section className="py-4 bg-gradient-to-r from-purple-600 via-pink-500 to-red-500">
+          <div className="container">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-white">
+              <Sparkles className="w-5 h-5 animate-pulse" />
+              <p className="text-lg font-semibold text-center">
+                🎉 NEW: Try our interactive demo - No signup required!
+              </p>
+              <Button size="sm" variant="secondary" asChild>
+                <Link href="/demo">Launch Demo →</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Video & Demo CTA Section */}
+        <section className="py-8 border-y bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+          <div className="container">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-2">See It In Action</h3>
+                <Button size="lg" variant="default" asChild>
+                  <a href="https://youtu.be/YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer">
+                    <Play className="mr-2 h-5 w-5" />
+                    Watch 2-Min Demo
+                  </a>
+                </Button>
+              </div>
+              <div className="hidden md:block w-px h-16 bg-border" />
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-2">Try It Yourself</h3>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/demo">
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Interactive Demo
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -849,6 +891,12 @@ export default function HomePage() {
               Join hundreds of startups already growing with EthAum.ai. Get started in minutes, no credit card required.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/demo">
+                  <Play className="mr-2 h-4 w-4" />
+                  Try Demo First
+                </Link>
+              </Button>
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/register/startup">
                   I&apos;m a Startup
