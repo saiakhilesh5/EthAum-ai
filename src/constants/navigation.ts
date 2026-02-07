@@ -23,24 +23,26 @@ export const STARTUP_NAV_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    title: 'My Launches',
+    title: 'Product Launches',
     href: '/launches',
     icon: Rocket,
   },
   {
-    title: 'Reviews',
+    title: 'Enterprise Reviews',
     href: '/reviews',
     icon: Star,
   },
   {
-    title: 'Insights',
+    title: 'Credibility Signals',
     href: '/insights',
     icon: BarChart3,
+    badge: 'AI',
   },
   {
-    title: 'Matchmaking',
+    title: 'Enterprise Matches',
     href: '/matchmaking',
     icon: Handshake,
+    badge: 'AI',
   },
   {
     title: 'Pitch Analyzer',
@@ -73,17 +75,18 @@ export const ENTERPRISE_NAV_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Explore Startups',
+    title: 'Enterprise-Ready Startups',
     href: '/explore',
     icon: Compass,
   },
   {
-    title: 'Matches',
+    title: 'AI Matches',
     href: '/matchmaking',
     icon: Handshake,
+    badge: 'AI',
   },
   {
-    title: 'Compare Tool',
+    title: 'Startup Compare',
     href: '/compare',
     icon: Scale,
     badge: 'AI',

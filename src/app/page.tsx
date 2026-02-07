@@ -106,15 +106,15 @@ export default function HomePage() {
             <div className="mx-auto max-w-4xl text-center">
               <Badge variant="secondary" className="mb-4">
                 <Zap className="mr-1 h-3 w-3" />
-                AI-Powered SaaS Marketplace
+                Replacing Gartner/G2 with AI
               </Badge>
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                Launch, Validate &{' '}
-                <span className="text-primary">Grow Your Startup</span>
+                AI Credibility Scoring for{' '}
+                <span className="text-primary">Enterprise-Ready Startups</span>
               </h1>
               <p className="mt-6 text-lg text-muted-foreground md:text-xl max-w-2xl mx-auto">
-                The all-in-one platform combining Product Hunt launches, G2 reviews,
-                Gartner insights, and AppSumo deals. Built for Series A to D startups.
+                Launch products → Collect verified reviews → Build AI credibility score → 
+                Get matched with enterprise buyers. The complete journey from startup to enterprise deal.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="lg" asChild>
@@ -125,9 +125,54 @@ export default function HomePage() {
                 </Button>
                 <Button size="lg" variant="outline" asChild>
                   <Link href="/register/enterprise">
-                    Find Startups to Partner
+                    I'm an Enterprise Buyer
                   </Link>
                 </Button>
+              </div>
+              <p className="mt-6 text-sm text-muted-foreground">
+                <Shield className="inline w-4 h-4 mr-1" />
+                AI-powered credibility analysis • Real-time market validation • Enterprise matchmaking
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Journey Section - NEW */}
+        <section className="border-y bg-primary/5 py-16">
+          <div className="container">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="mb-4">The EthAum Journey</Badge>
+              <h2 className="text-2xl md:text-3xl font-bold">
+                From Launch to Enterprise Deal
+              </h2>
+            </div>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">1</div>
+                <Rocket className="w-6 h-6 mt-3 text-primary" />
+                <p className="font-semibold mt-2">Launch</p>
+                <p className="text-xs text-muted-foreground">Product launches</p>
+              </div>
+              <ArrowRight className="hidden md:block w-8 h-8 text-primary" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">2</div>
+                <Star className="w-6 h-6 mt-3 text-yellow-500" />
+                <p className="font-semibold mt-2">Reviews</p>
+                <p className="text-xs text-muted-foreground">Verified feedback</p>
+              </div>
+              <ArrowRight className="hidden md:block w-8 h-8 text-primary" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold">3</div>
+                <BarChart3 className="w-6 h-6 mt-3 text-green-500" />
+                <p className="font-semibold mt-2">Credibility</p>
+                <p className="text-xs text-muted-foreground">AI-computed score</p>
+              </div>
+              <ArrowRight className="hidden md:block w-8 h-8 text-primary" />
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-green-500 text-white flex items-center justify-center text-2xl font-bold">4</div>
+                <Handshake className="w-6 h-6 mt-3 text-purple-500" />
+                <p className="font-semibold mt-2">Enterprise Deal</p>
+                <p className="text-xs text-muted-foreground">AI matchmaking</p>
               </div>
             </div>
           </div>

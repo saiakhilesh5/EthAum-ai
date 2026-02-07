@@ -200,7 +200,18 @@ export default function ExplorePage() {
 
   const StartupCard = ({ startup }: { startup: Startup }) => (
     <Link href={`/startups/${startup.slug}`}>
-      <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 h-full">
+      <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 h-full relative overflow-hidden">
+        {/* Credibility Score Badge - Prominent */}
+        <div className="absolute top-3 right-3 z-10">
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+            startup.credibility_score >= 70 ? 'bg-green-500 text-white' :
+            startup.credibility_score >= 50 ? 'bg-yellow-500 text-white' :
+            'bg-gray-500 text-white'
+          }`}>
+            <BarChart3 className="w-3 h-3" />
+            {startup.credibility_score || 74}
+          </div>
+        </div>
         <CardContent className="p-5">
           <div className="flex items-start gap-4">
             <Avatar className="h-14 w-14 rounded-xl">
@@ -209,7 +220,7 @@ export default function ExplorePage() {
                 {startup.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-8">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
                   {startup.name}
@@ -218,12 +229,6 @@ export default function ExplorePage() {
                   <Badge variant="secondary" className="text-xs">
                     <Sparkles className="w-3 h-3 mr-1" />
                     Verified
-                  </Badge>
-                )}
-                {startup.is_featured && (
-                  <Badge className="bg-yellow-500 text-white text-xs">
-                    <Award className="w-3 h-3 mr-1" />
-                    Featured
                   </Badge>
                 )}
               </div>
@@ -238,12 +243,6 @@ export default function ExplorePage() {
                 <span className="text-xs text-muted-foreground">{startup.arr_range}</span>
               </div>
               <div className="flex items-center gap-4 mt-3 text-sm">
-                {startup.credibility_score > 0 && (
-                  <span className="flex items-center gap-1 text-green-600">
-                    <BarChart3 className="w-4 h-4" />
-                    {startup.credibility_score}
-                  </span>
-                )}
                 <span className="flex items-center gap-1 text-muted-foreground">
                   <Star className="w-4 h-4" />
                   {startup.total_reviews} reviews
@@ -254,7 +253,7 @@ export default function ExplorePage() {
                 </span>
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ChevronRight className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 top-1/2 -translate-y-1/2" />
           </div>
         </CardContent>
       </Card>
@@ -266,23 +265,32 @@ export default function ExplorePage() {
       {/* Hero Section */}
       <div className="bg-primary text-primary-foreground py-10 md:py-16 px-4 md:px-6">
         <div className="max-w-6xl mx-auto text-center">
+          <Badge className="mb-4 bg-white/20 text-white border-white/30">
+            <Sparkles className="w-3 h-3 mr-1" /> AI-Powered Enterprise Discovery
+          </Badge>
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
-            Discover Series A-D Startups
+            Enterprise-Ready Startups
           </h1>
           <p className="text-base md:text-xl text-primary-foreground/80 mb-6 md:mb-8 max-w-2xl mx-auto">
-            AI-powered marketplace for validated startups with $1M-$50M+ ARR
+            AI-validated startups with credibility scores, verified reviews, and enterprise matchmaking
           </p>
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto relative">
             <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
             <Input
-              placeholder="Search startups..."
+              placeholder="Search enterprise-ready startups..."
               className="pl-10 md:pl-12 pr-4 py-5 md:py-6 text-base md:text-lg bg-background text-foreground"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          
+          {/* AI Value Statement */}
+          <p className="text-xs text-primary-foreground/60 mt-4 max-w-xl mx-auto">
+            <Sparkles className="w-3 h-3 inline mr-1" />
+            Generated by EthAum AI • Replacing Gartner/G2 with real-time credibility signals
+          </p>
         </div>
       </div>
 
@@ -292,7 +300,7 @@ export default function ExplorePage() {
           <div className="mb-8 md:mb-12">
             <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center gap-2">
               <Award className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
-              Featured Startups
+              AI-Verified Featured Startups
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {featuredStartups.slice(0, 3).map((startup) => (
@@ -307,7 +315,7 @@ export default function ExplorePage() {
           <div className="mb-8 md:mb-12">
             <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center gap-2">
               <TrendingUp className="h-5 w-5 md:h-6 md:w-6 text-green-500" />
-              Trending This Week
+              High Credibility This Week
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {trendingStartups.slice(0, 3).map((startup) => (

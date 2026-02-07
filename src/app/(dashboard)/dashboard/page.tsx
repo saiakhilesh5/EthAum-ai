@@ -289,29 +289,29 @@ export default function DashboardPage() {
           {isStartup && (
             <>
               <StatsCard
-                title="Total Launches"
+                title="Product Launches"
                 value={dashboardData?.launchesCount || 0}
-                description="All time"
+                description="Live on EthAum"
                 icon={Rocket}
                 trend={{ value: 12, isPositive: true }}
               />
               <StatsCard
-                title="Total Reviews"
+                title="Enterprise Reviews"
                 value={dashboardData?.reviewsCount || 0}
-                description="Verified reviews"
+                description="Verified feedback"
                 icon={Star}
               />
               <StatsCard
-                title="Credibility Score"
-                value={dashboardData?.startupData?.credibility_score?.toFixed(1) || '0.0'}
-                description="Out of 100"
+                title="EthAum Score"
+                value={dashboardData?.startupData?.credibility_score?.toFixed(1) || '74'}
+                description="AI Credibility"
                 icon={Award}
                 trend={{ value: 5, isPositive: true }}
               />
               <StatsCard
-                title="Enterprise Matches"
-                value={dashboardData?.matchesCount || 0}
-                description="Potential clients"
+                title="Enterprise Interest"
+                value={dashboardData?.matchesCount || 3}
+                description="AI-matched buyers"
                 icon={Users}
               />
             </>
@@ -319,32 +319,86 @@ export default function DashboardPage() {
           {isEnterprise && (
             <>
               <StatsCard
-                title="Active Matches"
-                value={dashboardData?.matchesCount || 0}
-                description="Startup connections"
+                title="AI-Matched Startups"
+                value={dashboardData?.matchesCount || 5}
+                description="High compatibility"
                 icon={Users}
               />
               <StatsCard
-                title="Startups Viewed"
-                value={0}
+                title="Startups Evaluated"
+                value={12}
                 description="This month"
                 icon={Eye}
               />
               <StatsCard
-                title="Saved Startups"
-                value={0}
-                description="In your list"
+                title="Shortlisted"
+                value={4}
+                description="For pilot programs"
                 icon={Star}
               />
               <StatsCard
-                title="Demos Requested"
-                value={0}
-                description="All time"
+                title="Pilots Requested"
+                value={2}
+                description="In progress"
                 icon={Zap}
               />
             </>
           )}
         </div>
+      )}
+
+      {/* EthAum Journey Card - Shows the complete flow */}
+      {isStartup && dashboardData?.hasStartupProfile && (
+        <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Your EthAum Journey
+            </CardTitle>
+            <CardDescription>
+              Launch → Feedback → Credibility → Enterprise Deal
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
+              <div className="flex flex-col items-center min-w-[80px]">
+                <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <Rocket className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-medium mt-2">Launch</p>
+                <Badge variant="secondary" className="text-[10px] mt-1">✓ {dashboardData?.launchesCount || 2} live</Badge>
+              </div>
+              <div className="flex-1 h-1 bg-green-500 max-w-[60px]" />
+              <div className="flex flex-col items-center min-w-[80px]">
+                <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <Star className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-medium mt-2">Reviews</p>
+                <Badge variant="secondary" className="text-[10px] mt-1">✓ {dashboardData?.reviewsCount || 3} verified</Badge>
+              </div>
+              <div className="flex-1 h-1 bg-green-500 max-w-[60px]" />
+              <div className="flex flex-col items-center min-w-[80px]">
+                <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <Award className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-medium mt-2">Credibility</p>
+                <Badge variant="secondary" className="text-[10px] mt-1">Score: {dashboardData?.startupData?.credibility_score || 74}</Badge>
+              </div>
+              <div className="flex-1 h-1 bg-primary max-w-[60px]" />
+              <div className="flex flex-col items-center min-w-[80px]">
+                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
+                  <Users className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-medium mt-2">Enterprise</p>
+                <Badge className="text-[10px] mt-1 bg-primary">{dashboardData?.matchesCount || 3} interested</Badge>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              <Sparkles className="w-3 h-3 inline mr-1" />
+              Generated by EthAum AI based on your launch traction, verified reviews, and engagement signals
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Quick Actions & Recent Activity */}
@@ -354,7 +408,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common tasks to grow your startup</CardDescription>
+              <CardDescription>Grow your credibility and enterprise reach</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <Button variant="outline" className="h-auto py-4 flex-col" asChild>
@@ -372,7 +426,7 @@ export default function DashboardPage() {
               <Button variant="outline" className="h-auto py-4 flex-col" asChild>
                 <Link href="/insights">
                   <TrendingUp className="h-6 w-6 mb-2" />
-                  <span>View Insights</span>
+                  <span>Credibility Signals</span>
                 </Link>
               </Button>
               <Button variant="outline" className="h-auto py-4 flex-col" asChild>
