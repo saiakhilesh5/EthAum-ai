@@ -177,20 +177,20 @@ export default function EnterpriseProfilePage() {
 
   if (userLoading || isLoading) {
     return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-[600px] w-full" />
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <Skeleton className="h-8 w-48 sm:w-64" />
+        <Skeleton className="h-[400px] sm:h-[600px] w-full" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
           {existingProfile ? 'Edit Company Profile' : 'Create Company Profile'}
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           {existingProfile
             ? 'Update your company information to get better startup recommendations.'
             : 'Set up your company profile to discover and connect with relevant startups.'}

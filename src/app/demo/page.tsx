@@ -50,47 +50,49 @@ export default function DemoPage() {
 
       <main className="flex-1">
         {/* Demo Banner */}
-        <section className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white py-3">
-          <div className="container flex items-center justify-center gap-4">
-            <Play className="w-5 h-5 animate-pulse" />
-            <span className="font-medium">Demo Mode — Explore all features without signing up</span>
-            <Button size="sm" variant="secondary" asChild>
-              <Link href="/register/startup">Create Your Account</Link>
+        <section className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white py-2 sm:py-3">
+          <div className="container flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 px-4">
+            <div className="flex items-center gap-2">
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+              <span className="text-sm sm:text-base font-medium">Demo Mode — Explore all features</span>
+            </div>
+            <Button size="sm" variant="secondary" className="text-xs sm:text-sm" asChild>
+              <Link href="/register/startup">Create Account</Link>
             </Button>
           </div>
         </section>
 
         {/* Demo Header */}
-        <section className="py-8 border-b">
-          <div className="container">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
+        <section className="py-4 sm:py-6 md:py-8 border-b">
+          <div className="container px-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Avatar className="h-12 w-12 sm:h-14 md:h-16 sm:w-14 md:w-16">
                   <AvatarImage src={currentStartup.logo_url || ''} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-xl">
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg sm:text-xl">
                     {currentStartup.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold">{currentStartup.name}</h1>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="text-lg sm:text-xl md:text-2xl font-bold">{currentStartup.name}</h1>
                     {currentStartup.is_verified && (
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                     )}
-                    <Badge variant="secondary">Demo</Badge>
+                    <Badge variant="secondary" className="text-xs">Demo</Badge>
                   </div>
-                  <p className="text-muted-foreground">{currentStartup.tagline}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-1">{currentStartup.tagline}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-6 h-6 text-green-500" />
-                    <span className="text-3xl font-bold text-green-600">
+              <div className="flex items-center gap-2 sm:gap-4 pl-14 sm:pl-0">
+                <div className="text-left sm:text-right">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
+                    <span className="text-2xl sm:text-3xl font-bold text-green-600">
                       {DEMO_CREDIBILITY_SCORE.overall_score}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">Credibility Score</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Credibility Score</p>
                 </div>
               </div>
             </div>
@@ -98,10 +100,10 @@ export default function DemoPage() {
         </section>
 
         {/* Demo Tabs */}
-        <section className="py-8">
-          <div className="container">
+        <section className="py-4 sm:py-6 md:py-8">
+          <div className="container px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto lg:inline-flex h-auto gap-1">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="launches">Launches</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews</TabsTrigger>
@@ -110,8 +112,8 @@ export default function DemoPage() {
               </TabsList>
 
               {/* Dashboard Tab */}
-              <TabsContent value="dashboard" className="mt-8">
-                <div className="grid lg:grid-cols-3 gap-6">
+              <TabsContent value="dashboard" className="mt-4 sm:mt-6 md:mt-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                   {/* Credibility Score Panel */}
                   <Card className="lg:col-span-1 border-2 border-green-500/20 bg-gradient-to-br from-green-50 to-white dark:from-green-950/20 dark:to-background">
                     <CardHeader>
@@ -168,41 +170,41 @@ export default function DemoPage() {
                       <CardDescription>Track your progress from launch to enterprise deal</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 py-4">
-                        <div className="flex flex-col items-center text-center">
-                          <div className="w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center">
-                            <CheckCircle2 className="w-6 h-6" />
+                      <div className="flex flex-row items-center justify-between gap-1 sm:gap-2 md:gap-4 py-2 sm:py-4 overflow-x-auto">
+                        <div className="flex flex-col items-center text-center min-w-[60px] sm:min-w-[70px]">
+                          <div className="w-10 h-10 sm:w-12 md:w-14 sm:h-12 md:h-14 rounded-full bg-green-500 text-white flex items-center justify-center">
+                            <CheckCircle2 className="w-4 h-4 sm:w-5 md:w-6 sm:h-5 md:h-6" />
                           </div>
-                          <Rocket className="w-5 h-5 mt-2 text-green-500" />
-                          <p className="font-medium mt-1 text-sm">Launch</p>
-                          <p className="text-xs text-green-600">3 launches</p>
+                          <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mt-1 sm:mt-2 text-green-500" />
+                          <p className="font-medium mt-1 text-xs sm:text-sm">Launch</p>
+                          <p className="text-[10px] sm:text-xs text-green-600">3</p>
                         </div>
-                        <ArrowRight className="hidden md:block w-6 h-6 text-green-500" />
-                        <div className="flex flex-col items-center text-center">
-                          <div className="w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center">
-                            <CheckCircle2 className="w-6 h-6" />
+                        <div className="flex-1 h-0.5 sm:h-1 bg-green-500 max-w-[20px] sm:max-w-[40px] md:max-w-[60px]" />
+                        <div className="flex flex-col items-center text-center min-w-[60px] sm:min-w-[70px]">
+                          <div className="w-10 h-10 sm:w-12 md:w-14 sm:h-12 md:h-14 rounded-full bg-green-500 text-white flex items-center justify-center">
+                            <CheckCircle2 className="w-4 h-4 sm:w-5 md:w-6 sm:h-5 md:h-6" />
                           </div>
-                          <Star className="w-5 h-5 mt-2 text-yellow-500" />
-                          <p className="font-medium mt-1 text-sm">Reviews</p>
-                          <p className="text-xs text-green-600">12 reviews</p>
+                          <Star className="w-4 h-4 sm:w-5 sm:h-5 mt-1 sm:mt-2 text-yellow-500" />
+                          <p className="font-medium mt-1 text-xs sm:text-sm">Reviews</p>
+                          <p className="text-[10px] sm:text-xs text-green-600">12</p>
                         </div>
-                        <ArrowRight className="hidden md:block w-6 h-6 text-green-500" />
-                        <div className="flex flex-col items-center text-center">
-                          <div className="w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center">
-                            <CheckCircle2 className="w-6 h-6" />
+                        <div className="flex-1 h-0.5 sm:h-1 bg-green-500 max-w-[20px] sm:max-w-[40px] md:max-w-[60px]" />
+                        <div className="flex flex-col items-center text-center min-w-[60px] sm:min-w-[70px]">
+                          <div className="w-10 h-10 sm:w-12 md:w-14 sm:h-12 md:h-14 rounded-full bg-green-500 text-white flex items-center justify-center">
+                            <CheckCircle2 className="w-4 h-4 sm:w-5 md:w-6 sm:h-5 md:h-6" />
                           </div>
-                          <BarChart3 className="w-5 h-5 mt-2 text-green-500" />
-                          <p className="font-medium mt-1 text-sm">Credibility</p>
-                          <p className="text-xs text-green-600">Score: 74</p>
+                          <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 mt-1 sm:mt-2 text-green-500" />
+                          <p className="font-medium mt-1 text-xs sm:text-sm">Credibility</p>
+                          <p className="text-[10px] sm:text-xs text-green-600">74</p>
                         </div>
-                        <ArrowRight className="hidden md:block w-6 h-6 text-primary animate-pulse" />
-                        <div className="flex flex-col items-center text-center">
-                          <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
-                            <Handshake className="w-6 h-6" />
+                        <div className="flex-1 h-0.5 sm:h-1 bg-primary max-w-[20px] sm:max-w-[40px] md:max-w-[60px]" />
+                        <div className="flex flex-col items-center text-center min-w-[60px] sm:min-w-[70px]">
+                          <div className="w-10 h-10 sm:w-12 md:w-14 sm:h-12 md:h-14 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
+                            <Handshake className="w-4 h-4 sm:w-5 md:w-6 sm:h-5 md:h-6" />
                           </div>
-                          <Handshake className="w-5 h-5 mt-2 text-purple-500" />
-                          <p className="font-medium mt-1 text-sm">Enterprise Deal</p>
-                          <p className="text-xs text-primary font-medium">3 matches!</p>
+                          <Handshake className="w-4 h-4 sm:w-5 sm:h-5 mt-1 sm:mt-2 text-purple-500" />
+                          <p className="font-medium mt-1 text-xs sm:text-sm">Enterprise</p>
+                          <p className="text-[10px] sm:text-xs text-primary font-medium">3!</p>
                         </div>
                       </div>
                     </CardContent>
@@ -210,21 +212,21 @@ export default function DemoPage() {
                 </div>
 
                 {/* Enterprise Interest Section */}
-                <Card className="mt-6 border-2 border-purple-500/20">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2 text-purple-700">
-                        <Building2 className="w-5 h-5" />
-                        Enterprise Interest Detected
+                <Card className="mt-4 sm:mt-6 border-2 border-purple-500/20">
+                  <CardHeader className="pb-2 p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <CardTitle className="flex items-center gap-2 text-purple-700 text-base sm:text-lg">
+                        <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Enterprise Interest
                       </CardTitle>
-                      <Badge className="bg-purple-500 text-white animate-pulse">
+                      <Badge className="bg-purple-500 text-white animate-pulse w-fit text-xs">
                         <Zap className="w-3 h-3 mr-1" />
                         Active Buyers
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-4">
-                    <div className="grid md:grid-cols-3 gap-4">
+                  <CardContent className="pt-2 sm:pt-4 p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                       {DEMO_MATCHES.map((match) => (
                         <div key={match.id} className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/20">
                           <Avatar className="h-12 w-12">
@@ -252,32 +254,32 @@ export default function DemoPage() {
               </TabsContent>
 
               {/* Launches Tab */}
-              <TabsContent value="launches" className="mt-8">
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <TabsContent value="launches" className="mt-4 sm:mt-6 md:mt-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {DEMO_LAUNCHES.map((launch) => (
                     <Card key={launch.id} className="hover:shadow-lg transition-all">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                          <div className="text-4xl">🚀</div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold">{launch.title}</h3>
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className="text-3xl sm:text-4xl">🚀</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-semibold text-sm sm:text-base truncate">{launch.title}</h3>
                               {launch.is_featured && (
                                 <Badge className="bg-yellow-500 text-white text-xs">Featured</Badge>
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground mt-1">{launch.tagline}</p>
-                            <div className="flex items-center gap-4 mt-4">
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">{launch.tagline}</p>
+                            <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm">
                               <span className="flex items-center gap-1 text-primary font-semibold">
-                                <ThumbsUp className="w-4 h-4" />
+                                <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4" />
                                 {launch.upvote_count}
                               </span>
-                              <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                                <MessageSquare className="w-4 h-4" />
+                              <span className="flex items-center gap-1 text-muted-foreground">
+                                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
                                 {launch.comment_count}
                               </span>
-                              <span className="flex items-center gap-1 text-muted-foreground text-sm">
-                                <Eye className="w-4 h-4" />
+                              <span className="flex items-center gap-1 text-muted-foreground">
+                                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                 {launch.view_count}
                               </span>
                             </div>
@@ -290,11 +292,11 @@ export default function DemoPage() {
               </TabsContent>
 
               {/* Reviews Tab */}
-              <TabsContent value="reviews" className="mt-8">
-                <div className="grid md:grid-cols-2 gap-6">
+              <TabsContent value="reviews" className="mt-4 sm:mt-6 md:mt-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {DEMO_REVIEWS.map((review) => (
                     <Card key={review.id}>
-                      <CardHeader>
+                      <CardHeader className="p-4 sm:p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
                             <Avatar>
@@ -340,8 +342,8 @@ export default function DemoPage() {
               </TabsContent>
 
               {/* AI Insights Tab */}
-              <TabsContent value="insights" className="mt-8">
-                <div className="grid lg:grid-cols-2 gap-6">
+              <TabsContent value="insights" className="mt-4 sm:mt-6 md:mt-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   {/* Market Position */}
                   <Card>
                     <CardHeader>
@@ -468,33 +470,33 @@ export default function DemoPage() {
                   </CardContent>
                 </Card>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {DEMO_MATCHES.map((match) => (
                     <Card key={match.id} className="hover:shadow-lg transition-all border-2 border-purple-500/10">
-                      <CardHeader>
+                      <CardHeader className="p-4 sm:p-6">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12">
-                              <AvatarFallback className="bg-purple-200 text-purple-700 font-bold">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
+                              <AvatarFallback className="bg-purple-200 text-purple-700 font-bold text-sm sm:text-base">
                                 {match.enterprise.company_name.substring(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div>
-                              <CardTitle className="text-lg">{match.enterprise.company_name}</CardTitle>
-                              <CardDescription>{match.enterprise.industry}</CardDescription>
+                            <div className="min-w-0">
+                              <CardTitle className="text-base sm:text-lg truncate">{match.enterprise.company_name}</CardTitle>
+                              <CardDescription className="text-xs sm:text-sm">{match.enterprise.industry}</CardDescription>
                             </div>
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
                         <div>
-                          <p className="text-sm text-muted-foreground">Looking for:</p>
-                          <p className="font-medium">{match.enterprise.looking_for?.[0] || 'Technology solutions'}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">Looking for:</p>
+                          <p className="text-sm sm:text-base font-medium">{match.enterprise.looking_for?.[0] || 'Technology solutions'}</p>
                         </div>
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-muted-foreground">Match Score</p>
-                            <p className="text-2xl font-bold text-purple-600">{match.match_score}%</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">Match Score</p>
+                            <p className="text-xl sm:text-2xl font-bold text-purple-600">{match.match_score}%</p>
                           </div>
                           <div className="text-right">
                             <p className="text-sm text-muted-foreground">Est. Deal Value</p>
@@ -521,20 +523,20 @@ export default function DemoPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 bg-primary text-primary-foreground">
-          <div className="container text-center">
-            <h2 className="text-2xl md:text-3xl font-bold">Ready to Get Your Own Dashboard?</h2>
-            <p className="mt-4 text-lg opacity-90 max-w-2xl mx-auto">
+        <section className="py-10 sm:py-12 md:py-16 bg-primary text-primary-foreground">
+          <div className="container px-4 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Ready to Get Your Own Dashboard?</h2>
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg opacity-90 max-w-2xl mx-auto">
               Create your account now and start building credibility with enterprise buyers.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" variant="secondary" asChild>
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto" asChild>
                 <Link href="/register/startup">
                   Create Startup Account
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
                 <Link href="/register/enterprise">I&apos;m an Enterprise Buyer</Link>
               </Button>
             </div>

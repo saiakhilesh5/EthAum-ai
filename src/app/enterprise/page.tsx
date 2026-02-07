@@ -136,44 +136,44 @@ export default function EnterprisePage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-16 md:py-24 bg-gradient-to-br from-primary/5 via-background to-purple-500/5">
-          <div className="container">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <section className="relative overflow-hidden py-10 sm:py-16 md:py-24 bg-gradient-to-br from-primary/5 via-background to-purple-500/5">
+          <div className="container px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div>
-                <Badge variant="secondary" className="mb-4">
+                <Badge variant="secondary" className="mb-3 sm:mb-4 text-xs sm:text-sm">
                   <Building2 className="mr-1 h-3 w-3" />
                   For Enterprise Buyers
                 </Badge>
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
                   Find Enterprise-Ready Vendors{' '}
                   <span className="text-primary">70% Faster</span>
                 </h1>
-                <p className="mt-6 text-lg text-muted-foreground">
+                <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-muted-foreground">
                   Stop wasting time on vendor evaluation. Our AI finds pre-vetted, credibility-scored 
                   startups matching your exact requirements — without the expensive analyst fees.
                 </p>
-                <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                  <Button size="lg" asChild>
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Button size="lg" className="w-full sm:w-auto" asChild>
                     <Link href="/register/enterprise">
                       Start Finding Vendors
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" asChild>
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
                     <Link href="/demo">
                       <Play className="mr-2 h-4 w-4" />
                       See Demo
                     </Link>
                   </Button>
                 </div>
-                <div className="mt-8 flex items-center gap-6">
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    <span className="text-sm">Free to get started</span>
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                    <span className="text-xs sm:text-sm">Free to get started</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    <span className="text-sm">No credit card required</span>
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+                    <span className="text-xs sm:text-sm">No credit card required</span>
                   </div>
                 </div>
               </div>
@@ -204,13 +204,13 @@ export default function EnterprisePage() {
         </section>
 
         {/* Stats */}
-        <section className="border-y bg-muted/50 py-12">
-          <div className="container">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <section className="border-y bg-muted/50 py-8 sm:py-12">
+          <div className="container px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-primary">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -218,22 +218,22 @@ export default function EnterprisePage() {
         </section>
 
         {/* ROI Calculator */}
-        <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/10 dark:to-blue-950/10">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">
+        <section className="py-10 sm:py-16 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/10 dark:to-blue-950/10">
+          <div className="container px-4">
+            <div className="text-center mb-8 sm:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">
                 <Calculator className="mr-1 h-3 w-3" />
                 ROI Calculator
               </Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
                 Calculate Your Savings
               </h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
                 See how much time and money you can save by using EthAum.ai for vendor evaluation
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {/* Inputs */}
               <Card>
                 <CardHeader>
@@ -335,23 +335,23 @@ export default function EnterprisePage() {
         </section>
 
         {/* Features */}
-        <section className="py-16">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">Features</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">
+        <section className="py-10 sm:py-16">
+          <div className="container px-4">
+            <div className="text-center mb-8 sm:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">Features</Badge>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
                 Built for Enterprise Procurement
               </h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {features.map((feature) => (
                 <Card key={feature.title}>
-                  <CardHeader>
-                    <feature.icon className="w-10 h-10 text-primary mb-4" />
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <CardHeader className="p-4 sm:p-6">
+                    <feature.icon className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4" />
+                    <CardTitle className="text-lg sm:text-xl">{feature.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">{feature.description}</CardDescription>
+                  <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+                    <CardDescription className="text-sm sm:text-base">{feature.description}</CardDescription>
                   </CardContent>
                 </Card>
               ))}
@@ -360,26 +360,26 @@ export default function EnterprisePage() {
         </section>
 
         {/* Use Cases */}
-        <section className="py-16 bg-muted/30">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">
+        <section className="py-10 sm:py-16 bg-muted/30">
+          <div className="container px-4">
+            <div className="text-center mb-8 sm:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">
                 <Target className="mr-1 h-3 w-3" />
                 Use Cases
               </Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
                 How Enterprises Use EthAum.ai
               </h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {useCases.map((useCase) => (
                 <Card key={useCase.title} className="text-center hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="text-4xl mb-4">{useCase.icon}</div>
-                    <CardTitle className="text-lg">{useCase.title}</CardTitle>
+                  <CardHeader className="p-3 sm:p-4 md:p-6">
+                    <div className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4">{useCase.icon}</div>
+                    <CardTitle className="text-sm sm:text-base md:text-lg">{useCase.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <CardDescription>{useCase.description}</CardDescription>
+                  <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+                    <CardDescription className="text-xs sm:text-sm">{useCase.description}</CardDescription>
                   </CardContent>
                 </Card>
               ))}
@@ -388,33 +388,33 @@ export default function EnterprisePage() {
         </section>
 
         {/* Testimonials */}
-        <section className="py-16">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">Testimonials</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">
+        <section className="py-10 sm:py-16">
+          <div className="container px-4">
+            <div className="text-center mb-8 sm:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">Testimonials</Badge>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
                 Trusted by Enterprise Buyers
               </h2>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {testimonials.map((testimonial, index) => (
                 <Card key={index} className="relative">
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-green-500 text-white">{testimonial.metric}</Badge>
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+                    <Badge className="bg-green-500 text-white text-xs">{testimonial.metric}</Badge>
                   </div>
-                  <CardHeader>
-                    <CardDescription className="text-lg italic">
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardDescription className="text-sm sm:text-base md:text-lg italic pr-12 sm:pr-16">
                       &quot;{testimonial.quote}&quot;
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Users className="w-5 h-5 text-primary" />
+                  <CardContent className="p-4 sm:p-6 pt-0">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                       </div>
                       <div>
-                        <p className="font-medium">{testimonial.name}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                        <p className="text-sm sm:text-base font-medium">{testimonial.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{testimonial.role}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -425,22 +425,22 @@ export default function EnterprisePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 bg-primary text-primary-foreground">
-          <div className="container text-center">
-            <h2 className="text-2xl md:text-3xl font-bold">
+        <section className="py-10 sm:py-16 bg-primary text-primary-foreground">
+          <div className="container px-4 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
               Ready to Transform Your Vendor Evaluation?
             </h2>
-            <p className="mt-4 text-lg opacity-90 max-w-2xl mx-auto">
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg opacity-90 max-w-2xl mx-auto">
               Join leading enterprises already finding better vendors faster with EthAum.ai.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" variant="secondary" asChild>
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto" asChild>
                 <Link href="/register/enterprise">
                   Create Enterprise Account
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
                 <Link href="/demo">Try Demo First</Link>
               </Button>
             </div>

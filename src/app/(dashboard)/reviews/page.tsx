@@ -250,20 +250,20 @@ export default function ReviewsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="all" className="w-full">
-            <div className="flex items-center justify-between mb-4">
-              <TabsList>
-                <TabsTrigger value="all">All Reviews</TabsTrigger>
-                <TabsTrigger value="verified">
-                  <CheckCircle className="w-4 h-4 mr-1" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <TabsList className="flex flex-wrap h-auto gap-1">
+                <TabsTrigger value="all" className="text-xs sm:text-sm">All</TabsTrigger>
+                <TabsTrigger value="verified" className="text-xs sm:text-sm">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Verified
                 </TabsTrigger>
-                <TabsTrigger value="pending">
+                <TabsTrigger value="pending" className="text-xs sm:text-sm">
                   Pending
                   {pendingReviews > 0 && (
-                    <Badge variant="secondary" className="ml-2 h-5">
+                    <Badge variant="secondary" className="ml-1 sm:ml-2 h-4 sm:h-5 text-xs">
                       {pendingReviews}
                     </Badge>
                   )}
@@ -286,7 +286,7 @@ export default function ReviewsPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Review Stats */}
           {reviewSummary && (
             <ReviewStats

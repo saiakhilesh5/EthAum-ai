@@ -58,14 +58,14 @@ function LoginForm() {
 
   return (
     <Card className="border-0 shadow-none lg:border lg:shadow-sm">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-        <CardDescription>
+      <CardHeader className="space-y-1 px-0 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl font-bold">Welcome back</CardTitle>
+        <CardDescription className="text-sm">
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <CardContent className="px-0 sm:px-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -122,7 +122,7 @@ function LoginForm() {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4">
+      <CardFooter className="flex flex-col space-y-3 sm:space-y-4 px-0 sm:px-6">
         <div className="relative w-full">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
@@ -133,11 +133,11 @@ function LoginForm() {
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 w-full">
-          <Button variant="outline" asChild>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 w-full">
+          <Button variant="outline" className="text-sm" asChild>
             <Link href="/register/startup">Join as Startup</Link>
           </Button>
-          <Button variant="outline" asChild>
+          <Button variant="outline" className="text-sm" asChild>
             <Link href="/register/enterprise">Join as Enterprise</Link>
           </Button>
         </div>

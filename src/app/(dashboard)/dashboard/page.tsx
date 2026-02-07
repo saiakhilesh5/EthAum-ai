@@ -340,50 +340,50 @@ export default function DashboardPage() {
       {/* EthAum Journey Card - Shows the complete flow */}
       {isStartup && dashboardData?.hasStartupProfile && (
         <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Your EthAum Journey
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               Launch → Feedback → Credibility → Enterprise Deal
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
-              <div className="flex flex-col items-center min-w-[80px]">
-                <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
-                  <Rocket className="w-6 h-6" />
+          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+            <div className="flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto pb-2">
+              <div className="flex flex-col items-center min-w-[60px] sm:min-w-[80px]">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <Rocket className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <p className="text-xs font-medium mt-2">Launch</p>
-                <Badge variant="secondary" className="text-[10px] mt-1">✓ {dashboardData?.launchesCount || 2} live</Badge>
+                <p className="text-[10px] sm:text-xs font-medium mt-1 sm:mt-2">Launch</p>
+                <Badge variant="secondary" className="text-[8px] sm:text-[10px] mt-1 px-1 sm:px-2">✓ {dashboardData?.launchesCount || 2} live</Badge>
               </div>
-              <div className="flex-1 h-1 bg-green-500 max-w-[60px]" />
-              <div className="flex flex-col items-center min-w-[80px]">
-                <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
-                  <Star className="w-6 h-6" />
+              <div className="flex-1 h-0.5 sm:h-1 bg-green-500 max-w-[30px] sm:max-w-[60px]" />
+              <div className="flex flex-col items-center min-w-[60px] sm:min-w-[80px]">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <Star className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <p className="text-xs font-medium mt-2">Reviews</p>
-                <Badge variant="secondary" className="text-[10px] mt-1">✓ {dashboardData?.reviewsCount || 3} verified</Badge>
+                <p className="text-[10px] sm:text-xs font-medium mt-1 sm:mt-2">Reviews</p>
+                <Badge variant="secondary" className="text-[8px] sm:text-[10px] mt-1 px-1 sm:px-2">✓ {dashboardData?.reviewsCount || 3}</Badge>
               </div>
-              <div className="flex-1 h-1 bg-green-500 max-w-[60px]" />
-              <div className="flex flex-col items-center min-w-[80px]">
-                <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
-                  <Award className="w-6 h-6" />
+              <div className="flex-1 h-0.5 sm:h-1 bg-green-500 max-w-[30px] sm:max-w-[60px]" />
+              <div className="flex flex-col items-center min-w-[60px] sm:min-w-[80px]">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <Award className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <p className="text-xs font-medium mt-2">Credibility</p>
-                <Badge variant="secondary" className="text-[10px] mt-1">Score: {dashboardData?.startupData?.credibility_score || 74}</Badge>
+                <p className="text-[10px] sm:text-xs font-medium mt-1 sm:mt-2">Score</p>
+                <Badge variant="secondary" className="text-[8px] sm:text-[10px] mt-1 px-1 sm:px-2">{dashboardData?.startupData?.credibility_score || 74}</Badge>
               </div>
-              <div className="flex-1 h-1 bg-primary max-w-[60px]" />
-              <div className="flex flex-col items-center min-w-[80px]">
-                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
-                  <Users className="w-6 h-6" />
+              <div className="flex-1 h-0.5 sm:h-1 bg-primary max-w-[30px] sm:max-w-[60px]" />
+              <div className="flex flex-col items-center min-w-[60px] sm:min-w-[80px]">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <p className="text-xs font-medium mt-2">Enterprise</p>
-                <Badge className="text-[10px] mt-1 bg-primary">{dashboardData?.matchesCount || 3} interested</Badge>
+                <p className="text-[10px] sm:text-xs font-medium mt-1 sm:mt-2">Enterprise</p>
+                <Badge className="text-[8px] sm:text-[10px] mt-1 bg-primary px-1 sm:px-2">{dashboardData?.matchesCount || 3} matches</Badge>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-4">
+            <p className="text-[10px] sm:text-xs text-muted-foreground text-center mt-3 sm:mt-4">
               <Sparkles className="w-3 h-3 inline mr-1" />
               Generated by EthAum AI based on your launch traction, verified reviews, and engagement signals
             </p>
@@ -393,36 +393,36 @@ export default function DashboardPage() {
 
       {/* Quick Actions & Recent Activity */}
       {isStartup && dashboardData?.hasStartupProfile && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Quick Actions */}
           <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Grow your credibility and enterprise reach</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Grow your credibility and enterprise reach</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-auto py-4 flex-col" asChild>
+            <CardContent className="grid grid-cols-2 gap-2 sm:gap-4 p-4 sm:p-6 pt-0">
+              <Button variant="outline" className="h-auto py-3 sm:py-4 flex-col text-xs sm:text-sm" asChild>
                 <Link href="/launches/new">
-                  <Rocket className="h-6 w-6 mb-2" />
+                  <Rocket className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
                   <span>New Launch</span>
                 </Link>
               </Button>
-              <Button variant="outline" className="h-auto py-4 flex-col" asChild>
+              <Button variant="outline" className="h-auto py-3 sm:py-4 flex-col text-xs sm:text-sm" asChild>
                 <Link href="/profile/startup">
-                  <Star className="h-6 w-6 mb-2" />
+                  <Star className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
                   <span>Edit Profile</span>
                 </Link>
               </Button>
-              <Button variant="outline" className="h-auto py-4 flex-col" asChild>
+              <Button variant="outline" className="h-auto py-3 sm:py-4 flex-col text-xs sm:text-sm" asChild>
                 <Link href="/insights">
-                  <TrendingUp className="h-6 w-6 mb-2" />
-                  <span>Credibility Signals</span>
+                  <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
+                  <span>Insights</span>
                 </Link>
               </Button>
-              <Button variant="outline" className="h-auto py-4 flex-col" asChild>
+              <Button variant="outline" className="h-auto py-3 sm:py-4 flex-col text-xs sm:text-sm" asChild>
                 <Link href="/matchmaking">
-                  <Users className="h-6 w-6 mb-2" />
-                  <span>View Matches</span>
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 mb-1 sm:mb-2" />
+                  <span>Matches</span>
                 </Link>
               </Button>
             </CardContent>
@@ -539,15 +539,15 @@ export default function DashboardPage() {
       {/* AI Features Showcase */}
       {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
         <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               AI-Powered Tools
             </CardTitle>
-            <CardDescription>Exclusive features to accelerate your growth</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Exclusive features to accelerate your growth</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {isStartup && (
                 <>
                   <Link href="/pitch-analyzer" className="group">
@@ -635,7 +635,7 @@ export default function DashboardPage() {
 
       {/* Activity Feed & Trust Score */}
       {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="lg:col-span-2">
             <ActivityFeed compact maxItems={8} />
           </div>

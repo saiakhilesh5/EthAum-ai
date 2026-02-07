@@ -301,16 +301,16 @@ export default function ExplorePage() {
         )}
 
         {/* Leaderboard Section */}
-        <div className="mb-8 md:mb-12 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl p-6">
-          <h2 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-2">
+        <div className="mb-8 md:mb-12 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6 flex flex-wrap items-center gap-2">
             <Trophy className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
             Weekly Leaderboard
-            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs">
               <Flame className="w-3 h-3 mr-1" />
               Hot
             </Badge>
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Top Credibility */}
             <Card className="bg-white/80 dark:bg-background/80 backdrop-blur">
               <CardHeader className="pb-2">
@@ -408,10 +408,10 @@ export default function ExplorePage() {
 
         {/* Filters */}
         <div className="flex flex-col gap-3 md:gap-4 mb-6 md:mb-8">
-          <div className="flex flex-wrap gap-2 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4">
             <Select value={industryFilter} onValueChange={setIndustryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <Filter className="w-4 h-4 mr-2" />
+              <SelectTrigger className="w-full">
+                <Filter className="w-4 h-4 mr-2 hidden sm:inline" />
                 <SelectValue placeholder="Industry" />
               </SelectTrigger>
               <SelectContent>
@@ -425,8 +425,8 @@ export default function ExplorePage() {
             </Select>
 
             <Select value={stageFilter} onValueChange={setStageFilter}>
-              <SelectTrigger className="w-[180px]">
-                <Rocket className="w-4 h-4 mr-2" />
+              <SelectTrigger className="w-full">
+                <Rocket className="w-4 h-4 mr-2 hidden sm:inline" />
                 <SelectValue placeholder="Stage" />
               </SelectTrigger>
               <SelectContent>
@@ -440,8 +440,8 @@ export default function ExplorePage() {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <BarChart3 className="w-4 h-4 mr-2" />
+              <SelectTrigger className="w-full col-span-2 sm:col-span-1">
+                <BarChart3 className="w-4 h-4 mr-2 hidden sm:inline" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -456,26 +456,26 @@ export default function ExplorePage() {
 
         {/* All Startups */}
         <div>
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            <Users className="h-6 w-6" />
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center gap-2">
+            <Users className="h-5 w-5 md:h-6 md:w-6" />
             All Startups
-            <Badge variant="secondary">{filteredStartups.length}</Badge>
+            <Badge variant="secondary" className="text-xs">{filteredStartups.length}</Badge>
           </h2>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-40 w-full" />
+                <Skeleton key={i} className="h-32 sm:h-40 w-full" />
               ))}
             </div>
           ) : filteredStartups.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">No startups found matching your criteria</p>
-              <p className="text-sm mt-2">Try adjusting your filters or search query</p>
+            <div className="text-center py-8 md:py-12 text-muted-foreground">
+              <Users className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-base md:text-lg">No startups found matching your criteria</p>
+              <p className="text-xs sm:text-sm mt-2">Try adjusting your filters or search query</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               {filteredStartups.map((startup) => (
                 <StartupCard key={startup.id} startup={startup} />
               ))}

@@ -547,12 +547,12 @@ export default function HomePage() {
         </section>
 
         {/* Competitor Comparison Table */}
-        <section className="py-12 md:py-16">
-          <div className="container">
-            <div className="text-center mb-8 md:mb-12">
-              <Badge variant="outline" className="mb-4">Why EthAum.ai</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">EthAum.ai vs. Competitors</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
+        <section className="py-8 sm:py-12 md:py-16">
+          <div className="container px-4">
+            <div className="text-center mb-6 sm:mb-8 md:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">Why EthAum.ai</Badge>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">EthAum.ai vs. Competitors</h2>
+              <p className="mt-3 sm:mt-4 text-muted-foreground max-w-2xl mx-auto text-xs sm:text-sm md:text-base px-2">
                 The only platform combining Product Hunt launches, G2 reviews, Gartner insights, and AppSumo deals
               </p>
             </div>
@@ -586,16 +586,16 @@ export default function HomePage() {
         </section>
 
         {/* Success Stories */}
-        <section className="py-12 md:py-16 bg-muted/30">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">
+        <section className="py-8 sm:py-12 md:py-16 bg-muted/30">
+          <div className="container px-4">
+            <div className="text-center mb-6 sm:mb-8 md:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">
                 <Sparkles className="mr-1 h-3 w-3" />
                 Success Stories
               </Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">Real Results from Real Startups</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Real Results from Real Startups</h2>
             </div>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {successStories.map((story) => (
                 <Card key={story.company} className="relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12" />
@@ -632,23 +632,23 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-12 md:py-16">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4">Features</Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">Everything You Need to Succeed</h2>
+        <section className="py-8 sm:py-12 md:py-16">
+          <div className="container px-4">
+            <div className="text-center mb-6 sm:mb-8 md:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">Features</Badge>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Everything You Need to Succeed</h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {features.map((feature) => (
                 <Card key={feature.title} className="border-2 hover:border-primary/50 transition-colors">
-                  <CardHeader>
-                    <div className={`w-12 h-12 rounded-lg ${feature.bgColor} flex items-center justify-center mb-4`}>
-                      <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                  <CardHeader className="p-4 sm:p-6">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${feature.bgColor} flex items-center justify-center mb-3 sm:mb-4`}>
+                      <feature.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${feature.color}`} />
                     </div>
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg md:text-xl">{feature.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">{feature.description}</CardDescription>
+                  <CardContent className="p-4 sm:p-6 pt-0">
+                    <CardDescription className="text-sm sm:text-base">{feature.description}</CardDescription>
                   </CardContent>
                 </Card>
               ))}
@@ -657,47 +657,47 @@ export default function HomePage() {
         </section>
 
         {/* Benefits Section */}
-        <section className="py-12 md:py-16 bg-muted/30">
-          <div className="container">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <section className="py-8 sm:py-12 md:py-16 bg-muted/30">
+          <div className="container px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
               <div>
-                <Badge variant="outline" className="mb-4">
+                <Badge variant="outline" className="mb-3 sm:mb-4 text-xs sm:text-sm">
                   <Award className="mr-1 h-3 w-3" />
                   Why EthAum.ai
                 </Badge>
-                <h2 className="text-2xl md:text-3xl font-bold">Reduce Marketing Spend by 80-90%</h2>
-                <p className="mt-4 text-muted-foreground">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Reduce Marketing Spend by 80-90%</h2>
+                <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground">
                   Stop burning cash on expensive marketing. Our platform drives organic growth through community, credibility, and AI-powered matchmaking.
                 </p>
-                <ul className="mt-8 space-y-4">
+                <ul className="mt-4 sm:mt-6 md:mt-8 space-y-2 sm:space-y-3 md:space-y-4">
                   {benefits.map((benefit) => (
-                    <li key={benefit} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <li key={benefit} className="flex items-start gap-2 sm:gap-3 text-sm sm:text-base">
+                      <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>{benefit}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="p-4 text-center">
-                  <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">+340%</div>
-                  <div className="text-xs text-muted-foreground">Avg. Visibility Boost</div>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+                <Card className="p-3 sm:p-4 text-center">
+                  <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 mx-auto mb-1 sm:mb-2" />
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold">+340%</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">Visibility Boost</div>
                 </Card>
-                <Card className="p-4 text-center">
-                  <Users className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">50+</div>
-                  <div className="text-xs text-muted-foreground">Enterprise Leads/Mo</div>
+                <Card className="p-3 sm:p-4 text-center">
+                  <Users className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mx-auto mb-1 sm:mb-2" />
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold">50+</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">Enterprise Leads</div>
                 </Card>
-                <Card className="p-4 text-center">
-                  <Shield className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">98%</div>
-                  <div className="text-xs text-muted-foreground">Review Authenticity</div>
+                <Card className="p-3 sm:p-4 text-center">
+                  <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 mx-auto mb-1 sm:mb-2" />
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold">98%</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">Authenticity</div>
                 </Card>
-                <Card className="p-4 text-center">
-                  <Zap className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">2 Days</div>
-                  <div className="text-xs text-muted-foreground">Avg. Time to Match</div>
+                <Card className="p-3 sm:p-4 text-center">
+                  <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500 mx-auto mb-1 sm:mb-2" />
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold">2 Days</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">Time to Match</div>
                 </Card>
               </div>
             </div>
@@ -705,20 +705,20 @@ export default function HomePage() {
         </section>
 
         {/* Try AI Features Section - No Login Required */}
-        <section className="py-16 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
-          <div className="container">
-            <div className="text-center mb-12">
-              <Badge variant="outline" className="mb-4 border-purple-500/50">
+        <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+          <div className="container px-4">
+            <div className="text-center mb-6 sm:mb-8 md:mb-12">
+              <Badge variant="outline" className="mb-3 sm:mb-4 border-purple-500/50 text-xs sm:text-sm">
                 <Brain className="mr-1 h-3 w-3" />
                 Try AI Features
               </Badge>
-              <h2 className="text-2xl md:text-3xl font-bold">Experience Our AI - No Login Required</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">Experience Our AI - No Login Required</h2>
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
                 Test our AI-powered features right now. These demos show exactly what you&apos;ll get with EthAum.ai.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {/* AI Pitch Analyzer Demo */}
               <Card className="border-2 border-purple-500/20 hover:border-purple-500/40 transition-colors">
                 <CardHeader>

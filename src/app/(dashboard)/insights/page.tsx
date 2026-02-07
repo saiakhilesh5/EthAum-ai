@@ -279,21 +279,21 @@ export default function InsightsPage() {
       <StatsOverview stats={stats} />
 
       {/* Main Content */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Trend Charts */}
           <Tabs defaultValue="upvotes">
-            <TabsList>
-              <TabsTrigger value="upvotes">
-                <ThumbsUp className="w-4 h-4 mr-1" />
+            <TabsList className="flex flex-wrap h-auto gap-1">
+              <TabsTrigger value="upvotes" className="text-xs sm:text-sm">
+                <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 Upvotes
               </TabsTrigger>
-              <TabsTrigger value="views">
-                <Eye className="w-4 h-4 mr-1" />
+              <TabsTrigger value="views" className="text-xs sm:text-sm">
+                <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 Views
               </TabsTrigger>
-              <TabsTrigger value="reviews">
-                <Star className="w-4 h-4 mr-1" />
+              <TabsTrigger value="reviews" className="text-xs sm:text-sm">
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 Reviews
               </TabsTrigger>
             </TabsList>
@@ -396,7 +396,7 @@ export default function InsightsPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Credibility Widget */}
           <CredibilityWidget
             score={startup.credibility_score || 72}

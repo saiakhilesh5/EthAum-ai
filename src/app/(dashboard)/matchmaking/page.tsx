@@ -255,7 +255,7 @@ export default function MatchmakingPage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid lg:grid-cols-4 gap-6">
+      <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Sidebar - Filters */}
         <div className="lg:col-span-1">
           <MatchFilters
@@ -267,33 +267,35 @@ export default function MatchmakingPage() {
         {/* Match List */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="all">
-                All Matches
-                <Badge variant="secondary" className="ml-2">
+            <TabsList className="flex flex-wrap h-auto gap-1 mb-4">
+              <TabsTrigger value="all" className="text-xs sm:text-sm">
+                All
+                <Badge variant="secondary" className="ml-1 sm:ml-2 text-xs">
                   {stats.total}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger value="pending">
+              <TabsTrigger value="pending" className="text-xs sm:text-sm">
                 Pending
                 {stats.pending > 0 && (
-                  <Badge variant="secondary" className="ml-2">
+                  <Badge variant="secondary" className="ml-1 sm:ml-2 text-xs">
                     {stats.pending}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="interested">
-                Interested
+              <TabsTrigger value="interested" className="text-xs sm:text-sm">
+                <span className="hidden sm:inline">Interested</span>
+                <span className="sm:hidden">Int.</span>
                 {stats.interested > 0 && (
-                  <Badge variant="secondary" className="ml-2">
+                  <Badge variant="secondary" className="ml-1 sm:ml-2 text-xs">
                     {stats.interested}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="connected">
-                Connected
+              <TabsTrigger value="connected" className="text-xs sm:text-sm">
+                <span className="hidden sm:inline">Connected</span>
+                <span className="sm:hidden">Conn.</span>
                 {stats.connected > 0 && (
-                  <Badge className="ml-2 bg-green-500">
+                  <Badge className="ml-1 sm:ml-2 bg-green-500 text-xs">
                     {stats.connected}
                   </Badge>
                 )}

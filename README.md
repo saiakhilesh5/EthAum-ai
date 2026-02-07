@@ -2,16 +2,20 @@
 
 <div align="center">
 
-## 🌐 [Live Demo: https://ethaum-gdudjs824-saiakhilesh5s-projects.vercel.app/](https://ethaum-gdudjs824-saiakhilesh5s-projects.vercel.app/)
+## 🌐 [Live Demo: https://ethaumai-chi.vercel.app](https://ethaumai-chi.vercel.app)
 
 **The AI-powered marketplace connecting enterprises with verified startups**
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+*🏆 Built for Hackathon - Full-Stack MVP with AI-Powered Features*
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Responsive](https://img.shields.io/badge/Responsive-Mobile%20First-green?style=flat-square)](https://ethaumai-chi.vercel.app)
+[![PWA Ready](https://img.shields.io/badge/PWA-Ready-purple?style=flat-square)](https://ethaumai-chi.vercel.app)
 
-[📖 Features](#-features) • [🚀 Deploy](#-deployment-guide)
+[📖 Features](#-features) • [🎯 Demo](#-try-the-demo) • [🚀 Deploy](#-deployment-guide) • [📱 Mobile App](#-progressive-web-app-pwa)
 
 </div>
 
@@ -20,6 +24,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [Try the Demo](#-try-the-demo)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
@@ -40,6 +45,31 @@
 - 🚀 **Startups** launch products, build credibility, and connect with enterprises
 - 🏢 **Enterprises** discover, evaluate, and partner with innovative startups
 - 💼 **Investors** identify promising opportunities with AI-powered insights
+
+---
+
+## 🎮 Try the Demo
+
+Experience the full platform without creating an account:
+
+### Quick Access Links
+
+| Page | Description | Link |
+|------|-------------|------|
+| 🏠 **Landing Page** | Modern, responsive homepage with all features | [Visit](https://ethaumai-chi.vercel.app) |
+| 🎯 **Interactive Demo** | Full dashboard demo with sample data | [Try Demo](https://ethaumai-chi.vercel.app/demo) |
+| 🏢 **Enterprise Page** | ROI calculator & enterprise features | [Explore](https://ethaumai-chi.vercel.app/enterprise) |
+| 🔍 **Explore Startups** | Browse startup directory with filters | [Browse](https://ethaumai-chi.vercel.app/explore) |
+
+### Demo Features Available
+- ✅ **Full Dashboard** - See analytics, credibility scores, AI insights
+- ✅ **AI Matchmaking** - View enterprise match recommendations
+- ✅ **Deal Predictor** - AI-powered deal success analysis
+- ✅ **Pitch Analyzer** - Upload and analyze pitch decks
+- ✅ **Compare Tool** - Side-by-side startup comparison
+- ✅ **Executive Brief Generator** - AI-generated reports
+
+> 💡 **Tip**: Click "Try Demo" on the landing page to explore all features with sample data!
 
 ---
 
@@ -125,7 +155,7 @@
 
 | Category | Technology |
 |----------|------------|
-| **Framework** | Next.js 15 (App Router) |
+| **Framework** | Next.js 16 (App Router + Turbopack) |
 | **Language** | TypeScript 5 |
 | **Styling** | Tailwind CSS 4 |
 | **Database** | Supabase (PostgreSQL) |
@@ -138,6 +168,26 @@
 | **Date Handling** | date-fns |
 | **State Management** | React Context + Hooks |
 | **Deployment** | Vercel |
+| **Responsive Design** | Mobile-first with Tailwind breakpoints (sm/md/lg/xl) |
+| **PWA** | Service Worker, Offline Support, Install Prompt |
+
+---
+
+## 📱 Screenshots
+
+<div align="center">
+
+### Desktop View
+| Landing Page | Dashboard | AI Matchmaking |
+|:---:|:---:|:---:|
+| Modern hero with animations | Analytics & credibility scores | Enterprise match recommendations |
+
+### Mobile View (Fully Responsive)
+| Mobile Menu | Explore Page | Demo Dashboard |
+|:---:|:---:|:---:|
+| Hamburger menu with overlay | Touch-friendly filters | Swipeable tabs |
+
+</div>
 
 ---
 
@@ -154,7 +204,7 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/ethaum-ai.git
+git clone https://github.com/saiakhilesh5/EthAum-ai.git
 cd ethaum-ai
 
 # 2. Install dependencies
@@ -474,54 +524,6 @@ Add your Vercel URL to Supabase Auth settings:
 
 ---
 
-## 🎨 Embed Trust Badge
-
-Showcase your EthAum trust score on your website:
-
-### Option 1: JavaScript Widget (Recommended)
-
-```html
-<div id="ethaum-trust-badge-YOUR_STARTUP_ID"></div>
-<script 
-  src="https://YOUR_DEPLOYED_URL/embed/widget.js" 
-  data-startup-id="YOUR_STARTUP_ID"
-  data-theme="light"
-  data-size="md"
-  async>
-</script>
-```
-
-### Option 2: Image Badge
-
-```html
-<a href="https://YOUR_DEPLOYED_URL/startups/YOUR_SLUG">
-  <img 
-    src="https://YOUR_DEPLOYED_URL/api/badge/YOUR_ID" 
-    alt="EthAum Trust Score" 
-  />
-</a>
-```
-
-### Option 3: Markdown (for GitHub README)
-
-```markdown
-[![EthAum Trust Score](https://YOUR_DEPLOYED_URL/api/badge/YOUR_ID)](https://YOUR_DEPLOYED_URL/startups/YOUR_SLUG)
-```
-
-### Option 4: React Component
-
-```jsx
-<iframe
-  src="https://YOUR_DEPLOYED_URL/embed/trust-badge/YOUR_ID"
-  width="200"
-  height="60"
-  frameBorder="0"
-  title="EthAum Trust Score"
-/>
-```
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -533,13 +535,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. **Open** a Pull Request
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Acknowledgments
 
 - [Next.js](https://nextjs.org/) - The React Framework for Production
@@ -556,10 +551,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for the startup ecosystem**
 
+### 🏆 Hackathon Project
+
+This project was built as a full-stack MVP demonstrating:
+- Modern Next.js 16 App Router architecture
+- AI-powered features with Google Gemini
+- Real-time database with Supabase
+- Fully responsive mobile-first design
+- Production-ready deployment on Vercel
+
 [⬆ Back to Top](#-ethaumai---enterprise-startup-intelligence-platform)
 
 ---
 
 📧 Questions? Open an issue or reach out!
+
+**GitHub**: [github.com/saiakhilesh5/EthAum-ai](https://github.com/saiakhilesh5/EthAum-ai)
 
 </div>

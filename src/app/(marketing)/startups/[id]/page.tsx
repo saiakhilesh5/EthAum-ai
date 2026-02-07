@@ -168,16 +168,16 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
 
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <Skeleton className="h-8 w-32 mb-8" />
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <Skeleton className="h-8 w-32 mb-6 sm:mb-8" />
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
-            <Skeleton className="h-48 w-full mb-6" />
-            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-36 sm:h-48 w-full mb-4 sm:mb-6" />
+            <Skeleton className="h-64 sm:h-96 w-full" />
           </div>
           <div>
-            <Skeleton className="h-64 w-full mb-6" />
-            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-48 sm:h-64 w-full mb-4 sm:mb-6" />
+            <Skeleton className="h-36 sm:h-48 w-full" />
           </div>
         </div>
       </div>
@@ -207,45 +207,45 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="min-h-screen bg-background">
       {/* Back Button */}
-      <div className="max-w-6xl mx-auto px-6 py-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <Link href="/explore">
           <Button variant="ghost" size="sm">
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Back to Explore
+            <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Back to</span> Explore
           </Button>
         </Link>
       </div>
 
       {/* Header */}
       <div className="border-b bg-card">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            <Avatar className="h-24 w-24 rounded-2xl">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
+            <Avatar className="h-16 w-16 sm:h-20 md:h-24 sm:w-20 md:w-24 rounded-xl sm:rounded-2xl">
               <AvatarImage src={startup.logo_url || ''} />
-              <AvatarFallback className="rounded-2xl bg-primary/10 text-primary font-bold text-2xl">
+              <AvatarFallback className="rounded-xl sm:rounded-2xl bg-primary/10 text-primary font-bold text-lg sm:text-xl md:text-2xl">
                 {startup.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-3xl font-bold">{startup.name}</h1>
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{startup.name}</h1>
                 {startup.is_verified && (
-                  <Badge variant="secondary" className="text-sm">
-                    <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                  <Badge variant="secondary" className="text-xs sm:text-sm">
+                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-green-500" />
                     Verified
                   </Badge>
                 )}
                 {startup.is_featured && (
-                  <Badge className="bg-yellow-500 text-white">
-                    <Award className="w-4 h-4 mr-1" />
+                  <Badge className="bg-yellow-500 text-white text-xs sm:text-sm">
+                    <Award className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     Featured
                   </Badge>
                 )}
               </div>
-              <p className="text-xl text-muted-foreground mt-2">{startup.tagline}</p>
-              <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
+              <p className="text-sm sm:text-lg md:text-xl text-muted-foreground mt-1 sm:mt-2 line-clamp-2">{startup.tagline}</p>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <Building className="w-4 h-4" />
+                  <Building className="w-3 h-3 sm:w-4 sm:h-4" />
                   {startup.industry}
                 </span>
                 <span className="flex items-center gap-1">
@@ -287,18 +287,18 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="w-full justify-start">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="launches">Launches</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsList className="w-full justify-start flex-wrap h-auto gap-1">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+                <TabsTrigger value="launches" className="text-xs sm:text-sm">Launches</TabsTrigger>
+                <TabsTrigger value="reviews" className="text-xs sm:text-sm">Reviews</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="mt-6">
+              <TabsContent value="overview" className="mt-4 sm:mt-6">
                 {/* Description */}
                 <Card>
                   <CardHeader>
@@ -351,28 +351,28 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
                 </Card>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6">
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <TrendingUp className="w-8 h-8 mx-auto mb-2 text-primary" />
-                      <p className="text-2xl font-bold">{startup.total_upvotes}</p>
-                      <p className="text-sm text-muted-foreground">Total Upvotes</p>
+                    <CardContent className="p-3 sm:p-6 text-center">
+                      <TrendingUp className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-primary" />
+                      <p className="text-lg sm:text-2xl font-bold">{startup.total_upvotes}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Upvotes</p>
                     </CardContent>
                   </Card>
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
-                      <p className="text-2xl font-bold">{startup.total_reviews}</p>
-                      <p className="text-sm text-muted-foreground">Reviews</p>
+                    <CardContent className="p-3 sm:p-6 text-center">
+                      <Star className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-yellow-500" />
+                      <p className="text-lg sm:text-2xl font-bold">{startup.total_reviews}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Reviews</p>
                     </CardContent>
                   </Card>
                   <Card>
-                    <CardContent className="p-6 text-center">
-                      <Shield className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                      <p className={`text-2xl font-bold ${getScoreColor(startup.credibility_score)}`}>
+                    <CardContent className="p-3 sm:p-6 text-center">
+                      <Shield className="w-5 h-5 sm:w-8 sm:h-8 mx-auto mb-1 sm:mb-2 text-green-500" />
+                      <p className={`text-lg sm:text-2xl font-bold ${getScoreColor(startup.credibility_score)}`}>
                         {startup.credibility_score || '--'}
                       </p>
-                      <p className="text-sm text-muted-foreground">Credibility Score</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Credibility</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -513,18 +513,18 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* DOMINANT Credibility Score Card - EthAum's Key Differentiator */}
             <Card className="overflow-hidden border-2 border-primary shadow-lg">
-              <div className={`bg-gradient-to-r ${getScoreGradient(startup.credibility_score)} p-6 text-white`}>
+              <div className={`bg-gradient-to-r ${getScoreGradient(startup.credibility_score)} p-4 sm:p-6 text-white`}>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Shield className="w-6 h-6" />
-                    <span className="text-sm font-medium uppercase tracking-wider opacity-90">EthAum Credibility Score</span>
+                    <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <span className="text-xs sm:text-sm font-medium uppercase tracking-wider opacity-90">EthAum Credibility</span>
                   </div>
-                  <p className="text-6xl font-bold">{startup.credibility_score || 74}</p>
-                  <p className="text-lg opacity-90">/ 100</p>
-                  <Badge className="mt-3 bg-white/20 text-white border-white/30">
+                  <p className="text-4xl sm:text-5xl md:text-6xl font-bold">{startup.credibility_score || 74}</p>
+                  <p className="text-sm sm:text-lg opacity-90">/ 100</p>
+                  <Badge className="mt-2 sm:mt-3 bg-white/20 text-white border-white/30 text-xs">
                     Enterprise Readiness: {startup.credibility_score >= 70 ? 'High' : startup.credibility_score >= 50 ? 'Medium' : 'Building'}
                   </Badge>
                 </div>
@@ -588,16 +588,16 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
 
             {/* Enterprise Interest Section - Critical for judges */}
             <Card className="border-2 border-green-500/50 bg-green-50/50 dark:bg-green-950/20">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2 text-green-700 dark:text-green-400">
-                    <Building className="w-5 h-5" />
-                    Enterprise Interest Detected
+              <CardHeader className="pb-3 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <CardTitle className="text-sm sm:text-base flex items-center gap-2 text-green-700 dark:text-green-400">
+                    <Building className="w-4 h-4 sm:w-5 sm:h-5" />
+                    Enterprise Interest
                   </CardTitle>
-                  <Badge className="bg-green-500 text-white animate-pulse">Live</Badge>
+                  <Badge className="bg-green-500 text-white animate-pulse w-fit text-xs">Live</Badge>
                 </div>
-                <CardDescription>
-                  AI-matched enterprises interested in this startup
+                <CardDescription className="text-xs sm:text-sm">
+                  AI-matched enterprises interested
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">

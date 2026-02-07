@@ -50,15 +50,15 @@ export default function AuthLayout({
       </div>
 
       {/* Right Side - Auth Forms */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
-          <div className="lg:hidden mb-8 text-center">
+          <div className="lg:hidden mb-6 sm:mb-8 text-center">
             <Link href="/" className="inline-flex items-center space-x-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <Rocket className="h-6 w-6 text-primary-foreground" />
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary">
+                <Rocket className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-bold">EthAum.ai</span>
+              <span className="text-xl sm:text-2xl font-bold">EthAum.ai</span>
             </Link>
           </div>
           {children}

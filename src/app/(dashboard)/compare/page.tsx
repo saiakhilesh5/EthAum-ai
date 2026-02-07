@@ -302,7 +302,7 @@ export default function CompareToolPage() {
         {selectedStartups.length >= 2 && (
           <div className="space-y-8">
             {/* Basic Info */}
-            <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${selectedStartups.length}, 1fr)` }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {selectedStartups.map((startup) => (
                 <Card key={startup.id} className="relative overflow-hidden">
                   {startup.score >= 90 && (
@@ -336,11 +336,11 @@ export default function CompareToolPage() {
                   Ratings Comparison
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 md:p-6">
                 <div className="space-y-4">
                   {['overall', 'easeOfUse', 'support', 'value', 'features'].map((metric) => (
-                    <div key={metric} className="grid gap-4 items-center" style={{ gridTemplateColumns: `150px repeat(${selectedStartups.length}, 1fr)` }}>
-                      <div className="text-sm font-medium capitalize">
+                    <div key={metric} className="grid gap-2 md:gap-4 items-center grid-cols-[100px_1fr] sm:grid-cols-[120px_1fr] md:grid-cols-[150px_repeat(3,1fr)]">
+                      <div className="text-xs sm:text-sm font-medium capitalize col-span-2 md:col-span-1">
                         {metric === 'easeOfUse' ? 'Ease of Use' : metric}
                       </div>
                       {selectedStartups.map((startup) => {
@@ -375,7 +375,7 @@ export default function CompareToolPage() {
                   Key Details
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 md:p-6">
                 <div className="space-y-4">
                   {[
                     { label: 'Pricing', key: 'pricing', icon: DollarSign },
@@ -383,8 +383,8 @@ export default function CompareToolPage() {
                     { label: 'Team Size', key: 'teamSize', icon: Users },
                     { label: 'Funding', key: 'funding', icon: TrendingUp },
                   ].map(({ label, key, icon: Icon }) => (
-                    <div key={key} className="grid gap-4 items-center" style={{ gridTemplateColumns: `150px repeat(${selectedStartups.length}, 1fr)` }}>
-                      <div className="flex items-center gap-2 text-sm font-medium">
+                    <div key={key} className="grid gap-2 md:gap-4 items-center grid-cols-[100px_1fr] sm:grid-cols-[120px_1fr] md:grid-cols-[150px_repeat(3,1fr)]">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm font-medium col-span-2 md:col-span-1">
                         <Icon className="w-4 h-4 text-muted-foreground" />
                         {label}
                       </div>
@@ -407,8 +407,8 @@ export default function CompareToolPage() {
                   Features
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${selectedStartups.length}, 1fr)` }}>
+              <CardContent className="p-4 md:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {selectedStartups.map((startup) => (
                     <div key={startup.id} className="space-y-2">
                       {startup.features.map((feature, i) => (
@@ -424,13 +424,13 @@ export default function CompareToolPage() {
             </Card>
 
             {/* Pros & Cons */}
-            <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${selectedStartups.length}, 1fr)` }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {selectedStartups.map((startup) => (
                 <Card key={startup.id}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{startup.name}</CardTitle>
+                  <CardHeader className="p-4 md:p-6">
+                    <CardTitle className="text-base md:text-lg">{startup.name}</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 p-4 md:p-6 pt-0">
                     <div>
                       <h4 className="text-sm font-medium text-green-500 mb-2">Pros</h4>
                       <ul className="space-y-1">
@@ -503,14 +503,14 @@ export default function CompareToolPage() {
 
         {/* Empty State */}
         {selectedStartups.length < 2 && (
-          <Card className="text-center py-16">
-            <CardContent>
-              <Scale className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Select Startups to Compare</h3>
-              <p className="text-muted-foreground mb-6">
+          <Card className="text-center py-8 sm:py-12 md:py-16">
+            <CardContent className="px-4">
+              <Scale className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">Select Startups to Compare</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
                 Choose at least 2 startups from the dropdown above to see a detailed comparison
               </p>
-              <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 md:gap-8 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
                   Side-by-side comparison

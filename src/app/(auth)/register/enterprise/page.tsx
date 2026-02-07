@@ -75,25 +75,25 @@ export default function EnterpriseRegisterPage() {
 
   return (
     <Card className="border-0 shadow-none lg:border lg:shadow-sm">
-      <CardHeader className="space-y-1">
+      <CardHeader className="space-y-1 px-0 sm:px-6">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" asChild>
             <Link href="/register">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
           <div>
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-xl sm:text-2xl font-bold">
               Join as Enterprise
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Create your account to discover startups
             </CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <CardContent className="px-0 sm:px-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
             <div className="relative">
@@ -192,8 +192,8 @@ export default function EnterpriseRegisterPage() {
           </Button>
         </form>
       </CardContent>
-      <CardFooter>
-        <p className="text-sm text-muted-foreground text-center w-full">
+      <CardFooter className="px-0 sm:px-6">
+        <p className="text-xs sm:text-sm text-muted-foreground text-center w-full">
           Already have an account?{' '}
           <Link href="/login" className="text-primary hover:underline">
             Sign in

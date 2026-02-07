@@ -114,18 +114,18 @@ export default function LaunchDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-4 sm:space-y-6">
         <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-48 sm:h-64 w-full" />
+        <Skeleton className="h-36 sm:h-48 w-full" />
       </div>
     );
   }
 
   if (!launch) {
     return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-semibold mb-2">Launch not found</h2>
+      <div className="p-4 sm:p-6 text-center">
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">Launch not found</h2>
         <Link href="/launches">
           <Button>Back to Launches</Button>
         </Link>
@@ -134,24 +134,24 @@ export default function LaunchDetailPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
       {/* Back Button */}
       <Link
         href="/launches"
-        className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6"
+        className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 sm:mb-6"
       >
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to Launches
       </Link>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column - Launch Details */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Header */}
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             {/* Thumbnail */}
-            <div className="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-muted">
+            <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-muted">
               {launch.thumbnail_url ? (
                 <img
                   src={launch.thumbnail_url}
@@ -160,7 +160,7 @@ export default function LaunchDetailPage() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Avatar className="w-16 h-16">
+                  <Avatar className="w-12 h-12 sm:w-16 sm:h-16">
                     <AvatarImage src={launch.startup.logo_url || ''} />
                     <AvatarFallback>
                       {launch.startup.name.substring(0, 2).toUpperCase()}
@@ -170,19 +170,19 @@ export default function LaunchDetailPage() {
               )}
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-2xl font-bold">{launch.title}</h1>
+                    <h1 className="text-lg sm:text-xl md:text-2xl font-bold">{launch.title}</h1>
                     {launch.is_featured && (
-                      <Badge className="bg-yellow-500 text-white">
+                      <Badge className="bg-yellow-500 text-white text-xs">
                         <Award className="w-3 h-3 mr-1" />
                         Featured
                       </Badge>
                     )}
                   </div>
-                  <p className="text-lg text-muted-foreground mt-1">
+                  <p className="text-sm sm:text-base md:text-lg text-muted-foreground mt-1 line-clamp-2">
                     {launch.tagline}
                   </p>
                 </div>
@@ -191,23 +191,23 @@ export default function LaunchDetailPage() {
           </div>
 
           {/* Stats Row */}
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
               {format(new Date(launch.launch_date), 'MMM d, yyyy')}
             </span>
             <span className="flex items-center gap-1">
-              <Eye className="w-4 h-4" />
+              <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
               {launch.view_count} views
             </span>
             <span className="flex items-center gap-1">
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
               {launch.comment_count} comments
             </span>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <UpvoteButton
               launchId={launch.id}
               initialCount={launch.upvote_count}
@@ -220,15 +220,15 @@ export default function LaunchDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="outline" size="lg">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Visit Website
+                <Button variant="outline" size="sm" className="sm:size-lg">
+                  <ExternalLink className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Visit Website</span>
                 </Button>
               </a>
             )}
-            <Button variant="ghost" size="lg" onClick={handleShare}>
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
+            <Button variant="ghost" size="sm" className="sm:size-lg" onClick={handleShare}>
+              <Share2 className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Share</span>
             </Button>
           </div>
 
@@ -236,8 +236,8 @@ export default function LaunchDetailPage() {
 
           {/* Description */}
           <div>
-            <h2 className="text-lg font-semibold mb-3">About this Launch</h2>
-            <p className="text-muted-foreground whitespace-pre-wrap">
+            <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">About this Launch</h2>
+            <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap">
               {launch.description}
             </p>
           </div>
@@ -245,8 +245,8 @@ export default function LaunchDetailPage() {
           {/* Key Features */}
           {launch.key_features && launch.key_features.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                 Key Features
               </h2>
               <ul className="space-y-2">
@@ -262,11 +262,11 @@ export default function LaunchDetailPage() {
 
           {/* Target Audience */}
           <div>
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <Target className="h-5 w-5 text-blue-500" />
+            <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2">
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
               Target Audience
             </h2>
-            <p className="text-muted-foreground">{launch.target_audience}</p>
+            <p className="text-sm sm:text-base text-muted-foreground">{launch.target_audience}</p>
           </div>
 
           {/* Special Offer */}
@@ -293,15 +293,15 @@ export default function LaunchDetailPage() {
         </div>
 
         {/* Right Column - Startup Info */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Rocket className="h-5 w-5" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                <Rocket className="h-4 w-4 sm:h-5 sm:w-5" />
                 About the Startup
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
               <Link href={`/startups/${launch.startup.slug}`}>
                 <div className="flex items-center gap-3 hover:bg-muted p-2 rounded-lg transition-colors">
                   <Avatar className="h-12 w-12">

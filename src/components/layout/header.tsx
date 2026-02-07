@@ -74,8 +74,8 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 sm:h-16 items-center justify-between">
+    <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary">
@@ -187,19 +187,15 @@ export function Header() {
             </div>
           ) : (
             <>
-              {/* Desktop Auth Buttons */}
-              <div className="hidden sm:flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild>
+              {/* Auth Buttons - Always visible */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3" asChild>
                   <Link href="/login">Log in</Link>
                 </Button>
-                <Button size="sm" asChild>
+                <Button size="sm" className="text-xs sm:text-sm px-2 sm:px-3" asChild>
                   <Link href="/register">Sign up</Link>
                 </Button>
               </div>
-              {/* Mobile Auth - Just show login icon */}
-              <Button variant="ghost" size="sm" className="sm:hidden" asChild>
-                <Link href="/login">Log in</Link>
-              </Button>
             </>
           )}
 
@@ -222,133 +218,148 @@ export function Header() {
 
       {/* Mobile Menu - Full Screen Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-14 sm:top-16 z-50 md:hidden bg-background">
-          <div className="container py-6 space-y-6 h-full overflow-y-auto">
-            {/* Navigation Links */}
-            <nav className="space-y-1">
+        <div 
+          className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+      <div 
+        className={cn(
+          "fixed inset-x-0 top-14 sm:top-16 bottom-0 z-[9999] md:hidden bg-background border-t transition-all duration-300 ease-in-out",
+          mobileMenuOpen 
+            ? "opacity-100 visible translate-y-0" 
+            : "opacity-0 invisible -translate-y-2 pointer-events-none"
+        )}
+      >
+        <div className="px-4 py-4 space-y-4 h-full overflow-y-auto pb-24">
+          {/* Navigation Links */}
+          <nav className="space-y-1">
+            <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Navigation</p>
+            <Link
+              href="/"
+              className={cn(
+                'flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors',
+                pathname === '/'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-foreground hover:bg-muted'
+              )}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Home className="h-5 w-5" />
+              Home
+            </Link>
+            {publicNavItems.map((item) => (
               <Link
-                href="/"
+                key={item.href}
+                href={item.href}
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors',
-                  pathname === '/'
+                  pathname === item.href
                     ? 'bg-primary/10 text-primary'
                     : 'text-foreground hover:bg-muted'
                 )}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Home className="h-5 w-5" />
-                Home
+                <item.icon className="h-5 w-5" />
+                {item.title}
               </Link>
-              {publicNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors',
-                    pathname === item.href
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-foreground hover:bg-muted'
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.title}
+            ))}
+          </nav>
+
+          {/* Divider */}
+          <div className="border-t my-2" />
+
+          {/* Auth Section for Mobile */}
+          {!isAuthenticated && (
+            <div className="space-y-3">
+              <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Get Started</p>
+              <Button className="w-full" size="lg" asChild>
+                <Link href="/register">
+                  <Rocket className="mr-2 h-4 w-4" />
+                  Get Started Free
                 </Link>
-              ))}
-            </nav>
-
-            {/* Divider */}
-            <div className="border-t" />
-
-            {/* Auth Section for Mobile */}
-            {!isAuthenticated && (
-              <div className="space-y-3 px-4">
-                <Button className="w-full" size="lg" asChild>
-                  <Link href="/register">
-                    <Rocket className="mr-2 h-4 w-4" />
-                    Get Started Free
-                  </Link>
-                </Button>
-                <Button variant="outline" className="w-full" size="lg" asChild>
-                  <Link href="/login">Log in to your account</Link>
-                </Button>
-              </div>
-            )}
-
-            {/* User Info for Mobile when logged in */}
-            {isAuthenticated && profile && (
-              <div className="space-y-3 px-4">
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage
-                      src={profile.avatar_url || ''}
-                      alt={profile.full_name}
-                    />
-                    <AvatarFallback>
-                      {getInitials(profile.full_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{profile.full_name}</p>
-                    <p className="text-sm text-muted-foreground">{profile.email}</p>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium hover:bg-muted"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LayoutDashboard className="h-5 w-5" />
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium hover:bg-muted"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <User className="h-5 w-5" />
-                    Profile
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium hover:bg-muted"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Settings className="h-5 w-5" />
-                    Settings
-                  </Link>
-                  <button
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 w-full text-left"
-                    onClick={() => {
-                      signOut();
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <LogOut className="h-5 w-5" />
-                    Log out
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Search on Mobile */}
-            <div className="px-4 sm:hidden">
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  window.dispatchEvent(new CustomEvent('open-search'));
-                }}
-              >
-                <Search className="mr-2 h-4 w-4" />
-                Search startups...
+              </Button>
+              <Button variant="outline" className="w-full" size="lg" asChild>
+                <Link href="/login">Log in to your account</Link>
               </Button>
             </div>
+          )}
+
+          {/* User Info for Mobile when logged in */}
+          {isAuthenticated && profile && (
+            <div className="space-y-3">
+              <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Account</p>
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage
+                    src={profile.avatar_url || ''}
+                    alt={profile.full_name}
+                  />
+                  <AvatarFallback>
+                    {getInitials(profile.full_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium truncate">{profile.full_name}</p>
+                  <p className="text-sm text-muted-foreground truncate">{profile.email}</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium hover:bg-muted"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard className="h-5 w-5" />
+                  Dashboard
+                </Link>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium hover:bg-muted"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User className="h-5 w-5" />
+                  Profile
+                </Link>
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium hover:bg-muted"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Settings className="h-5 w-5" />
+                  Settings
+                </Link>
+                <div className="border-t my-2" />
+                <button
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 w-full text-left"
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-5 w-5" />
+                  Log out
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Search on Mobile */}
+          <div className="border-t pt-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                window.dispatchEvent(new CustomEvent('open-search'));
+              }}
+            >
+              <Search className="mr-2 h-4 w-4" />
+              Search startups...
+            </Button>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

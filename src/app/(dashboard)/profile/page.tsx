@@ -20,9 +20,9 @@ export default function ProfilePage() {
   }, [isStartup, isEnterprise, isLoading, router]);
 
   return (
-    <div className="p-6 space-y-6">
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-64 w-full" />
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <Skeleton className="h-8 w-32 sm:w-48" />
+      <Skeleton className="h-48 sm:h-64 w-full" />
     </div>
   );
 }
