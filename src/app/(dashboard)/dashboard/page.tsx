@@ -52,7 +52,104 @@ export default function DashboardPage() {
       if (!user && !DEMO_MODE) return;
 
       try {
-        // Use demo data if DEMO_MODE is enabled
+        // If user is logged in, always try to fetch real data first
+        if (user) {
+          // Check for startup profile
+          const { data: startupData } = await supabase
+            .from('startups')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          // Check for enterprise profile
+          const { data: enterpriseData } = await supabase
+            .from('enterprises')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          // Get counts based on profile type
+          let launchesCount = 0;
+          let reviewsCount = 0;
+          let matchesCount = 0;
+          let recentLaunches: any[] = [];
+          let recentReviews: any[] = [];
+
+          if (startupData) {
+            // Get launches count
+            const { count: lCount } = await supabase
+              .from('launches')
+              .select('*', { count: 'exact', head: true })
+              .eq('startup_id', startupData.id);
+            launchesCount = lCount || 0;
+
+            // Get reviews count
+            const { count: rCount } = await supabase
+              .from('reviews')
+              .select('*', { count: 'exact', head: true })
+              .eq('startup_id', startupData.id);
+            reviewsCount = rCount || 0;
+
+            // Get matches count
+            const { count: mCount } = await supabase
+              .from('matches')
+              .select('*', { count: 'exact', head: true })
+              .eq('startup_id', startupData.id);
+            matchesCount = mCount || 0;
+
+            // Get recent launches
+            const { data: launches } = await supabase
+              .from('launches')
+              .select('*')
+              .eq('startup_id', startupData.id)
+              .order('created_at', { ascending: false })
+              .limit(3);
+            recentLaunches = launches || [];
+          }
+
+          if (enterpriseData) {
+            // Get matches count for enterprise
+            const { count: mCount } = await supabase
+              .from('matches')
+              .select('*', { count: 'exact', head: true })
+              .eq('enterprise_id', enterpriseData.id);
+            matchesCount = mCount || 0;
+          }
+
+          // If user has no profile yet and DEMO_MODE is on, show demo data
+          if (!startupData && !enterpriseData && DEMO_MODE) {
+            const demoStartup = DEMO_STARTUPS[0];
+            const demoEnterprise = DEMO_ENTERPRISES[0];
+            
+            setDashboardData({
+              hasStartupProfile: true,
+              hasEnterpriseProfile: true,
+              startupData: demoStartup,
+              enterpriseData: demoEnterprise,
+              launchesCount: DEMO_LAUNCHES.length,
+              reviewsCount: DEMO_REVIEWS.length,
+              matchesCount: DEMO_MATCHES.length,
+              recentLaunches: DEMO_LAUNCHES.slice(0, 3),
+              recentReviews: DEMO_REVIEWS.slice(0, 3),
+            });
+          } else {
+            setDashboardData({
+              hasStartupProfile: !!startupData,
+              hasEnterpriseProfile: !!enterpriseData,
+              startupData,
+              enterpriseData,
+              launchesCount,
+              reviewsCount,
+              matchesCount,
+              recentLaunches,
+              recentReviews,
+            });
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        // If no user but DEMO_MODE is enabled, show demo data
         if (DEMO_MODE) {
           const demoStartup = DEMO_STARTUPS[0];
           const demoEnterprise = DEMO_ENTERPRISES[0];
@@ -71,88 +168,31 @@ export default function DashboardPage() {
           setIsLoading(false);
           return;
         }
-
-        // Check for startup profile
-        const { data: startupData } = await supabase
-          .from('startups')
-          .select('*')
-          .eq('user_id', user!.id)
-          .single();
-
-        // Check for enterprise profile
-        const { data: enterpriseData } = await supabase
-          .from('enterprises')
-          .select('*')
-          .eq('user_id', user!.id)
-          .single();
-
-        // Get counts based on profile type
-        let launchesCount = 0;
-        let reviewsCount = 0;
-        let matchesCount = 0;
-        let recentLaunches: any[] = [];
-        let recentReviews: any[] = [];
-
-        if (startupData) {
-          // Get launches count
-          const { count: lCount } = await supabase
-            .from('launches')
-            .select('*', { count: 'exact', head: true })
-            .eq('startup_id', startupData.id);
-          launchesCount = lCount || 0;
-
-          // Get reviews count
-          const { count: rCount } = await supabase
-            .from('reviews')
-            .select('*', { count: 'exact', head: true })
-            .eq('startup_id', startupData.id);
-          reviewsCount = rCount || 0;
-
-          // Get matches count
-          const { count: mCount } = await supabase
-            .from('matches')
-            .select('*', { count: 'exact', head: true })
-            .eq('startup_id', startupData.id);
-          matchesCount = mCount || 0;
-
-          // Get recent launches
-          const { data: launches } = await supabase
-            .from('launches')
-            .select('*')
-            .eq('startup_id', startupData.id)
-            .order('created_at', { ascending: false })
-            .limit(3);
-          recentLaunches = launches || [];
-        }
-
-        if (enterpriseData) {
-          // Get matches count for enterprise
-          const { count: mCount } = await supabase
-            .from('matches')
-            .select('*', { count: 'exact', head: true })
-            .eq('enterprise_id', enterpriseData.id);
-          matchesCount = mCount || 0;
-        }
-
-        setDashboardData({
-          hasStartupProfile: !!startupData,
-          hasEnterpriseProfile: !!enterpriseData,
-          startupData,
-          enterpriseData,
-          launchesCount,
-          reviewsCount,
-          matchesCount,
-          recentLaunches,
-          recentReviews,
-        });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        // Fall back to demo data on error if DEMO_MODE enabled
+        if (DEMO_MODE) {
+          const demoStartup = DEMO_STARTUPS[0];
+          const demoEnterprise = DEMO_ENTERPRISES[0];
+          
+          setDashboardData({
+            hasStartupProfile: true,
+            hasEnterpriseProfile: true,
+            startupData: demoStartup,
+            enterpriseData: demoEnterprise,
+            launchesCount: DEMO_LAUNCHES.length,
+            reviewsCount: DEMO_REVIEWS.length,
+            matchesCount: DEMO_MATCHES.length,
+            recentLaunches: DEMO_LAUNCHES.slice(0, 3),
+            recentReviews: DEMO_REVIEWS.slice(0, 3),
+          });
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (user) {
+    if (user || DEMO_MODE) {
       fetchDashboardData();
     }
   }, [user]);

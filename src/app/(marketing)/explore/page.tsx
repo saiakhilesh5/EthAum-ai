@@ -70,34 +70,7 @@ export default function ExplorePage() {
 
   const fetchStartups = async () => {
     try {
-      // Use demo data in demo mode or when DB is empty
-      if (DEMO_MODE) {
-        let demoData = [...DEMO_STARTUPS] as any[];
-        
-        if (industryFilter !== 'all') {
-          demoData = demoData.filter(s => s.industry === industryFilter);
-        }
-        if (stageFilter !== 'all') {
-          demoData = demoData.filter(s => s.stage === stageFilter);
-        }
-        
-        switch (sortBy) {
-          case 'credibility':
-            demoData.sort((a, b) => b.credibility_score - a.credibility_score);
-            break;
-          case 'reviews':
-            demoData.sort((a, b) => b.total_reviews - a.total_reviews);
-            break;
-          case 'upvotes':
-            demoData.sort((a, b) => b.total_upvotes - a.total_upvotes);
-            break;
-        }
-        
-        setStartups(demoData);
-        setIsLoading(false);
-        return;
-      }
-
+      // Always try to fetch real data first
       let query = supabase
         .from('startups')
         .select('*');
@@ -127,54 +100,92 @@ export default function ExplorePage() {
 
       const { data, error } = await query.limit(20);
 
-      if (error) throw error;
-      
-      // Fall back to demo data if empty
-      if (!data || data.length === 0) {
-        setStartups(DEMO_STARTUPS as any[]);
+      // Use real data if available, otherwise fall back to demo
+      if (!error && data && data.length > 0) {
+        setStartups(data);
+      } else if (DEMO_MODE) {
+        // Fall back to demo data if database is empty
+        let demoData = [...DEMO_STARTUPS] as any[];
+        
+        if (industryFilter !== 'all') {
+          demoData = demoData.filter(s => s.industry === industryFilter);
+        }
+        if (stageFilter !== 'all') {
+          demoData = demoData.filter(s => s.stage === stageFilter);
+        }
+        
+        switch (sortBy) {
+          case 'credibility':
+            demoData.sort((a, b) => b.credibility_score - a.credibility_score);
+            break;
+          case 'reviews':
+            demoData.sort((a, b) => b.total_reviews - a.total_reviews);
+            break;
+          case 'upvotes':
+            demoData.sort((a, b) => b.total_upvotes - a.total_upvotes);
+            break;
+        }
+        
+        setStartups(demoData);
       } else {
-        setStartups(data || []);
+        setStartups([]);
       }
     } catch (error) {
       console.error('Error fetching startups:', error);
-      // Fall back to demo data on error
-      setStartups(DEMO_STARTUPS as any[]);
+      // Fall back to demo data on error if DEMO_MODE enabled
+      if (DEMO_MODE) {
+        setStartups(DEMO_STARTUPS as any[]);
+      } else {
+        setStartups([]);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const fetchFeaturedStartups = async () => {
-    if (DEMO_MODE) {
-      setFeaturedStartups(DEMO_STARTUPS.filter(s => s.is_featured) as any[]);
-      return;
-    }
-    const { data } = await supabase
-      .from('startups')
-      .select('*')
-      .eq('is_featured', true)
-      .limit(5);
+    try {
+      const { data, error } = await supabase
+        .from('startups')
+        .select('*')
+        .eq('is_featured', true)
+        .limit(5);
 
-    setFeaturedStartups(data?.length ? data : DEMO_STARTUPS.filter(s => s.is_featured) as any[]);
+      if (!error && data && data.length > 0) {
+        setFeaturedStartups(data);
+      } else if (DEMO_MODE) {
+        setFeaturedStartups(DEMO_STARTUPS.filter(s => s.is_featured) as any[]);
+      } else {
+        setFeaturedStartups([]);
+      }
+    } catch {
+      if (DEMO_MODE) {
+        setFeaturedStartups(DEMO_STARTUPS.filter(s => s.is_featured) as any[]);
+      }
+    }
   };
 
   const fetchTrendingStartups = async () => {
-    if (DEMO_MODE) {
-      const sorted = [...DEMO_STARTUPS].sort((a, b) => b.total_upvotes - a.total_upvotes);
-      setTrendingStartups(sorted.slice(0, 5) as any[]);
-      return;
-    }
-    const { data } = await supabase
-      .from('startups')
-      .select('*')
-      .order('total_upvotes', { ascending: false })
-      .limit(5);
+    try {
+      const { data, error } = await supabase
+        .from('startups')
+        .select('*')
+        .order('total_upvotes', { ascending: false })
+        .limit(5);
 
-    if (!data || data.length === 0) {
-      const sorted = [...DEMO_STARTUPS].sort((a, b) => b.total_upvotes - a.total_upvotes);
-      setTrendingStartups(sorted.slice(0, 5) as any[]);
-    } else {
-      setTrendingStartups(data);
+      if (!error && data && data.length > 0) {
+        setTrendingStartups(data);
+      } else if (DEMO_MODE) {
+        const sorted = [...DEMO_STARTUPS].sort((a, b) => b.total_upvotes - a.total_upvotes);
+        setTrendingStartups(sorted.slice(0, 5) as any[]);
+      } else {
+        setTrendingStartups([]);
+      }
+    } catch {
+      if (DEMO_MODE) {
+        const sorted = [...DEMO_STARTUPS].sort((a, b) => b.total_upvotes - a.total_upvotes);
+        setTrendingStartups(sorted.slice(0, 5) as any[]);
+      }
     }
   };
 

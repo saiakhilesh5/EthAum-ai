@@ -60,22 +60,8 @@ export default function MatchList({
   const fetchMatches = async () => {
     setIsLoading(true);
     
-    // Use demo data in demo mode
-    if (DEMO_MODE) {
-      let demoData = [...DEMO_MATCHES] as any[];
-      
-      if (status !== 'all') {
-        demoData = demoData.filter(m => m.status === status);
-      }
-      
-      demoData = demoData.filter(m => m.match_score >= minScore);
-      
-      setMatches(demoData);
-      setIsLoading(false);
-      return;
-    }
-    
     try {
+      // Always try to fetch real data first
       // First get the user's startup or enterprise ID
       let profileId: string | null = null;
       
@@ -96,12 +82,17 @@ export default function MatchList({
       }
 
       if (!profileId) {
-        // Fall back to demo data if no profile
-        let demoData = [...DEMO_MATCHES] as any[];
-        if (status !== 'all') {
-          demoData = demoData.filter(m => m.status === status);
+        // Fall back to demo data if no profile and DEMO_MODE enabled
+        if (DEMO_MODE) {
+          let demoData = [...DEMO_MATCHES] as any[];
+          if (status !== 'all') {
+            demoData = demoData.filter(m => m.status === status);
+          }
+          demoData = demoData.filter(m => m.match_score >= minScore);
+          setMatches(demoData);
+        } else {
+          setMatches([]);
         }
-        setMatches(demoData);
         setIsLoading(false);
         return;
       }
@@ -154,29 +145,37 @@ export default function MatchList({
 
       if (error) throw error;
 
-      // Fall back to demo data if empty
-      if (!data || data.length === 0) {
-        let demoData = [...DEMO_MATCHES] as any[];
-        if (status !== 'all') {
-          demoData = demoData.filter(m => m.status === status);
-        }
-        setMatches(demoData);
-      } else {
+      // Use real data if available, otherwise fall back to demo
+      if (data && data.length > 0) {
         const formattedMatches = data.map((match: any) => ({
           ...match,
           startup: match.startups,
           enterprise: match.enterprises,
         }));
         setMatches(formattedMatches);
+      } else if (DEMO_MODE) {
+        // Fall back to demo data if empty
+        let demoData = [...DEMO_MATCHES] as any[];
+        if (status !== 'all') {
+          demoData = demoData.filter(m => m.status === status);
+        }
+        demoData = demoData.filter(m => m.match_score >= minScore);
+        setMatches(demoData);
+      } else {
+        setMatches([]);
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
-      // Fall back to demo data on error
-      let demoData = [...DEMO_MATCHES] as any[];
-      if (status !== 'all') {
-        demoData = demoData.filter(m => m.status === status);
+      // Fall back to demo data on error if DEMO_MODE enabled
+      if (DEMO_MODE) {
+        let demoData = [...DEMO_MATCHES] as any[];
+        if (status !== 'all') {
+          demoData = demoData.filter(m => m.status === status);
+        }
+        setMatches(demoData);
+      } else {
+        setMatches([]);
       }
-      setMatches(demoData);
     } finally {
       setIsLoading(false);
     }

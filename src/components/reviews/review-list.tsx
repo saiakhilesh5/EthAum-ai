@@ -72,58 +72,7 @@ export default function ReviewList({
     const offset = (currentPage - 1) * limit;
 
     try {
-      // Use demo data if DEMO_MODE is enabled
-      if (DEMO_MODE) {
-        let demoReviews = DEMO_REVIEWS.map(review => ({
-          ...review,
-          user: {
-            full_name: review.reviewer.full_name,
-            avatar_url: review.reviewer.avatar_url,
-            job_title: review.reviewer.role,
-          },
-          enterprise: review.reviewer.company ? {
-            company_name: review.reviewer.company,
-            industry: 'Technology',
-          } : null,
-        }));
-
-        // Apply rating filter
-        if (filterRating !== 'all') {
-          demoReviews = demoReviews.filter(r => r.overall_rating === parseInt(filterRating));
-        }
-
-        // Apply sorting
-        switch (sortBy) {
-          case 'newest':
-            demoReviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-            break;
-          case 'oldest':
-            demoReviews.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-            break;
-          case 'highest':
-            demoReviews.sort((a, b) => b.overall_rating - a.overall_rating);
-            break;
-          case 'lowest':
-            demoReviews.sort((a, b) => a.overall_rating - b.overall_rating);
-            break;
-          case 'helpful':
-            demoReviews.sort((a, b) => b.helpful_count - a.helpful_count);
-            break;
-        }
-
-        const paginatedReviews = demoReviews.slice(offset, offset + limit);
-        
-        if (reset) {
-          setReviews(paginatedReviews as any[]);
-        } else {
-          setReviews([...reviews, ...paginatedReviews] as any[]);
-        }
-
-        setHasMore(paginatedReviews.length === limit);
-        setIsLoading(false);
-        return;
-      }
-
+      // Always try to fetch real data first
       let query = supabase
         .from('reviews')
         .select(`
@@ -172,27 +121,91 @@ export default function ReviewList({
 
       const { data, error } = await query;
 
-      if (error) {
-        console.error('Error fetching reviews:', error);
-        setReviews([]);
-        return;
-      }
+      // Use real data if available
+      if (!error && data && data.length > 0) {
+        const formattedReviews = data.map((review: any) => ({
+          ...review,
+          user: review.users || { full_name: 'Anonymous', avatar_url: null },
+          enterprise: review.enterprises || null,
+        }));
 
-      const formattedReviews = (data || []).map((review: any) => ({
-        ...review,
-        user: review.users || { full_name: 'Anonymous', avatar_url: null },
-        enterprise: review.enterprises || null,
-      }));
+        if (reset) {
+          setReviews(formattedReviews);
+        } else {
+          setReviews([...reviews, ...formattedReviews]);
+        }
+        setHasMore(formattedReviews.length === limit);
+      } else if (DEMO_MODE) {
+        // Fall back to demo data if database is empty
+        let demoReviews = DEMO_REVIEWS.map(review => ({
+          ...review,
+          user: {
+            full_name: review.reviewer.full_name,
+            avatar_url: review.reviewer.avatar_url,
+            job_title: review.reviewer.role,
+          },
+          enterprise: review.reviewer.company ? {
+            company_name: review.reviewer.company,
+            industry: 'Technology',
+          } : null,
+        }));
 
-      if (reset) {
-        setReviews(formattedReviews);
+        // Apply rating filter
+        if (filterRating !== 'all') {
+          demoReviews = demoReviews.filter(r => r.overall_rating === parseInt(filterRating));
+        }
+
+        // Apply sorting
+        switch (sortBy) {
+          case 'newest':
+            demoReviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            break;
+          case 'oldest':
+            demoReviews.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            break;
+          case 'highest':
+            demoReviews.sort((a, b) => b.overall_rating - a.overall_rating);
+            break;
+          case 'lowest':
+            demoReviews.sort((a, b) => a.overall_rating - b.overall_rating);
+            break;
+          case 'helpful':
+            demoReviews.sort((a, b) => b.helpful_count - a.helpful_count);
+            break;
+        }
+
+        const paginatedReviews = demoReviews.slice(offset, offset + limit);
+        
+        if (reset) {
+          setReviews(paginatedReviews as any[]);
+        } else {
+          setReviews([...reviews, ...paginatedReviews] as any[]);
+        }
+        setHasMore(paginatedReviews.length === limit);
       } else {
-        setReviews([...reviews, ...formattedReviews]);
+        setReviews([]);
+        setHasMore(false);
       }
-
-      setHasMore(formattedReviews.length === limit);
     } catch (error) {
       console.error('Error fetching reviews:', error);
+      // Fall back to demo data on error if DEMO_MODE enabled
+      if (DEMO_MODE) {
+        const demoReviews = DEMO_REVIEWS.map(review => ({
+          ...review,
+          user: {
+            full_name: review.reviewer.full_name,
+            avatar_url: review.reviewer.avatar_url,
+            job_title: review.reviewer.role,
+          },
+          enterprise: review.reviewer.company ? {
+            company_name: review.reviewer.company,
+            industry: 'Technology',
+          } : null,
+        }));
+        setReviews(demoReviews as any[]);
+      } else {
+        setReviews([]);
+      }
     } finally {
       setIsLoading(false);
     }

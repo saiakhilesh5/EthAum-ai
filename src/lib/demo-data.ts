@@ -1,7 +1,9 @@
 // Demo data for showcasing the platform when database is empty or not connected
 // This provides realistic sample data for judges to see the full platform functionality
 
-export const DEMO_MODE = true; // Toggle this to enable/disable demo data
+// When true: Always fetch from database first, fall back to demo if empty
+// When false: Only use database data, no demo fallback
+export const DEMO_MODE = true; // Enable demo fallback for empty database
 
 // Demo Startups
 export const DEMO_STARTUPS = [

@@ -30,29 +30,7 @@ export function LaunchList({ filter = 'all', limit, showRank = true }: LaunchLis
   }, [user, launches]);
 
   const fetchLaunches = async () => {
-    // Use demo data in demo mode
-    if (DEMO_MODE) {
-      let demoData = [...DEMO_LAUNCHES];
-      
-      // Apply date filters for demo
-      const now = new Date();
-      if (filter === 'today') {
-        const today = new Date(now.setHours(0, 0, 0, 0));
-        demoData = demoData.filter(l => new Date(l.launch_date) >= today);
-      } else if (filter === 'week') {
-        const weekAgo = new Date(now.setDate(now.getDate() - 7));
-        demoData = demoData.filter(l => new Date(l.launch_date) >= weekAgo);
-      }
-      
-      if (limit) {
-        demoData = demoData.slice(0, limit);
-      }
-      
-      setLaunches(demoData);
-      setIsLoading(false);
-      return;
-    }
-
+    // Always try to fetch real data first
     try {
       let query = supabase
         .from('launches')
@@ -95,16 +73,39 @@ export function LaunchList({ filter = 'all', limit, showRank = true }: LaunchLis
 
       if (error) throw error;
       
-      // Fall back to demo data if empty
-      if (!data || data.length === 0) {
-        setLaunches(DEMO_LAUNCHES);
-      } else {
+      // Use real data if available, otherwise fall back to demo data
+      if (data && data.length > 0) {
         setLaunches(data);
+      } else if (DEMO_MODE) {
+        // Fall back to demo data if database is empty
+        let demoData = [...DEMO_LAUNCHES];
+        
+        // Apply date filters for demo
+        const now = new Date();
+        if (filter === 'today') {
+          const today = new Date(now.setHours(0, 0, 0, 0));
+          demoData = demoData.filter(l => new Date(l.launch_date) >= today);
+        } else if (filter === 'week') {
+          const weekAgo = new Date(now.setDate(now.getDate() - 7));
+          demoData = demoData.filter(l => new Date(l.launch_date) >= weekAgo);
+        }
+        
+        if (limit) {
+          demoData = demoData.slice(0, limit);
+        }
+        
+        setLaunches(demoData);
+      } else {
+        setLaunches([]);
       }
     } catch (error) {
       console.error('Error fetching launches:', error);
-      // Fall back to demo data on error
-      setLaunches(DEMO_LAUNCHES);
+      // Fall back to demo data on error if DEMO_MODE is enabled
+      if (DEMO_MODE) {
+        setLaunches(DEMO_LAUNCHES);
+      } else {
+        setLaunches([]);
+      }
     } finally {
       setIsLoading(false);
     }
