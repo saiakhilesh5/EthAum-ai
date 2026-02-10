@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@src/context/auth-context';
 import { useUser } from '@src/hooks/use-user';
@@ -46,6 +47,12 @@ export function Header() {
   const { signOut } = useAuth();
   const { user, profile, isAuthenticated, isLoading } = useUser();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Track when component is mounted (for portal)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -73,7 +80,7 @@ export function Header() {
       .slice(0, 2);
   };
 
-  return (
+  const headerContent = (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
         {/* Logo */}
@@ -215,14 +222,20 @@ export function Header() {
           </Button>
         </div>
       </div>
+    </header>
+  );
 
-      {/* Mobile Menu - Full Screen Overlay */}
+  // Mobile Menu Portal - Rendered at document body level to avoid z-index issues
+  const mobileMenuPortal = mounted ? createPortal(
+    <>
+      {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-[9998] md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
+      {/* Mobile Menu Content */}
       <div 
         className={cn(
           "fixed inset-x-0 top-14 sm:top-16 bottom-0 z-[9999] md:hidden bg-background border-t transition-all duration-300 ease-in-out",
@@ -360,6 +373,14 @@ export function Header() {
           </div>
         </div>
       </div>
-    </header>
+    </>,
+    document.body
+  ) : null;
+
+  return (
+    <>
+      {headerContent}
+      {mobileMenuPortal}
+    </>
   );
 }
