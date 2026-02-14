@@ -29,7 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Cache keys for session storage
 const PROFILE_CACHE_KEY = 'ethaum_profile_cache';
 const CACHE_EXPIRY_KEY = 'ethaum_cache_expiry';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes (shorter for fresher data)
 
 // Get cached profile from sessionStorage
 const getCachedProfile = (): UserProfile | null => {
@@ -161,8 +161,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setCachedProfile(null);
         }
 
+        // Refresh router to update server components on auth changes
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          router.refresh();
+        }
+
         if (event === 'SIGNED_OUT') {
           setCachedProfile(null);
+          router.refresh();
           router.push('/');
         }
       }
@@ -232,6 +238,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      // Refresh router to update server components after sign in
+      router.refresh();
+
       return { error: null };
     } catch (error) {
       return { error };
@@ -245,6 +254,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setProfile(null);
     setSession(null);
+    router.refresh();
     router.push('/');
   }, [router]);
 
