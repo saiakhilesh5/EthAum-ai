@@ -177,10 +177,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign up function
   const signUp = async (email: string, password: string, fullName: string, userType: string) => {
     try {
+      // Get the current origin for email redirect (works for both localhost and production)
+      const redirectUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/login?confirmed=true`
+        : process.env.NEXT_PUBLIC_SITE_URL 
+          ? `${process.env.NEXT_PUBLIC_SITE_URL}/login?confirmed=true`
+          : 'http://localhost:3000/login?confirmed=true';
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
             user_type: userType,
