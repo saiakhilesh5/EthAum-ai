@@ -113,6 +113,8 @@ Experience the full platform without creating an account:
 | **Advanced Analytics** | Performance trends, referrer tracking, and growth metrics |
 | **Trust Score Breakdown** | Detailed analysis of credibility factors |
 | **Competitive Insights** | Understand your market position |
+| **Activity Feed** | Live stream of platform activity |
+| **Platform Stats** | Real-time platform-wide statistics |
 
 ### 🔔 Real-time Features
 
@@ -173,7 +175,7 @@ Experience the full platform without creating an account:
 
 ---
 
-## 📱 Screenshots
+## 📱 Screenshots & Responsive Design
 
 <div align="center">
 
@@ -185,9 +187,18 @@ Experience the full platform without creating an account:
 ### Mobile View (Fully Responsive)
 | Mobile Menu | Explore Page | Demo Dashboard |
 |:---:|:---:|:---:|
-| Hamburger menu with overlay | Touch-friendly filters | Swipeable tabs |
+| Portal-based hamburger menu | Touch-friendly filters | Swipeable tabs |
 
 </div>
+
+### 📱 Responsive Features
+
+- **Mobile-First Design** - All pages optimized for mobile devices
+- **Responsive Navigation** - Portal-based mobile menu that overlays all content
+- **Adaptive Layouts** - Grid layouts that adjust from 1 column (mobile) to 3+ columns (desktop)
+- **Touch-Friendly** - Large touch targets, swipeable components
+- **Responsive Typography** - Text sizes scale appropriately across breakpoints
+- **Flexible Cards** - Cards and forms adapt to screen size
 
 ---
 
@@ -280,14 +291,17 @@ ethaum-ai/
 │   │
 │   ├── 📁 components/          # React components
 │   │   ├── common/             # Shared components
-│   │   │   ├── advanced-analytics.tsx
-│   │   │   ├── advanced-search.tsx
-│   │   │   ├── command-palette.tsx
+│   │   │   ├── activity-feed.tsx       # Live activity display
+│   │   │   ├── advanced-search.tsx     # Advanced filtering
+│   │   │   ├── command-palette.tsx     # Ctrl+K command menu
 │   │   │   ├── embed-widget-generator.tsx
 │   │   │   ├── keyboard-shortcuts-modal.tsx
 │   │   │   ├── loading.tsx
 │   │   │   ├── notification-center.tsx
-│   │   │   └── pwa-install.tsx
+│   │   │   ├── pwa-install.tsx
+│   │   │   ├── smart-search.tsx        # AI-powered search
+│   │   │   ├── stats-card.tsx          # Statistics display
+│   │   │   └── trust-score.tsx         # Credibility score UI
 │   │   ├── dashboard/
 │   │   ├── insights/
 │   │   ├── landing/
@@ -488,6 +502,16 @@ Add your Vercel URL to Supabase Auth settings:
 | `/api/ai/generate-brief` | POST | Generate executive brief |
 | `/api/ai/smart-search` | POST | Natural language startup search |
 | `/api/ai/transcribe` | POST | Transcribe voice reviews |
+| `/api/ai/analyze-review` | POST | Analyze review sentiment |
+| `/api/ai/generate-launch-content` | POST | Generate launch descriptions |
+
+### Data Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-----------|
+| `/api/home-data` | GET | Landing page data (launches, startups, stats) |
+| `/api/stats` | GET | Platform statistics |
+| `/api/seed` | POST | Seed database with demo data |
 
 ### Badge API
 
@@ -554,10 +578,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ### 🏆 Hackathon Project
 
 This project was built as a full-stack MVP demonstrating:
-- Modern Next.js 16 App Router architecture
+- Modern Next.js 16 App Router architecture with Turbopack
 - AI-powered features with Google Gemini
 - Real-time database with Supabase
-- Fully responsive mobile-first design
+- Fully responsive mobile-first design (all 39+ pages)
+- PWA support with offline capabilities
+- Portal-based mobile navigation for perfect z-index stacking
 - Production-ready deployment on Vercel
 
 [⬆ Back to Top](#-ethaumai---enterprise-startup-intelligence-platform)
