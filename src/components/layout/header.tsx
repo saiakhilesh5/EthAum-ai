@@ -121,9 +121,10 @@ export function Header() {
             <Search className="h-4 w-4" />
           </Button>
 
-          {isLoading ? (
+          {/* Show loading only briefly, prioritize showing profile if available */}
+          {isLoading && !profile ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
-          ) : isAuthenticated && profile ? (
+          ) : (isAuthenticated || profile) && profile ? (
             <div className="flex items-center gap-1 sm:gap-2">
               <div className="hidden sm:block">
                 <NotificationCenter />
@@ -283,7 +284,7 @@ export function Header() {
           <div className="border-t my-2" />
 
           {/* Auth Section for Mobile */}
-          {!isAuthenticated && (
+          {!isAuthenticated && !profile && (
             <div className="space-y-3">
               <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Get Started</p>
               <Button className="w-full" size="lg" asChild>
@@ -299,7 +300,7 @@ export function Header() {
           )}
 
           {/* User Info for Mobile when logged in */}
-          {isAuthenticated && profile && (
+          {(isAuthenticated || profile) && profile && (
             <div className="space-y-3">
               <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Account</p>
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">

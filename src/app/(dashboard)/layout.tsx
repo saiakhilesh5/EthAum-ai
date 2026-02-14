@@ -11,9 +11,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { isLoading } = useUser();
+  const { isLoading, profile } = useUser();
 
-  if (isLoading) {
+  // Show skeleton only if truly loading with no cached profile
+  if (isLoading && !profile) {
     return (
       <div className="flex h-screen">
         {/* Sidebar Skeleton */}

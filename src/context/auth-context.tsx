@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@src/lib/db/supabase';
 import { useRouter } from 'next/navigation';
@@ -26,15 +26,55 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Cache keys for session storage
+const PROFILE_CACHE_KEY = 'ethaum_profile_cache';
+const CACHE_EXPIRY_KEY = 'ethaum_cache_expiry';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Get cached profile from sessionStorage
+const getCachedProfile = (): UserProfile | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const expiry = sessionStorage.getItem(CACHE_EXPIRY_KEY);
+    if (expiry && Date.now() > parseInt(expiry)) {
+      sessionStorage.removeItem(PROFILE_CACHE_KEY);
+      sessionStorage.removeItem(CACHE_EXPIRY_KEY);
+      return null;
+    }
+    const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
+    return cached ? JSON.parse(cached) : null;
+  } catch {
+    return null;
+  }
+};
+
+// Cache profile to sessionStorage
+const setCachedProfile = (profile: UserProfile | null) => {
+  if (typeof window === 'undefined') return;
+  try {
+    if (profile) {
+      sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
+      sessionStorage.setItem(CACHE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION));
+    } else {
+      sessionStorage.removeItem(PROFILE_CACHE_KEY);
+      sessionStorage.removeItem(CACHE_EXPIRY_KEY);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Initialize with cached profile for faster hydration
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(() => getCachedProfile());
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
   // Fetch user profile from database
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('users')
@@ -44,11 +84,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
       setProfile(data);
+      setCachedProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
       setProfile(null);
+      setCachedProfile(null);
     }
-  };
+  }, []);
 
   // Refresh profile data
   const refreshProfile = async () => {
@@ -57,22 +99,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Initialize auth state
+  // Initialize auth state - optimized for speed
   useEffect(() => {
+    let mounted = true;
+
     const initializeAuth = async () => {
       try {
+        // Check for cached profile first - show immediately
+        const cachedProfile = getCachedProfile();
+        if (cachedProfile && mounted) {
+          setProfile(cachedProfile);
+          // If we have cached profile, we can assume user is logged in
+          // Set loading false early for better UX
+          setIsLoading(false);
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await fetchProfile(session.user.id);
+          // Only fetch fresh profile if no cache or cache expired
+          if (!cachedProfile) {
+            await fetchProfile(session.user.id);
+          } else {
+            // Refresh profile in background
+            fetchProfile(session.user.id);
+          }
+        } else {
+          // No session, clear cache
+          setProfile(null);
+          setCachedProfile(null);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+          setIsInitialized(true);
+        }
       }
     };
 
@@ -81,6 +149,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -88,18 +158,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await fetchProfile(session.user.id);
         } else {
           setProfile(null);
+          setCachedProfile(null);
         }
 
         if (event === 'SIGNED_OUT') {
+          setCachedProfile(null);
           router.push('/');
         }
       }
     );
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, fetchProfile]);
 
   // Sign up function
   const signUp = async (email: string, password: string, fullName: string, userType: string) => {
@@ -158,13 +231,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Sign out function
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
+    setCachedProfile(null);
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
     setSession(null);
     router.push('/');
-  };
+  }, [router]);
 
   const value = {
     user,
