@@ -238,6 +238,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      // Update state immediately so UI reflects logged-in state
+      if (data.session && data.user) {
+        setSession(data.session);
+        setUser(data.user);
+        // Fetch and set profile immediately
+        await fetchProfile(data.user.id);
+      }
+
       // Refresh router to update server components after sign in
       router.refresh();
 
