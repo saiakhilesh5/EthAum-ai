@@ -294,34 +294,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Video & Demo CTA Section */}
-        <section className="py-6 sm:py-8 border-y bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
-          <div className="container px-4">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
-              <div className="text-center w-full sm:w-auto">
-                <h3 className="text-base sm:text-xl font-semibold mb-2">See It In Action</h3>
-                <Button size="default" className="w-full sm:w-auto" variant="default" asChild>
-                  <a href="https://youtu.be/YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer">
-                    <Play className="mr-2 h-4 w-4" />
-                    Watch 2-Min Demo
-                  </a>
-                </Button>
-              </div>
-              <div className="hidden sm:block w-px h-12 bg-border" />
-              <div className="block sm:hidden w-full h-px bg-border" />
-              <div className="text-center w-full sm:w-auto">
-                <h3 className="text-base sm:text-xl font-semibold mb-2">Try It Yourself</h3>
-                <Button size="default" className="w-full sm:w-auto" variant="outline" asChild>
-                  <Link href="/demo">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Interactive Demo
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Journey Section */}
         <section className="border-y bg-primary/5 py-8 sm:py-12">
           <div className="container px-4">
