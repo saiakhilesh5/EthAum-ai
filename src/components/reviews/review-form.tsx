@@ -162,10 +162,9 @@ export default function ReviewForm({
     
     try {
       // Perform DB operation
-      const { error } = await supabase.from('reviews').insert({
+      const reviewPayload: Record<string, any> = {
         startup_id: startupId,
         user_id: userId,
-        enterprise_id: enterpriseId,
         title: values.title,
         content: values.content,
         overall_rating: values.overall_rating,
@@ -173,13 +172,15 @@ export default function ReviewForm({
         value_for_money_rating: values.value_for_money_rating,
         customer_support_rating: values.customer_support_rating,
         features_rating: values.features_rating,
-        recommend_likelihood: values.recommend_likelihood,
-        use_case: values.use_case,
         pros,
         cons,
-        sentiment_score: sentimentAnalysis?.confidence,
         is_verified: false,
-      }).select();
+      };
+
+      // Only include optional fields if they have values
+      if (enterpriseId) reviewPayload.enterprise_id = enterpriseId;
+
+      const { error } = await supabase.from('reviews').insert(reviewPayload).select();
 
       if (error) {
         console.error('Error submitting review:', error);
