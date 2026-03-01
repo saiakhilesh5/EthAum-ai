@@ -109,23 +109,24 @@ export function LaunchForm({ existingLaunch, startup }: LaunchFormProps) {
         status: data.status,
       };
 
+      // Perform DB operation
+      let result;
       if (existingLaunch) {
-        const { error } = await supabase
+        result = await supabase
           .from('launches')
           .update(launchData)
-          .eq('id', existingLaunch.id);
-
-        if (error) throw error;
-        toast.success('Launch updated successfully!');
+          .eq('id', existingLaunch.id)
+          .select();
       } else {
-        const { error } = await supabase
+        result = await supabase
           .from('launches')
-          .insert([launchData]);
-
-        if (error) throw error;
-        toast.success('Launch created successfully!');
+          .insert([launchData])
+          .select();
       }
 
+      if (result.error) throw result.error;
+
+      toast.success(existingLaunch ? 'Launch updated successfully!' : 'Launch created successfully!');
       router.push('/launches');
     } catch (error: any) {
       console.error('Error saving launch:', error);

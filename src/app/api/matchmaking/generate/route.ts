@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { createServerSupabaseClient } from '@src/lib/db/supabase-server';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+const groq = new Groq({
+  apiKey: process.env.GROK_API_KEY || '',
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,54 +66,72 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ matchCount: 0, matches: [] });
     }
 
-    // Use AI to score matches
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Filter out already-matched profiles in one batch query
+    const existingMatchFilter = userType === 'startup'
+      ? supabase.from('matches').select('enterprise_id').eq('startup_id', profileId)
+      : supabase.from('matches').select('startup_id').eq('enterprise_id', profileId);
 
-    const matches = [];
+    const { data: existingMatches } = await existingMatchFilter;
+    const existingIds = new Set((existingMatches || []).map((m: any) =>
+      userType === 'startup' ? m.enterprise_id : m.startup_id
+    ));
 
-    for (const potential of potentialMatches) {
-      // Check if match already exists
-      const { data: existingMatch } = await supabase
-        .from('matches')
-        .select('id')
-        .eq(userType === 'startup' ? 'startup_id' : 'enterprise_id', profileId)
-        .eq(userType === 'startup' ? 'enterprise_id' : 'startup_id', potential.id)
-        .single();
+    const newPotentials = (potentialMatches || []).filter((p: any) => !existingIds.has(p.id));
 
-      if (existingMatch) continue;
+    if (newPotentials.length === 0) {
+      return NextResponse.json({ matchCount: 0, matches: [] });
+    }
 
-      // Generate AI match score
-      const prompt = `Analyze the compatibility between these two profiles and return ONLY valid JSON (no markdown).
+    // Single AI call to score ALL potential matches at once
+
+    const batchPrompt = `Analyze compatibility between the following ${userType === 'startup' ? 'startup' : 'enterprise'} profile and multiple ${userType === 'startup' ? 'enterprise' : 'startup'} profiles.
+Return ONLY valid JSON (no markdown).
 
 ${userType === 'startup' ? 'Startup' : 'Enterprise'} Profile:
 ${JSON.stringify(userProfile, null, 2)}
 
-${userType === 'startup' ? 'Enterprise' : 'Startup'} Profile:
-${JSON.stringify(potential, null, 2)}
+Potential ${userType === 'startup' ? 'Enterprise' : 'Startup'} Profiles:
+${JSON.stringify(newPotentials.map((p: any) => ({ id: p.id, ...p })), null, 2)}
 
-Consider:
+For each potential profile, consider:
 1. Industry alignment
 2. Technology/use case fit
 3. Stage/budget compatibility
 4. Geographic considerations
 5. Potential synergies
 
-Return this exact JSON format:
-{
-  "matchScore": 0-100,
-  "matchReasons": ["reason1", "reason2", "reason3"],
-  "aiAnalysis": "Brief analysis of why these profiles match or don't match"
-}`;
+Return this exact JSON format (array of results):
+[
+  {
+    "id": "profile_id",
+    "matchScore": 0-100,
+    "matchReasons": ["reason1", "reason2", "reason3"],
+    "aiAnalysis": "Brief analysis"
+  }
+]`;
 
-      try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
-        const analysis = JSON.parse(cleanedText);
+    let scoredMatches: any[] = [];
+    try {
+      const result = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: batchPrompt }],
+      });
+      const text = result.choices[0]?.message?.content || '';
+      const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
+      scoredMatches = JSON.parse(cleanedText);
+    } catch (aiError) {
+      console.error('AI batch analysis error:', aiError);
+      return NextResponse.json({ matchCount: 0, matches: [] });
+    }
 
-        // Only create matches with score >= 40
-        if (analysis.matchScore >= 40) {
+    // Insert all qualifying matches in parallel
+    const matches: any[] = [];
+    await Promise.all(
+      scoredMatches
+        .filter((s: any) => s.matchScore >= 40)
+        .map(async (analysis: any) => {
+          const potential = newPotentials.find((p: any) => p.id === analysis.id);
+          if (!potential) return;
           const matchData = {
             startup_id: userType === 'startup' ? profileId : potential.id,
             enterprise_id: userType === 'enterprise' ? profileId : potential.id,
@@ -120,22 +140,14 @@ Return this exact JSON format:
             ai_analysis: analysis.aiAnalysis,
             status: 'pending',
           };
-
           const { data: newMatch, error } = await supabase
             .from('matches')
             .insert(matchData)
             .select()
             .single();
-
-          if (!error && newMatch) {
-            matches.push(newMatch);
-          }
-        }
-      } catch (aiError) {
-        console.error('AI analysis error:', aiError);
-        continue;
-      }
-    }
+          if (!error && newMatch) matches.push(newMatch);
+        })
+    );
 
     return NextResponse.json({
       matchCount: matches.length,

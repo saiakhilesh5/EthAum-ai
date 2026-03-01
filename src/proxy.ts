@@ -6,36 +6,51 @@ import type { NextRequest } from 'next/server';
 const protectedRoutes = [
   '/dashboard',
   '/launches/new',
+  '/launches',
   '/profile',
   '/settings',
   '/matchmaking',
+  '/reviews',
+  '/insights',
 ];
 
 // Routes that should redirect to dashboard if already authenticated
 const authRoutes = ['/login', '/register'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Update session and get user
-  const { supabaseResponse, user } = await updateSession(request);
 
-  // Check if the current route is protected
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
-
-  // Check if the current route is an auth route
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
-  // Redirect to login if trying to access protected route without session
+  // Skip session check for unrelated routes
+  if (!isProtectedRoute && !isAuthRoute) {
+    return NextResponse.next();
+  }
+
+  // For RSC / client-side navigation, skip server auth check for speed.
+  // The client AuthProvider + page-level guards handle redirects for these.
+  const isRSCRequest =
+    request.headers.get('RSC') === '1' ||
+    request.headers.get('Next-Router-State-Tree') !== null;
+
+  if (isRSCRequest) {
+    return NextResponse.next();
+  }
+
+  // Full page load — validate session via cookie (no network call)
+  const { supabaseResponse, user } = await updateSession(request);
+
+  // Unauthenticated user trying to access a protected route
   if (isProtectedRoute && !user) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Redirect to dashboard if trying to access auth routes with active session
+  // Authenticated user trying to access login/register
   if (isAuthRoute && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
@@ -49,7 +64,7 @@ export const config = {
      * Match all request paths except:
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * - favicon.ico
      * - public folder
      * - api routes (handled separately)
      */

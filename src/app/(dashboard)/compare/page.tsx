@@ -34,6 +34,7 @@ import {
   Rocket,
 } from 'lucide-react';
 import Link from 'next/link';
+import { supabase } from '@src/lib/db/supabase';
 
 interface ComparisonStartup {
   id: string;
@@ -58,60 +59,39 @@ interface ComparisonStartup {
   };
 }
 
-const demoStartups: ComparisonStartup[] = [
-  {
-    id: '1',
-    name: 'CloudSync Pro',
-    logo: '☁️',
-    tagline: 'Enterprise cloud data synchronization',
-    category: 'Cloud Infrastructure',
-    score: 92,
-    features: ['Real-time sync', 'Multi-cloud support', 'Enterprise SSO', 'API access', 'Custom integrations'],
-    pricing: '$99/month',
-    founded: '2021',
-    teamSize: '25-50',
-    funding: '$5.2M Series A',
-    pros: ['Excellent uptime', 'Great support', 'Scalable'],
-    cons: ['Steep learning curve', 'Limited free tier'],
-    ratings: { overall: 4.5, easeOfUse: 4.0, support: 4.8, value: 4.3, features: 4.6 },
+const industryEmoji: Record<string, string> = {
+  SaaS: '☁️', FinTech: '💰', HealthTech: '🏥', EdTech: '📚',
+  CyberSecurity: '🔒', AI: '🤖', Analytics: '📊', 'E-Commerce': '🛒',
+  Logistics: '🚚', HR: '👥',
+};
+
+const mapStartupToComparison = (s: any): ComparisonStartup => ({
+  id: s.id,
+  name: s.name,
+  logo: s.logo_url ? s.logo_url : (industryEmoji[s.industry] || '🚀'),
+  tagline: s.tagline || '',
+  category: s.industry || '',
+  score: s.credibility_score || 0,
+  features: [...(s.tech_stack || []), ...(s.use_cases || [])].slice(0, 5),
+  pricing: s.arr_range || 'Contact for pricing',
+  founded: String(s.founding_year || ''),
+  teamSize: s.team_size || 'Unknown',
+  funding: s.stage?.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || '',
+  pros: s.use_cases?.slice(0, 3) || [],
+  cons: [],
+  ratings: {
+    overall: Math.min(5, (s.credibility_score || 50) / 20),
+    easeOfUse: Math.min(5, ((s.credibility_score || 50) - 5) / 20),
+    support: Math.min(5, ((s.credibility_score || 50) + 2) / 20),
+    value: Math.min(5, ((s.credibility_score || 50) - 3) / 20),
+    features: Math.min(5, ((s.credibility_score || 50) + 5) / 20),
   },
-  {
-    id: '2',
-    name: 'DataFlow AI',
-    logo: '🌊',
-    tagline: 'AI-powered data pipeline automation',
-    category: 'Data Analytics',
-    score: 88,
-    features: ['AI automation', 'Visual workflows', 'Real-time analytics', 'Data quality', 'Team collaboration'],
-    pricing: '$149/month',
-    founded: '2022',
-    teamSize: '10-25',
-    funding: '$3.1M Seed',
-    pros: ['Innovative AI features', 'Beautiful UI', 'Fast onboarding'],
-    cons: ['Higher price point', 'Newer company'],
-    ratings: { overall: 4.3, easeOfUse: 4.6, support: 4.2, value: 4.0, features: 4.5 },
-  },
-  {
-    id: '3',
-    name: 'SecureVault',
-    logo: '🔒',
-    tagline: 'Zero-trust security platform',
-    category: 'Cybersecurity',
-    score: 95,
-    features: ['Zero-trust architecture', 'Threat detection', 'Compliance tools', 'Audit logs', 'SSO integration'],
-    pricing: '$199/month',
-    founded: '2020',
-    teamSize: '50-100',
-    funding: '$12M Series B',
-    pros: ['Industry-leading security', 'Compliance ready', 'Excellent documentation'],
-    cons: ['Complex setup', 'Premium pricing'],
-    ratings: { overall: 4.7, easeOfUse: 3.8, support: 4.6, value: 4.2, features: 4.9 },
-  },
-];
+});
 
 export default function CompareToolPage() {
   const [selectedStartups, setSelectedStartups] = useState<ComparisonStartup[]>([]);
-  const [availableStartups, setAvailableStartups] = useState<ComparisonStartup[]>(demoStartups);
+  const [availableStartups, setAvailableStartups] = useState<ComparisonStartup[]>([]);
+  const [isLoadingStartups, setIsLoadingStartups] = useState(true);
   const [aiComparison, setAiComparison] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recommendation, setRecommendation] = useState<{
@@ -119,6 +99,18 @@ export default function CompareToolPage() {
     reason: string;
     bestFor: Record<string, string>;
   } | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from('startups')
+      .select('id, name, tagline, logo_url, industry, stage, arr_range, team_size, founding_year, credibility_score, tech_stack, use_cases, is_verified')
+      .order('credibility_score', { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        setAvailableStartups((data || []).map(mapStartupToComparison));
+        setIsLoadingStartups(false);
+      });
+  }, []);
 
   const addStartup = (id: string) => {
     if (selectedStartups.length >= 3) {
@@ -260,6 +252,9 @@ export default function CompareToolPage() {
               ))}
               
               {selectedStartups.length < 3 && (
+                isLoadingStartups ? (
+                  <Skeleton className="h-10 w-[200px]" />
+                ) : (
                 <Select onValueChange={addStartup}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Add startup..." />
@@ -270,13 +265,14 @@ export default function CompareToolPage() {
                       .map((startup) => (
                         <SelectItem key={startup.id} value={startup.id}>
                           <span className="flex items-center gap-2">
-                            <span>{startup.logo}</span>
+                            <span>{typeof startup.logo === 'string' && startup.logo.length <= 2 ? startup.logo : '🚀'}</span>
                             {startup.name}
                           </span>
                         </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
+                )
               )}
 
               {selectedStartups.length >= 2 && (

@@ -37,42 +37,58 @@ export default function LaunchDetailPage() {
 
   useEffect(() => {
     if (params.id) {
-      fetchLaunch();
-      incrementViewCount();
+      // Always fetch fresh data
+      fetchAllData();
     }
   }, [params.id]);
 
-  useEffect(() => {
-    if (user && launch) {
-      checkUserUpvote();
-    }
-  }, [user, launch]);
-
-  const fetchLaunch = async () => {
+  // Combined fetch to parallelize
+  const fetchAllData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('launches')
-        .select(`
-          *,
-          startup:startups(
-            id,
-            name,
-            slug,
-            logo_url,
-            tagline,
-            industry,
-            stage,
-            arr_range,
-            website_url,
-            credibility_score,
-            is_verified
-          )
-        `)
-        .eq('id', params.id)
-        .single();
+      // Fetch launch and increment view count in parallel
+      const [launchData] = await Promise.all([
+        supabase
+          .from('launches')
+          .select(`
+            *,
+            startup:startups(
+              id,
+              name,
+              slug,
+              logo_url,
+              tagline,
+              industry,
+              stage,
+              arr_range,
+              website_url,
+              credibility_score,
+              is_verified
+            )
+          `)
+          .eq('id', params.id)
+          .single(),
+        supabase.rpc('increment_view_count', { launch_id: params.id }),
+      ]);
 
-      if (error) throw error;
-      setLaunch(data);
+      if (launchData.error) throw launchData.error;
+      
+      const fetchedLaunch = launchData.data;
+      setLaunch(fetchedLaunch);
+      
+      // Check upvote status if user is logged in
+      let upvoted = false;
+      if (user && fetchedLaunch) {
+        const { data: upvoteData } = await supabase
+          .from('upvotes')
+          .select('id')
+          .eq('launch_id', fetchedLaunch.id)
+          .eq('user_id', user.id)
+          .single();
+        upvoted = !!upvoteData;
+        setUserUpvoted(upvoted);
+      }
+      
+      // Store fetched launch in local state only
     } catch (error) {
       console.error('Error fetching launch:', error);
     } finally {
@@ -82,17 +98,6 @@ export default function LaunchDetailPage() {
 
   const incrementViewCount = async () => {
     await supabase.rpc('increment_view_count', { launch_id: params.id });
-  };
-
-  const checkUserUpvote = async () => {
-    const { data } = await supabase
-      .from('upvotes')
-      .select('id')
-      .eq('launch_id', launch.id)
-      .eq('user_id', user?.id)
-      .single();
-
-    setUserUpvoted(!!data);
   };
 
   const handleShare = async () => {

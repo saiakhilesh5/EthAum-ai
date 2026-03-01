@@ -46,6 +46,11 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Derive user type from dashboardData when profile hasn't loaded from DB yet.
+  // dashboardData is fetched immediately on mount; profile may lag behind.
+  const effectiveIsStartup = isStartup || !!dashboardData?.hasStartupProfile;
+  const effectiveIsEnterprise = isEnterprise || !!dashboardData?.hasEnterpriseProfile;
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!user) {
@@ -53,49 +58,57 @@ export default function DashboardPage() {
         return;
       }
 
+      setIsLoading(true);
+
       try {
-        // Fetch startup and enterprise profiles in parallel
+        // Single parallel fetch — startup with embedded counts + recent launches
+        // This eliminates the previous 2-wave serial query pattern
         const [startupResult, enterpriseResult] = await Promise.all([
-          supabase.from('startups').select('*').eq('user_id', user.id).single(),
-          supabase.from('enterprises').select('*').eq('user_id', user.id).single(),
+          supabase
+            .from('startups')
+            .select(`
+              *,
+              launches(id, title, tagline, created_at, status, upvote_count, view_count, thumbnail_url),
+              reviews(count),
+              matches(count)
+            `)
+            .eq('user_id', user.id)
+            .single(),
+          supabase
+            .from('enterprises')
+            .select('*, matches(count)')
+            .eq('user_id', user.id)
+            .single(),
         ]);
 
-        const startupData = startupResult.data;
-        const enterpriseData = enterpriseResult.data;
+        const rawStartup = startupResult.data as any;
+        const rawEnterprise = enterpriseResult.data as any;
 
-        // Initialize counts
-        let launchesCount = 0;
-        let reviewsCount = 0;
-        let matchesCount = 0;
-        let recentLaunches: any[] = [];
-        let recentReviews: any[] = [];
+        // Extract counts from embedded results (no second wave needed)
+        const allLaunches: any[] = rawStartup?.launches || [];
+        const launchesCount = allLaunches.length;
+        const reviewsCount = rawStartup?.reviews?.[0]?.count || 0;
+        const matchesCount = rawStartup
+          ? (rawStartup?.matches?.[0]?.count || 0)
+          : (rawEnterprise?.matches?.[0]?.count || 0);
 
-        // Fetch all counts and data in parallel based on profile type
-        if (startupData) {
-          const [launchesCountResult, reviewsCountResult, matchesCountResult, recentLaunchesResult] = await Promise.all([
-            supabase.from('launches').select('*', { count: 'exact', head: true }).eq('startup_id', startupData.id),
-            supabase.from('reviews').select('*', { count: 'exact', head: true }).eq('startup_id', startupData.id),
-            supabase.from('matches').select('*', { count: 'exact', head: true }).eq('startup_id', startupData.id),
-            supabase.from('launches').select('*').eq('startup_id', startupData.id).order('created_at', { ascending: false }).limit(3),
-          ]);
+        // Sort + limit recent launches client-side (already in memory)
+        const recentLaunches = [...allLaunches]
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 3);
 
-          launchesCount = launchesCountResult.count || 0;
-          reviewsCount = reviewsCountResult.count || 0;
-          matchesCount = matchesCountResult.count || 0;
-          recentLaunches = recentLaunchesResult.data || [];
-        }
+        // Clean startup/enterprise objects — strip embedded arrays before storing in state
+        const startupData = rawStartup
+          ? { ...rawStartup, launches: undefined, reviews: undefined, matches: undefined }
+          : null;
+        const enterpriseData = rawEnterprise
+          ? { ...rawEnterprise, matches: undefined }
+          : null;
 
-        if (enterpriseData && !startupData) {
-          // Only fetch enterprise matches if no startup profile
-          const { count: mCount } = await supabase
-            .from('matches')
-            .select('*', { count: 'exact', head: true })
-            .eq('enterprise_id', enterpriseData.id);
-          matchesCount = mCount || 0;
-        }
+        const recentReviews: any[] = [];
 
         // Set dashboard data
-        setDashboardData({
+        const newData = {
           hasStartupProfile: !!startupData,
           hasEnterpriseProfile: !!enterpriseData,
           startupData,
@@ -105,7 +118,8 @@ export default function DashboardPage() {
           matchesCount,
           recentLaunches,
           recentReviews,
-        });
+        };
+        setDashboardData(newData);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -120,7 +134,7 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  // Show loading skeleton only when truly loading with no cached profile
+  // Show loading skeleton only when truly loading
   if ((userLoading && !profile) || isLoading) {
     return (
       <div className="p-4 md:p-6 space-y-4 md:space-y-6">
@@ -137,7 +151,7 @@ export default function DashboardPage() {
 
   // Calculate profile completion
   const calculateProfileCompletion = () => {
-    if (isStartup) {
+    if (effectiveIsStartup) {
       if (!dashboardData?.hasStartupProfile) {
         return { percentage: 20, missingSteps: ['Create Startup Profile', 'Add Logo', 'Add Description', 'Add Features'] };
       }
@@ -160,7 +174,7 @@ export default function DashboardPage() {
       return { percentage: Math.round((completed / 6) * 100), missingSteps: steps };
     }
 
-    if (isEnterprise) {
+    if (effectiveIsEnterprise) {
       if (!dashboardData?.hasEnterpriseProfile) {
         return { percentage: 20, missingSteps: ['Create Company Profile', 'Add Requirements', 'Set Preferences'] };
       }
@@ -181,10 +195,10 @@ export default function DashboardPage() {
             Welcome back, {profile?.full_name?.split(' ')[0]}! 👋
           </h1>
           <p className="text-sm text-muted-foreground">
-            Here's what's happening with your {isStartup ? 'startup' : 'account'} today.
+            Here's what's happening with your {effectiveIsStartup ? 'startup' : 'account'} today.
           </p>
         </div>
-        {isStartup && dashboardData?.hasStartupProfile && (
+        {effectiveIsStartup && dashboardData?.hasStartupProfile && (
           <Button asChild>
             <Link href="/launches/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -203,7 +217,7 @@ export default function DashboardPage() {
       )}
 
       {/* No Profile State */}
-      {isStartup && !dashboardData?.hasStartupProfile && (
+      {effectiveIsStartup && !dashboardData?.hasStartupProfile && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -225,7 +239,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {isEnterprise && !dashboardData?.hasEnterpriseProfile && (
+      {effectiveIsEnterprise && !dashboardData?.hasEnterpriseProfile && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -248,9 +262,9 @@ export default function DashboardPage() {
       )}
 
       {/* Stats Grid - Only show if profile exists */}
-      {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
+      {((effectiveIsStartup && dashboardData?.hasStartupProfile) || (effectiveIsEnterprise && dashboardData?.hasEnterpriseProfile)) && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          {isStartup && (
+          {effectiveIsStartup && (
             <>
               <StatsCard
                 title="Product Launches"
@@ -280,7 +294,7 @@ export default function DashboardPage() {
               />
             </>
           )}
-          {isEnterprise && (
+          {effectiveIsEnterprise && (
             <>
               <StatsCard
                 title="AI-Matched Startups"
@@ -312,7 +326,7 @@ export default function DashboardPage() {
       )}
 
       {/* EthAum Journey Card - Shows the complete flow */}
-      {isStartup && dashboardData?.hasStartupProfile && (
+      {effectiveIsStartup && dashboardData?.hasStartupProfile && (
         <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -366,7 +380,7 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Actions & Recent Activity */}
-      {isStartup && dashboardData?.hasStartupProfile && (
+      {effectiveIsStartup && dashboardData?.hasStartupProfile && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Quick Actions */}
           <Card>
@@ -455,7 +469,7 @@ export default function DashboardPage() {
       )}
 
       {/* Enterprise Quick Actions */}
-      {isEnterprise && dashboardData?.hasEnterpriseProfile && (
+      {effectiveIsEnterprise && dashboardData?.hasEnterpriseProfile && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
@@ -511,7 +525,7 @@ export default function DashboardPage() {
       )}
 
       {/* AI Features Showcase */}
-      {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
+      {((effectiveIsStartup && dashboardData?.hasStartupProfile) || (effectiveIsEnterprise && dashboardData?.hasEnterpriseProfile)) && (
         <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -522,7 +536,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {isStartup && (
+              {effectiveIsStartup && (
                 <>
                   <Link href="/pitch-analyzer" className="group">
                     <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
@@ -562,7 +576,7 @@ export default function DashboardPage() {
                   </Link>
                 </>
               )}
-              {isEnterprise && (
+              {effectiveIsEnterprise && (
                 <>
                   <Link href="/compare" className="group">
                     <div className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
@@ -608,7 +622,7 @@ export default function DashboardPage() {
       )}
 
       {/* Activity Feed & Trust Score */}
-      {((isStartup && dashboardData?.hasStartupProfile) || (isEnterprise && dashboardData?.hasEnterpriseProfile)) && (
+      {((effectiveIsStartup && dashboardData?.hasStartupProfile) || (effectiveIsEnterprise && dashboardData?.hasEnterpriseProfile)) && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="lg:col-span-2">
             <ActivityFeed compact maxItems={8} />

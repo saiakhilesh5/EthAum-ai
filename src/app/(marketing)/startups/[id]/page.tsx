@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { useRouter, notFound } from 'next/navigation';
 import { supabase } from '@src/lib/db/supabase';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
 import {
   Globe,
   MapPin,
@@ -95,24 +96,49 @@ interface CredibilityScore {
 
 export default function StartupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+  const router = useRouter();
   const [startup, setStartup] = useState<StartupDetails | null>(null);
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [credibility, setCredibility] = useState<CredibilityScore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleWriteReview = () => {
+    toast.info('Please log in to write a review');
+    router.push('/login');
+  };
+
   useEffect(() => {
     fetchStartup();
   }, [resolvedParams.id]);
 
   const fetchStartup = async () => {
+    setIsLoading(true);
     try {
-      // Fetch startup details
-      const { data: startupData, error: startupError } = await supabase
+      // Try to fetch by slug first, then by id
+      let startupData = null;
+      let startupError = null;
+
+      // First try by slug
+      const slugResult = await supabase
         .from('startups')
         .select('*')
-        .or(`slug.eq.${resolvedParams.id},id.eq.${resolvedParams.id}`)
-        .single();
+        .eq('slug', resolvedParams.id)
+        .maybeSingle();
+
+      if (slugResult.data) {
+        startupData = slugResult.data;
+      } else {
+        // Try by id
+        const idResult = await supabase
+          .from('startups')
+          .select('*')
+          .eq('id', resolvedParams.id)
+          .maybeSingle();
+        
+        startupData = idResult.data;
+        startupError = idResult.error;
+      }
 
       if (startupError || !startupData) {
         notFound();
@@ -121,36 +147,7 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
 
       setStartup(startupData);
 
-      // Fetch launches
-      const { data: launchesData } = await supabase
-        .from('launches')
-        .select('id, title, tagline, upvote_count, launch_date, is_featured')
-        .eq('startup_id', startupData.id)
-        .order('launch_date', { ascending: false })
-        .limit(5);
-
-      setLaunches(launchesData || []);
-
-      // Fetch reviews
-      const { data: reviewsData } = await supabase
-        .from('reviews')
-        .select(`
-          id,
-          overall_rating,
-          title,
-          content,
-          pros,
-          cons,
-          is_verified,
-          created_at
-        `)
-        .eq('startup_id', startupData.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      setReviews((reviewsData as unknown as Review[]) || []);
-
-      // Calculate credibility score from startup data
+      // Calculate and set credibility immediately (doesn't need DB)
       setCredibility({
         overall_score: startupData.credibility_score || 75,
         review_score: Math.min(100, (startupData.total_reviews || 0) * 5 + 50),
@@ -158,6 +155,44 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
         engagement_score: Math.min(100, (startupData.total_upvotes || 0) / 5 + 40),
         longevity_score: 70,
       });
+
+      // Fetch launches and reviews in parallel
+      const [launchesResult, reviewsResult] = await Promise.all([
+        supabase
+          .from('launches')
+          .select('id, title, tagline, upvote_count, launch_date, is_featured')
+          .eq('startup_id', startupData.id)
+          .order('launch_date', { ascending: false })
+          .limit(5),
+        supabase
+          .from('reviews')
+          .select(`
+            id,
+            overall_rating,
+            title,
+            content,
+            pros,
+            cons,
+            is_verified,
+            created_at
+          `)
+          .eq('startup_id', startupData.id)
+          .order('created_at', { ascending: false })
+          .limit(5),
+      ]);
+
+      setLaunches(launchesResult.data || []);
+      setReviews((reviewsResult.data as unknown as Review[]) || []);
+      
+      // Calculate credibility scores
+      const cred = {
+        overall_score: startupData.credibility_score || 75,
+        review_score: Math.min(100, (startupData.total_reviews || 0) * 5 + 50),
+        verification_score: startupData.is_verified ? 100 : 50,
+        engagement_score: Math.min(100, (startupData.total_upvotes || 0) / 5 + 40),
+        longevity_score: 70,
+      };
+      setCredibility(cred);
     } catch (error) {
       console.error('Error fetching startup:', error);
       notFound();
@@ -429,7 +464,7 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
                     <CardContent className="p-12 text-center">
                       <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                       <p className="text-muted-foreground">No reviews yet</p>
-                      <Button className="mt-4">Write the first review</Button>
+                      <Button className="mt-4" onClick={handleWriteReview}>Write the first review</Button>
                     </CardContent>
                   </Card>
                 ) : (

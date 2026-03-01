@@ -8,7 +8,7 @@
 
 *🏆 Built for Hackathon - Full-Stack MVP with AI-Powered Features*
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.4-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com/)
@@ -34,6 +34,7 @@
 - [API Reference](#-api-reference)
 - [Keyboard Shortcuts](#-keyboard-shortcuts)
 - [Embed Trust Badge](#-embed-trust-badge)
+- [Troubleshooting](#-troubleshooting)
 - [Contributing](#-contributing)
 
 ---
@@ -157,21 +158,26 @@ Experience the full platform without creating an account:
 
 | Category | Technology |
 |----------|------------|
-| **Framework** | Next.js 16 (App Router + Turbopack) |
+| **Framework** | Next.js 16.1.4 (App Router + Turbopack) |
 | **Language** | TypeScript 5 |
-| **Styling** | Tailwind CSS 4 |
+| **Styling** | Tailwind CSS 4 + tw-animate-css |
 | **Database** | Supabase (PostgreSQL) |
-| **Authentication** | Supabase Auth |
+| **Authentication** | Supabase Auth + SSR (`@supabase/ssr`) |
 | **Real-time** | Supabase Realtime |
-| **AI** | Google Gemini |
+| **AI Providers** | xAI Grok, Google Gemini (`@google/generative-ai`), OpenAI, Groq |
+| **AI SDK** | Vercel AI SDK (`ai`) |
+| **PDF Processing** | pdfjs-dist |
+| **File Uploads** | react-dropzone |
 | **UI Components** | shadcn/ui + Radix UI |
 | **Charts** | Recharts |
-| **Forms** | React Hook Form + Zod |
-| **Date Handling** | date-fns |
-| **State Management** | React Context + Hooks |
+| **Forms** | React Hook Form + Zod 4 |
+| **Notifications** | Sonner |
+| **Date Handling** | date-fns 4 |
+| **State Management** | React Context + Custom Hooks |
+| **Middleware** | Custom `proxy.ts` for route protection & session management |
 | **Deployment** | Vercel |
 | **Responsive Design** | Mobile-first with Tailwind breakpoints (sm/md/lg/xl) |
-| **PWA** | Service Worker, Offline Support, Install Prompt |
+| **PWA** | Service Worker, Offline Support, Install Prompt, Web Manifest |
 
 ---
 
@@ -209,7 +215,7 @@ Experience the full platform without creating an account:
 - **Node.js** 18 or higher
 - **npm** or **yarn** or **pnpm**
 - **Supabase** account (free tier available)
-- **Google AI** API key (optional, for AI features)
+- **Grok / Google Gemini / OpenAI / Groq** API key (optional, for AI features)
 
 ### Installation
 
@@ -238,12 +244,20 @@ npm run dev
 ```
 ethaum-ai/
 ├── 📁 public/                  # Static assets
-│   ├── embed/                  # Embeddable widget scripts
-│   ├── icons/                  # PWA icons
+│   ├── embed/widget.js         # Embeddable trust-badge widget
 │   ├── manifest.json           # PWA manifest
-│   └── sw.js                   # Service worker
+│   └── sw.js                   # Service worker (offline support)
+│
+├── 📁 components/              # Root shadcn/ui components
+│   └── ui/                     # Avatar, Badge, Button, Card, Checkbox,
+│                               # Dialog, Dropdown, Form, Input, Label,
+│                               # Popover, Progress, ScrollArea, Select,
+│                               # Separator, Sheet, Skeleton, Slider,
+│                               # Sonner, Tabs, Textarea, Tooltip
 │
 ├── 📁 src/
+│   ├── proxy.ts                # Next.js middleware (route protection & session)
+│   │
 │   ├── 📁 app/                 # Next.js App Router
 │   │   ├── (auth)/             # Authentication pages
 │   │   │   ├── login/
@@ -251,60 +265,79 @@ ethaum-ai/
 │   │   │       ├── enterprise/
 │   │   │       └── startup/
 │   │   │
-│   │   ├── (dashboard)/        # Protected dashboard routes
-│   │   │   ├── dashboard/      # Main dashboard
-│   │   │   ├── insights/       # Analytics & insights
+│   │   ├── (dashboard)/        # Protected dashboard routes (auth required)
+│   │   │   ├── compare/        # Side-by-side startup comparison
+│   │   │   ├── dashboard/      # Main analytics dashboard
+│   │   │   ├── deal-predictor/ # AI deal success probability tool
+│   │   │   ├── executive-brief/# AI executive brief generator
+│   │   │   ├── insights/       # Advanced analytics & insights
 │   │   │   ├── launches/       # Launch management
-│   │   │   │   ├── [id]/       # Launch detail
-│   │   │   │   └── new/        # Create launch
-│   │   │   ├── matchmaking/    # AI matchmaking
-│   │   │   ├── profile/        # User profile
+│   │   │   │   ├── [id]/       # Launch detail page
+│   │   │   │   └── new/        # Create new launch
+│   │   │   ├── matchmaking/    # AI enterprise matchmaking
+│   │   │   ├── pitch-analyzer/ # AI pitch deck analyzer
+│   │   │   ├── profile/        # User/startup profile management
 │   │   │   ├── reviews/        # Reviews management
-│   │   │   └── settings/       # Account settings
+│   │   │   └── settings/       # Account & notification settings
 │   │   │
-│   │   ├── (marketing)/        # Public pages
-│   │   │   ├── explore/        # Browse startups
+│   │   ├── (marketing)/        # Public-facing pages
+│   │   │   ├── explore/        # Browse & filter all startups
 │   │   │   └── startups/
-│   │   │       └── [id]/       # Startup profile
+│   │   │       └── [id]/       # Individual startup public profile
 │   │   │
 │   │   ├── 📁 api/             # API Routes
-│   │   │   ├── ai/             # AI endpoints
-│   │   │   ├── auth/           # Auth callbacks
-│   │   │   ├── badge/[id]/     # Trust badge API
+│   │   │   ├── ai/
+│   │   │   │   ├── analyze-pitch/       # AI pitch analysis
+│   │   │   │   ├── analyze-review/      # Sentiment analysis
+│   │   │   │   ├── compare/             # Multi-startup comparison
+│   │   │   │   ├── generate-brief/      # Executive brief generation
+│   │   │   │   ├── generate-launch-content/ # Launch copywriting
+│   │   │   │   ├── predict-deal/        # Deal success prediction
+│   │   │   │   ├── smart-search/        # NL startup search
+│   │   │   │   └── transcribe/          # Voice review transcription
+│   │   │   ├── badge/[id]/     # SVG trust badge endpoint
+│   │   │   ├── home-data/      # Landing page data
 │   │   │   ├── launches/       # Launch CRUD
 │   │   │   ├── matchmaking/    # Match generation
 │   │   │   ├── reviews/        # Review management
-│   │   │   └── startups/       # Startup data
+│   │   │   ├── seed/           # Database seeding
+│   │   │   └── stats/          # Platform statistics
 │   │   │
-│   │   ├── embed/              # Embeddable pages
-│   │   │   └── trust-badge/
-│   │   ├── offline/            # PWA offline page
+│   │   ├── demo/               # Interactive demo (no auth required)
+│   │   ├── embed/trust-badge/  # Embeddable badge page
+│   │   ├── enterprise/         # Enterprise landing page
+│   │   ├── offline/            # PWA offline fallback
 │   │   │
 │   │   ├── error.tsx           # Error boundary
 │   │   ├── global-error.tsx    # Global error handler
-│   │   ├── layout.tsx          # Root layout
-│   │   ├── loading.tsx         # Loading state
+│   │   ├── layout.tsx          # Root layout (fonts, providers)
+│   │   ├── loading.tsx         # Global loading state
 │   │   ├── not-found.tsx       # 404 page
-│   │   ├── page.tsx            # Homepage
+│   │   ├── page.tsx            # Homepage / landing page
 │   │   ├── robots.ts           # SEO robots.txt
 │   │   └── sitemap.ts          # SEO sitemap
 │   │
-│   ├── 📁 components/          # React components
-│   │   ├── common/             # Shared components
-│   │   │   ├── activity-feed.tsx       # Live activity display
-│   │   │   ├── advanced-search.tsx     # Advanced filtering
+│   ├── 📁 components/          # Feature React components
+│   │   ├── common/             # Shared platform components
+│   │   │   ├── activity-feed.tsx
+│   │   │   ├── advanced-search.tsx
 │   │   │   ├── command-palette.tsx     # Ctrl+K command menu
 │   │   │   ├── embed-widget-generator.tsx
 │   │   │   ├── keyboard-shortcuts-modal.tsx
 │   │   │   ├── loading.tsx
 │   │   │   ├── notification-center.tsx
 │   │   │   ├── pwa-install.tsx
-│   │   │   ├── smart-search.tsx        # AI-powered search
-│   │   │   ├── stats-card.tsx          # Statistics display
-│   │   │   └── trust-score.tsx         # Credibility score UI
+│   │   │   ├── smart-search.tsx        # AI-powered NL search
+│   │   │   ├── stats-card.tsx
+│   │   │   └── trust-score.tsx
 │   │   ├── dashboard/
+│   │   │   ├── dashboard-header.tsx
+│   │   │   ├── mobile-sidebar.tsx
+│   │   │   ├── profile-completion-banner.tsx
+│   │   │   └── sidebar.tsx
 │   │   ├── insights/
-│   │   ├── landing/
+│   │   │   ├── advanced-analytics.tsx
+│   │   │   └── credibility-widget.tsx
 │   │   ├── launches/
 │   │   ├── layout/
 │   │   │   ├── header.tsx
@@ -313,36 +346,39 @@ ethaum-ai/
 │   │   ├── profile/
 │   │   └── reviews/
 │   │
-│   ├── 📁 context/             # React Context
+│   ├── 📁 constants/           # App-wide constants
+│   │   ├── app.ts
+│   │   ├── index.ts
+│   │   └── navigation.ts
+│   │
+│   ├── 📁 context/             # React Context providers
 │   │   ├── auth-context.tsx
 │   │   └── notification-context.tsx
 │   │
-│   ├── 📁 hooks/               # Custom hooks
-│   │   ├── use-user.ts
-│   │   └── use-keyboard-shortcuts.tsx
+│   ├── 📁 hooks/               # Custom React hooks
+│   │   ├── use-debounce.ts
+│   │   ├── use-keyboard-shortcuts.tsx
+│   │   └── use-user.ts
 │   │
-│   ├── 📁 lib/                 # Utilities
-│   │   ├── ai/                 # AI integrations
-│   │   ├── api/
-│   │   │   └── security.ts     # Rate limiting, CSRF
-│   │   ├── auth/
-│   │   ├── db/                 # Database clients
-│   │   ├── helpers/
-│   │   │   └── export.ts       # CSV, JSON, PDF export
-│   │   ├── validators/         # Zod schemas
-│   │   └── env.ts              # Env validation
+│   ├── 📁 lib/                 # Core utilities & integrations
+│   │   ├── api/security.ts     # Rate limiting & CSRF protection
+│   │   ├── auth/               # Supabase auth helpers
+│   │   ├── db/                 # Supabase client & middleware
+│   │   ├── helpers/export.ts   # CSV, JSON, PDF export
+│   │   ├── demo-data.ts        # Demo mode sample data
+│   │   └── env.ts              # Environment variable validation
 │   │
-│   ├── 📁 styles/              # Global styles
-│   └── 📁 types/               # TypeScript types
+│   └── 📁 types/               # TypeScript type definitions
+│       ├── database.ts         # Supabase DB types
+│       └── index.ts
 │
-├── 📁 components/              # Root UI components (shadcn/ui)
-│   └── ui/
-│
-├── .env.example                # Environment template
-├── next.config.ts              # Next.js config
+├── .env.local                  # Local environment variables
+├── eslint.config.mjs
+├── next.config.ts              # Next.js + image + optimization config
 ├── package.json
-├── tailwind.config.ts
-└── tsconfig.json
+├── postcss.config.mjs
+├── tsconfig.json
+└── CloudScale_AI_Pitch_Deck.html  # Pitch deck presentation
 ```
 
 ---
@@ -362,12 +398,33 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 # ===========================================
-# GOOGLE AI (Optional - for AI features)
+# GROK AI (Optional - primary AI provider)
 # ===========================================
-# Get from: https://makersuite.google.com/app/apikey
+# Get from: https://console.x.ai/
 
-NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY=your-gemini-api-key
-GOOGLE_GEMINI_API_KEY=your-gemini-api-key
+NEXT_PUBLIC_GROK_API_KEY=your-grok-api-key
+GROK_API_KEY=your-grok-api-key
+
+# ===========================================
+# GOOGLE GENERATIVE AI (Optional - fallback AI)
+# ===========================================
+# Get from: https://aistudio.google.com/app/apikey
+
+GOOGLE_GENERATIVE_AI_API_KEY=your-google-ai-key
+
+# ===========================================
+# OPENAI (Optional - fallback AI)
+# ===========================================
+# Get from: https://platform.openai.com/api-keys
+
+OPENAI_API_KEY=your-openai-api-key
+
+# ===========================================
+# GROQ (Optional - fast inference fallback)
+# ===========================================
+# Get from: https://console.groq.com/keys
+
+GROQ_API_KEY=your-groq-api-key
 
 # ===========================================
 # APP CONFIG
@@ -387,12 +444,26 @@ NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
    - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
 
-### How to Get Google Gemini API Key
+### How to Get AI API Keys
 
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the key → `GOOGLE_GEMINI_API_KEY`
+**Grok (xAI) — Primary:**
+1. Go to [xAI Console](https://console.x.ai/)
+2. Sign in → **Create API Key**
+3. Copy the key → `GROK_API_KEY`
+
+**Google Gemini — Fallback:**
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Click **Create API key** → Copy it → `GOOGLE_GENERATIVE_AI_API_KEY`
+
+**OpenAI — Fallback:**
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Click **Create new secret key** → Copy it → `OPENAI_API_KEY`
+
+**Groq — Fast inference fallback:**
+1. Go to [Groq Console](https://console.groq.com/keys)
+2. Click **Create API Key** → Copy it → `GROQ_API_KEY`
+
+> 💡 Only one AI provider is required. The app will use whichever keys are present.
 
 ---
 
@@ -446,8 +517,12 @@ git push -u origin main
    | `NEXT_PUBLIC_SUPABASE_URL` | `https://your-project.supabase.co` |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `your-anon-key` |
    | `SUPABASE_SERVICE_ROLE_KEY` | `your-service-role-key` |
-   | `NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY` | `your-gemini-key` |
-   | `GOOGLE_GEMINI_API_KEY` | `your-gemini-key` |
+   | `GROK_API_KEY` | `your-grok-key` |
+   | `NEXT_PUBLIC_GROK_API_KEY` | `your-grok-key` |
+   | `GOOGLE_GENERATIVE_AI_API_KEY` | `your-google-ai-key` |
+   | `OPENAI_API_KEY` | `your-openai-key` |
+   | `GROQ_API_KEY` | `your-groq-key` |
+   | `NEXT_PUBLIC_APP_URL` | `https://your-app.vercel.app` |
 
 7. **Click "Deploy"** 🚀
 
@@ -548,6 +623,60 @@ Add your Vercel URL to Supabase Auth settings:
 
 ---
 
+## 🔧 Troubleshooting
+
+### Turbopack Panic on Windows (OneDrive)
+
+**Error**: `FATAL: An unexpected Turbopack error occurred` / `Insufficient system resources exist to complete the requested service (OS error 1450)`
+
+This happens when your project lives inside **OneDrive** and Windows cannot write Turbopack's build cache fast enough.
+
+**Fix 1 — Clear the build cache:**
+```powershell
+Remove-Item -Recurse -Force .next
+npm run dev
+```
+
+**Fix 2 — Remove the stray lockfile** (fixes the multiple-lockfile warning too):
+```powershell
+Remove-Item "C:\Users\<YourName>\package-lock.json"
+```
+
+**Fix 3 — Move the project outside OneDrive** (recommended):
+```powershell
+Move-Item "C:\Users\<YourName>\OneDrive\Documents\ethaum-ai" "C:\Projects\ethaum-ai"
+cd C:\Projects\ethaum-ai
+npm run dev
+```
+
+**Fix 4 — Disable Turbopack temporarily:**
+```json
+// package.json
+"dev": "next dev --no-turbopack"
+```
+
+---
+
+### Multiple Lockfile Warning
+
+If you see:
+> *Next.js inferred your workspace root but it may not be correct — detected multiple lockfiles*
+
+Delete the extra `package-lock.json` at your Windows user root or set `turbopack.root` in `next.config.ts`:
+
+```ts
+// next.config.ts
+const nextConfig = {
+  experimental: {
+    turbopack: {
+      root: __dirname,
+    },
+  },
+};
+```
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -566,7 +695,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI Components
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-First CSS Framework
 - [Vercel](https://vercel.com/) - Platform for Frontend Developers
-- [Google Gemini](https://ai.google.dev/) - Generative AI Capabilities
+- [xAI Grok](https://x.ai/) - Generative AI Capabilities
 - [Radix UI](https://www.radix-ui.com/) - Unstyled, Accessible Components
 
 ---
@@ -578,12 +707,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ### 🏆 Hackathon Project
 
 This project was built as a full-stack MVP demonstrating:
-- Modern Next.js 16 App Router architecture with Turbopack
-- AI-powered features with Google Gemini
-- Real-time database with Supabase
-- Fully responsive mobile-first design (all 39+ pages)
-- PWA support with offline capabilities
-- Portal-based mobile navigation for perfect z-index stacking
+- Modern **Next.js 16.1.4** App Router architecture with Turbopack
+- **Multi-provider AI** (Grok, Google Gemini, OpenAI, Groq) via Vercel AI SDK
+- Real-time database with **Supabase** (PostgreSQL + Auth + Realtime)
+- Fully responsive mobile-first design across all 39+ pages
+- **PWA** support with Service Worker and offline capabilities
+- Portal-based mobile navigation for correct z-index stacking
+- Custom `proxy.ts` middleware for fast, edge-compatible route protection
+- 8 AI-powered API routes (pitch analysis, deal prediction, matchmaking, briefs & more)
+- 5 new dashboard tools: Deal Predictor, Pitch Analyzer, Executive Brief, Compare, Insights
+- PDF processing with `pdfjs-dist` and file uploads via `react-dropzone`
 - Production-ready deployment on Vercel
 
 [⬆ Back to Top](#-ethaumai---enterprise-startup-intelligence-platform)

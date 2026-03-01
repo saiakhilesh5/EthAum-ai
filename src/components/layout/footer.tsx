@@ -3,27 +3,26 @@ import { Rocket } from 'lucide-react';
 
 const footerLinks = {
   product: [
-    { title: 'Features', href: '/features' },
-    { title: 'Pricing', href: '/pricing' },
+    { title: 'Explore Startups', href: '/explore' },
     { title: 'Launches', href: '/launches' },
     { title: 'Reviews', href: '/reviews' },
+    { title: 'Matchmaking', href: '/matchmaking' },
   ],
-  company: [
-    { title: 'About', href: '/about' },
-    { title: 'Blog', href: '/blog' },
-    { title: 'Careers', href: '/careers' },
-    { title: 'Contact', href: '/contact' },
+  tools: [
+    { title: 'Pitch Analyzer', href: '/pitch-analyzer' },
+    { title: 'Deal Predictor', href: '/deal-predictor' },
+    { title: 'Compare Tool', href: '/compare' },
+    { title: 'Executive Briefs', href: '/executive-brief' },
   ],
-  resources: [
-    { title: 'Documentation', href: '/docs' },
-    { title: 'Help Center', href: '/help' },
-    { title: 'API', href: '/api' },
-    { title: 'Status', href: '/status' },
+  getStarted: [
+    { title: 'For Startups', href: '/register/startup' },
+    { title: 'For Enterprises', href: '/register/enterprise' },
+    { title: 'Login', href: '/login' },
+    { title: 'Dashboard', href: '/dashboard' },
   ],
-  legal: [
-    { title: 'Privacy', href: '/privacy' },
-    { title: 'Terms', href: '/terms' },
-    { title: 'Cookies', href: '/cookies' },
+  insights: [
+    { title: 'Analytics', href: '/insights' },
+    { title: 'Settings', href: '/settings' },
   ],
 };
 
@@ -62,11 +61,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company Links */}
+          {/* AI Tools Links */}
           <div>
-            <h3 className="font-semibold mb-4">Company</h3>
+            <h3 className="font-semibold mb-4">AI Tools</h3>
             <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
+              {footerLinks.tools.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -79,11 +78,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources Links */}
+          {/* Get Started Links */}
           <div>
-            <h3 className="font-semibold mb-4">Resources</h3>
+            <h3 className="font-semibold mb-4">Get Started</h3>
             <ul className="space-y-2">
-              {footerLinks.resources.map((link) => (
+              {footerLinks.getStarted.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -96,11 +95,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal Links */}
+          {/* Insights Links */}
           <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
+            <h3 className="font-semibold mb-4">Insights</h3>
             <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
+              {footerLinks.insights.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}

@@ -121,10 +121,11 @@ export function Header() {
             <Search className="h-4 w-4" />
           </Button>
 
-          {/* Show loading only briefly, prioritize showing profile if available */}
-          {isLoading && !profile ? (
+          {/* While auth initialises OR user is known but profile is still fetching,
+               show a skeleton — never show Login/Sign Up to a logged-in user */}
+          {(isLoading || (user && !profile)) ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
-          ) : (isAuthenticated || profile) && profile ? (
+          ) : profile ? (
             <div className="flex items-center gap-1 sm:gap-2">
               <div className="hidden sm:block">
                 <NotificationCenter />
@@ -284,7 +285,9 @@ export function Header() {
           <div className="border-t my-2" />
 
           {/* Auth Section for Mobile */}
-          {!isAuthenticated && !profile && (
+          {/* Only show Login/Sign Up when we are certain the user is NOT logged in
+              (no active session). While loading or profile still fetching, show nothing. */}
+          {!isLoading && !user && !profile && (
             <div className="space-y-3">
               <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Get Started</p>
               <Button className="w-full" size="lg" asChild>
@@ -300,7 +303,7 @@ export function Header() {
           )}
 
           {/* User Info for Mobile when logged in */}
-          {(isAuthenticated || profile) && profile && (
+          {profile && (
             <div className="space-y-3">
               <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Account</p>
               <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">

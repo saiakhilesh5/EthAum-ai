@@ -47,6 +47,12 @@ const startupProfileSchema = z.object({
 
 type StartupProfileFormData = z.infer<typeof startupProfileSchema>;
 
+interface StartupProfileCache {
+  profile: any;
+  technologies: string[];
+  features: string[];
+}
+
 export default function StartupProfilePage() {
   const { user, profile, isLoading: userLoading } = useUser();
   const router = useRouter();
@@ -73,9 +79,24 @@ export default function StartupProfilePage() {
 
   // Fetch existing profile
   useEffect(() => {
+    const populateForm = (data: any) => {
+      setValue('name', data.name);
+      setValue('tagline', data.tagline);
+      setValue('description', data.description);
+      setValue('website_url', data.website_url || '');
+      setValue('demo_url', data.demo_url || '');
+      setValue('stage', data.stage);
+      setValue('arr_range', data.arr_range);
+      setValue('industry', data.industry);
+      setValue('founded_year', data.founded_year);
+      setValue('team_size', data.team_size);
+      setValue('headquarters', data.headquarters);
+    };
+
     const fetchProfile = async () => {
       if (!user) return;
 
+      setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from('startups')
@@ -85,18 +106,7 @@ export default function StartupProfilePage() {
 
         if (data) {
           setExistingProfile(data);
-          // Populate form with existing data
-          setValue('name', data.name);
-          setValue('tagline', data.tagline);
-          setValue('description', data.description);
-          setValue('website_url', data.website_url || '');
-          setValue('demo_url', data.demo_url || '');
-          setValue('stage', data.stage);
-          setValue('arr_range', data.arr_range);
-          setValue('industry', data.industry);
-          setValue('founded_year', data.founded_year);
-          setValue('team_size', data.team_size);
-          setValue('headquarters', data.headquarters);
+          populateForm(data);
           setTechnologies(data.technologies || []);
           setFeatures(data.features || []);
         }
@@ -121,11 +131,15 @@ export default function StartupProfilePage() {
   };
 
   const onSubmit = async (data: StartupProfileFormData) => {
-    if (!user) return;
+    if (!user) {
+      toast.error('Please login first');
+      return;
+    }
 
     setIsSaving(true);
 
     try {
+
       const profileData = {
         user_id: user.id,
         name: data.name,
@@ -144,25 +158,27 @@ export default function StartupProfilePage() {
         features,
       };
 
+      // Perform DB operation
+      let result;
       if (existingProfile) {
-        // Update existing profile
-        const { error } = await supabase
+        result = await supabase
           .from('startups')
           .update(profileData)
-          .eq('id', existingProfile.id);
-
-        if (error) throw error;
-        toast.success('Profile updated successfully!');
+          .eq('id', existingProfile.id)
+          .select();
       } else {
-        // Create new profile
-        const { error } = await supabase
+        result = await supabase
           .from('startups')
-          .insert([profileData]);
-
-        if (error) throw error;
-        toast.success('Profile created successfully!');
+          .insert([profileData])
+          .select();
       }
 
+      if (result.error) {
+        throw result.error;
+      }
+
+      toast.success(existingProfile ? 'Profile updated successfully!' : 'Profile created successfully!');
+      router.refresh(); // Invalidate Next.js cache so dashboard sees new data immediately
       router.push('/dashboard');
     } catch (error: any) {
       console.error('Error saving profile:', error);

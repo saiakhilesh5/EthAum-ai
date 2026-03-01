@@ -11,8 +11,8 @@ const serverOnlyEnvVars = [
 ] as const;
 
 const optionalEnvVars = [
-  'NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY',
-  'GOOGLE_GEMINI_API_KEY',
+  'NEXT_PUBLIC_GROK_API_KEY',
+  'GROK_API_KEY',
   'NEXT_PUBLIC_APP_URL',
   'NODE_ENV',
 ] as const;
@@ -25,12 +25,12 @@ interface EnvConfig {
   // Public (available on client)
   NEXT_PUBLIC_SUPABASE_URL: string;
   NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
-  NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY?: string;
+  NEXT_PUBLIC_GROK_API_KEY?: string;
   NEXT_PUBLIC_APP_URL?: string;
   
   // Server only
   SUPABASE_SERVICE_ROLE_KEY?: string;
-  GOOGLE_GEMINI_API_KEY?: string;
+  GROK_API_KEY?: string;
   
   // System
   NODE_ENV: 'development' | 'production' | 'test';
@@ -123,10 +123,10 @@ Need help? Visit: https://supabase.com/dashboard/project/_/settings/api
   return {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY,
+    NEXT_PUBLIC_GROK_API_KEY: process.env.NEXT_PUBLIC_GROK_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
+    GROK_API_KEY: process.env.GROK_API_KEY,
     NODE_ENV: (process.env.NODE_ENV as EnvConfig['NODE_ENV']) || 'development',
   };
 }

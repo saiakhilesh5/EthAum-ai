@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const groq = new Groq({
+  apiKey: process.env.GROK_API_KEY!,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +15,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `You are a smart search assistant for a B2B SaaS marketplace platform.
 
@@ -50,9 +50,11 @@ Return JSON:
 
 Generate 3-5 realistic results that would match this query in a SaaS marketplace context.`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const result = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = result.choices[0]?.message?.content || '';
 
     // Parse JSON from response
     let parsed;
@@ -72,11 +74,12 @@ Generate 3-5 realistic results that would match this query in a SaaS marketplace
 
     return NextResponse.json(parsed);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Smart search error:', error);
+    const is429 = error?.status === 429 || String(error?.message).includes('429') || String(error?.message).includes('quota');
     return NextResponse.json(
-      { error: 'Search failed' },
-      { status: 500 }
+      { error: is429 ? 'AI quota exceeded. Please try again in a few seconds.' : 'Search failed' },
+      { status: is429 ? 429 : 500 }
     );
   }
 }

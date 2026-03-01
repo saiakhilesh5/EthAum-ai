@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+const groq = new Groq({
+  apiKey: process.env.GROK_API_KEY!,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +15,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `Analyze this product review and provide a JSON response with sentiment analysis and improvement suggestions.
 
@@ -48,20 +48,22 @@ Be strict about detecting fake or biased reviews. Look for:
 - Template-like writing
 - Inconsistencies between rating and content`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const result = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = result.choices[0]?.message?.content || '';
 
-    // Parse the JSON response
     const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
     const analysis = JSON.parse(cleanedText);
 
     return NextResponse.json(analysis);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error analyzing review:', error);
+    const is429 = error?.status === 429 || String(error?.message).includes('429') || String(error?.message).includes('quota');
     return NextResponse.json(
-      { error: 'Failed to analyze review' },
-      { status: 500 }
+      { error: is429 ? 'AI quota exceeded. Please try again in a few seconds.' : 'Failed to analyze review' },
+      { status: is429 ? 429 : 500 }
     );
   }
 }

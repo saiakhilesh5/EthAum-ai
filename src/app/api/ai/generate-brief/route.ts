@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const groq = new Groq({
+  apiKey: process.env.GROK_API_KEY!,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,11 +15,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // In production, fetch actual startup data from database
-    // For now, we'll use Gemini to generate a comprehensive brief
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `You are a professional business analyst creating an executive brief for investors and partners.
 
@@ -79,9 +76,11 @@ Return in JSON format:
 
 Only include the sections that were requested. Make the data realistic and professional.`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const result = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = result.choices[0]?.message?.content || '';
 
     // Parse JSON from response
     let parsed;
@@ -109,11 +108,12 @@ Only include the sections that were requested. Make the data realistic and profe
 
     return NextResponse.json(parsed);
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Brief generation error:', error);
+    const is429 = error?.status === 429 || String(error?.message).includes('429') || String(error?.message).includes('quota');
     return NextResponse.json(
-      { error: 'Failed to generate brief' },
-      { status: 500 }
+      { error: is429 ? 'AI quota exceeded. Please try again in a few seconds.' : 'Failed to generate brief' },
+      { status: is429 ? 429 : 500 }
     );
   }
 }

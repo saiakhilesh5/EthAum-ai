@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@src/lib/db/supabase-server';
 
+// Cache for 60 seconds
+export const revalidate = 60;
+
 export async function GET() {
   try {
     const supabase = await createServerSupabaseClient();
 
-    // Fetch data in parallel
+    // Fetch data in parallel - select only needed fields for performance
     const [
       { data: launches },
       { data: startups },
@@ -17,7 +20,7 @@ export async function GET() {
       // Get trending launches (most recent, featured first)
       supabase
         .from('launches')
-        .select('*')
+        .select('id, title, tagline, upvote_count, comment_count, is_featured')
         .order('is_featured', { ascending: false })
         .order('upvote_count', { ascending: false })
         .order('created_at', { ascending: false })
@@ -26,7 +29,7 @@ export async function GET() {
       // Get top startups by credibility score
       supabase
         .from('startups')
-        .select('*')
+        .select('id, name, tagline, logo_url, credibility_score, is_verified')
         .order('credibility_score', { ascending: false })
         .limit(5),
       
@@ -37,7 +40,7 @@ export async function GET() {
       supabase.from('matches').select('*', { count: 'exact', head: true }),
     ]);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       launches: launches || [],
       startups: startups || [],
       stats: {
@@ -48,6 +51,11 @@ export async function GET() {
         platform_growth: '+47%',
       },
     });
+
+    // Add cache headers for faster subsequent loads
+    response.headers.set('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching home data:', error);
     return NextResponse.json({

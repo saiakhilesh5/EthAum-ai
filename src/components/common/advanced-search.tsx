@@ -465,7 +465,7 @@ export function AdvancedSearch() {
           results.map((startup) => (
             <a
               key={startup.id}
-              href={`/startups/${startup.slug}`}
+              href={`/startups/${startup.slug || startup.id}`}
               className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors group"
             >
               <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">

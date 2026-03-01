@@ -43,10 +43,13 @@ export default function MatchmakingPage() {
   });
 
   useEffect(() => {
+    // Always fetch fresh data
     if (user) {
       determineUserType();
+    } else if (!userLoading) {
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [user, userLoading]);
 
   const determineUserType = async () => {
     if (!user) {
@@ -55,32 +58,20 @@ export default function MatchmakingPage() {
     }
 
     try {
-      // Check if user has a startup
-      const { data: startup } = await supabase
-        .from('startups')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
+      // Check startup and enterprise in parallel
+      const [startupResult, enterpriseResult] = await Promise.all([
+        supabase.from('startups').select('id').eq('user_id', user.id).single(),
+        supabase.from('enterprises').select('id').eq('user_id', user.id).single(),
+      ]);
 
-      if (startup) {
+      if (startupResult.data) {
         setUserType('startup');
-        setProfileId(startup.id);
-        await fetchStats(startup.id, 'startup');
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if user has an enterprise
-      const { data: enterprise } = await supabase
-        .from('enterprises')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (enterprise) {
+        setProfileId(startupResult.data.id);
+        fetchStats(startupResult.data.id, 'startup');
+      } else if (enterpriseResult.data) {
         setUserType('enterprise');
-        setProfileId(enterprise.id);
-        await fetchStats(enterprise.id, 'enterprise');
+        setProfileId(enterpriseResult.data.id);
+        fetchStats(enterpriseResult.data.id, 'enterprise');
       }
     } catch (error) {
       console.error('Error determining user type:', error);
@@ -98,12 +89,13 @@ export default function MatchmakingPage() {
       .eq(column, id);
 
     if (data) {
-      setStats({
+      const newStats = {
         total: data.length,
         pending: data.filter((m) => m.status === 'pending').length,
         interested: data.filter((m) => m.status === 'interested').length,
         connected: data.filter((m) => m.status === 'connected').length,
-      });
+      };
+      setStats(newStats);
     }
   };
 

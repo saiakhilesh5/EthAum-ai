@@ -1,105 +1,28 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable React strict mode for better development experience
+  // Enable React Strict Mode for better debugging
   reactStrictMode: true,
-
-  // Image optimization settings
+  
+  // Optimize images
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
+        hostname: '**',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
-
-  // Security headers
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(self), geolocation=()',
-          },
-        ],
-      },
-      {
-        // Embed pages should be embeddable
-        source: '/embed/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'ALLOWALL',
-          },
-        ],
-      },
-      {
-        // Service worker
-        source: '/sw.js',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
-          },
-          {
-            key: 'Service-Worker-Allowed',
-            value: '/',
-          },
-        ],
-      },
-    ];
-  },
-
-  // Redirects for common patterns
-  async redirects() {
-    return [
-      {
-        source: '/home',
-        destination: '/',
-        permanent: true,
-      },
-    ];
-  },
-
-  // Experimental features
+  
+  // Enable experimental features for better performance
   experimental: {
-    // Enable server actions
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+    optimizeCss: true,
   },
-
-  // Set turbopack root to fix lockfile warning
-  turbopack: {
-    root: process.cwd(),
-  },
+  
+  // Optimize output
+  poweredByHeader: false,
+  compress: true,
 };
 
 export default nextConfig;

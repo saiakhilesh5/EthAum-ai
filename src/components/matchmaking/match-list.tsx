@@ -155,47 +155,61 @@ export default function MatchList({
   };
 
   const handleInterest = async (matchId: string) => {
-    try {
-      const { error } = await supabase
-        .from('matches')
-        .update({ status: 'interested' })
-        .eq('id', matchId);
+    // Optimistic update - update UI immediately
+    setMatches(
+      matches.map((m) =>
+        m.id === matchId ? { ...m, status: 'interested' } : m
+      )
+    );
+    toast.success('Interest shown! We\'ll notify them.');
 
-      if (error) throw error;
-
-      setMatches(
-        matches.map((m) =>
-          m.id === matchId ? { ...m, status: 'interested' } : m
-        )
-      );
-
-      toast.success('Interest shown! We\'ll notify them.');
-    } catch (error) {
-      console.error('Error updating match:', error);
-      toast.error('Failed to update match');
-    }
+    // Perform DB operation in background
+    supabase
+      .from('matches')
+      .update({ status: 'interested' })
+      .eq('id', matchId)
+      .select()
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error updating match:', error);
+          toast.error('Failed to update match');
+          // Revert on error
+          setMatches(
+            matches.map((m) =>
+              m.id === matchId ? { ...m, status: 'pending' } : m
+            )
+          );
+        }
+      });
   };
 
   const handleDecline = async (matchId: string) => {
-    try {
-      const { error } = await supabase
-        .from('matches')
-        .update({ status: 'declined' })
-        .eq('id', matchId);
+    // Optimistic update - update UI immediately
+    setMatches(
+      matches.map((m) =>
+        m.id === matchId ? { ...m, status: 'declined' } : m
+      )
+    );
+    toast.success('Match declined');
 
-      if (error) throw error;
-
-      setMatches(
-        matches.map((m) =>
-          m.id === matchId ? { ...m, status: 'declined' } : m
-        )
-      );
-
-      toast.success('Match declined');
-    } catch (error) {
-      console.error('Error declining match:', error);
-      toast.error('Failed to decline match');
-    }
+    // Perform DB operation in background
+    supabase
+      .from('matches')
+      .update({ status: 'declined' })
+      .eq('id', matchId)
+      .select()
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error declining match:', error);
+          toast.error('Failed to decline match');
+          // Revert on error
+          setMatches(
+            matches.map((m) =>
+              m.id === matchId ? { ...m, status: 'pending' } : m
+            )
+          );
+        }
+      });
   };
 
   const handleView = (matchId: string) => {

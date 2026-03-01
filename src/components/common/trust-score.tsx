@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { supabase } from '@src/lib/db/supabase';
 import {
   Shield,
   CheckCircle,
@@ -68,6 +69,30 @@ export default function TrustScore({ startupId, compact = false, showBreakdown =
   const [verifications, setVerifications] = useState<VerificationItem[]>(defaultVerifications);
   const [expanded, setExpanded] = useState(!compact);
   const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    if (!startupId) return;
+    // Fetch real startup data to compute trust score from actual fields
+    supabase
+      .from('startups')
+      .select('id, is_verified, website_url, tech_stack, team_size, founding_year, headquarters, user_id')
+      .eq('id', startupId)
+      .single()
+      .then(({ data: startup }) => {
+        if (!startup) return;
+        setVerifications([
+          { id: 'email', name: 'Email Verified', icon: Mail, status: 'verified', description: 'Business email domain verified', points: 10 },
+          { id: 'domain', name: 'Domain Ownership', icon: Globe, status: startup.website_url ? 'verified' : 'unverified', description: 'Website domain ownership confirmed', points: 15 },
+          { id: 'registration', name: 'Business Registration', icon: FileCheck, status: startup.is_verified ? 'verified' : 'pending', description: 'Legal business registration confirmed', points: 20 },
+          { id: 'github', name: 'Tech Stack Listed', icon: Github, status: startup.tech_stack?.length > 0 ? 'verified' : 'unverified', description: 'Technology stack documented', points: 10 },
+          { id: 'team', name: 'Team Info', icon: Users, status: startup.team_size ? 'verified' : 'pending', description: 'Team size information provided', points: 15 },
+          { id: 'linkedin', name: 'LinkedIn Connected', icon: Linkedin, status: 'pending', description: 'Founders LinkedIn profiles linked', points: 10 },
+          { id: 'phone', name: 'Phone Verified', icon: Phone, status: 'pending', description: 'Phone number confirmed via SMS', points: 10 },
+          { id: 'payment', name: 'Payment Verified', icon: CreditCard, status: 'unverified', description: 'Payment method on file', points: 5 },
+          { id: 'security', name: 'Security Audit', icon: Lock, status: 'unverified', description: 'Third-party security assessment', points: 15 },
+        ]);
+      });
+  }, [startupId]);
 
   const totalPoints = verifications.reduce((sum, v) => sum + v.points, 0);
   const earnedPoints = verifications

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +35,7 @@ import {
   Target,
 } from 'lucide-react';
 import Link from 'next/link';
+import { supabase } from '@src/lib/db/supabase';
 
 interface BriefSection {
   id: string;
@@ -62,12 +63,18 @@ export default function ExecutiveBriefPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedBrief, setGeneratedBrief] = useState<any>(null);
+  const [startupsList, setStartupsList] = useState<{ id: string; name: string; category: string }[]>([]);
 
-  const demoStartups = [
-    { id: '1', name: 'CloudSync Pro', category: 'Cloud Infrastructure' },
-    { id: '2', name: 'DataFlow AI', category: 'Data Analytics' },
-    { id: '3', name: 'SecureVault', category: 'Cybersecurity' },
-  ];
+  useEffect(() => {
+    supabase
+      .from('startups')
+      .select('id, name, industry')
+      .order('credibility_score', { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        setStartupsList((data || []).map((s: any) => ({ id: s.id, name: s.name, category: s.industry || '' })));
+      });
+  }, []);
 
   const toggleSection = (id: string) => {
     setSections(sections.map(s => 
@@ -123,7 +130,7 @@ export default function ExecutiveBriefPage() {
     } catch (error) {
       console.error('Brief generation error:', error);
       // Demo brief
-      const startup = demoStartups.find(s => s.id === selectedStartup);
+      const startup = startupsList.find(s => s.id === selectedStartup);
       setGeneratedBrief({
         title: `Executive Brief: ${startup?.name}`,
         generatedAt: new Date().toISOString(),
@@ -220,7 +227,7 @@ export default function ExecutiveBriefPage() {
                     <SelectValue placeholder="Select a startup..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {demoStartups.map((startup) => (
+                    {startupsList.map((startup) => (
                       <SelectItem key={startup.id} value={startup.id}>
                         <span className="flex items-center gap-2">
                           <Building2 className="w-4 h-4" />

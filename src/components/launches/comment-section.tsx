@@ -57,26 +57,30 @@ export function CommentSection({ launchId }: CommentSectionProps) {
 
       if (error) throw error;
 
-      // Fetch replies for each comment
-      const commentsWithReplies = await Promise.all(
-        (data || []).map(async (comment: any) => {
-          const { data: replies } = await supabase
-            .from('comments')
-            .select(`
-              id,
-              content,
-              created_at,
-              user:users(id, full_name, avatar_url)
-            `)
-            .eq('parent_id', comment.id)
-            .order('created_at', { ascending: true });
+      const topLevelComments = data || [];
 
-          return {
-            ...comment,
-            replies: replies || [],
-          };
-        })
-      );
+      // Single batch query for all replies instead of N+1 individual queries
+      let allReplies: any[] = [];
+      if (topLevelComments.length > 0) {
+        const commentIds = topLevelComments.map((c: any) => c.id);
+        const { data: repliesData } = await supabase
+          .from('comments')
+          .select(`
+            id,
+            content,
+            created_at,
+            parent_id,
+            user:users(id, full_name, avatar_url)
+          `)
+          .in('parent_id', commentIds)
+          .order('created_at', { ascending: true });
+        allReplies = repliesData || [];
+      }
+
+      const commentsWithReplies = topLevelComments.map((comment: any) => ({
+        ...comment,
+        replies: allReplies.filter((r) => r.parent_id === comment.id),
+      }));
 
       setComments(commentsWithReplies);
     } catch (error) {
@@ -96,26 +100,41 @@ export function CommentSection({ launchId }: CommentSectionProps) {
 
     if (!newComment.trim()) return;
 
-    setIsSubmitting(true);
+    const commentContent = newComment.trim();
+    
+    // Optimistic update - add comment to UI immediately
+    const optimisticComment: Comment = {
+      id: `temp-${Date.now()}`,
+      content: commentContent,
+      created_at: new Date().toISOString(),
+      user: {
+        id: user?.id || '',
+        full_name: profile?.full_name || 'You',
+        avatar_url: profile?.avatar_url || null,
+      },
+      replies: [],
+    };
+    
+    setComments([optimisticComment, ...comments]);
+    setNewComment('');
+    toast.success('Comment posted!');
 
-    try {
-      const { error } = await supabase.from('comments').insert({
-        launch_id: launchId,
-        user_id: user?.id,
-        content: newComment.trim(),
-      });
-
-      if (error) throw error;
-
-      setNewComment('');
-      fetchComments();
-      toast.success('Comment posted!');
-    } catch (error: any) {
-      toast.error('Failed to post comment');
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Perform DB operation in background
+    supabase.from('comments').insert({
+      launch_id: launchId,
+      user_id: user?.id,
+      content: commentContent,
+    }).select().then(({ error }) => {
+      if (error) {
+        console.error('Comment error:', error);
+        toast.error('Failed to post comment - please try again');
+        // Revert optimistic update
+        setComments(comments.filter(c => c.id !== optimisticComment.id));
+      } else {
+        // Refresh to get real comment with proper ID
+        fetchComments();
+      }
+    });
   };
 
   const handleSubmitReply = async (parentId: string) => {
@@ -126,28 +145,46 @@ export function CommentSection({ launchId }: CommentSectionProps) {
 
     if (!replyContent.trim()) return;
 
-    setIsSubmitting(true);
+    const replyText = replyContent.trim();
+    
+    // Optimistic update - add reply to UI immediately
+    const optimisticReply: Comment = {
+      id: `temp-${Date.now()}`,
+      content: replyText,
+      created_at: new Date().toISOString(),
+      user: {
+        id: user?.id || '',
+        full_name: profile?.full_name || 'You',
+        avatar_url: profile?.avatar_url || null,
+      },
+    };
+    
+    setComments(comments.map(c => 
+      c.id === parentId 
+        ? { ...c, replies: [...(c.replies || []), optimisticReply] }
+        : c
+    ));
+    setReplyContent('');
+    setReplyingTo(null);
+    toast.success('Reply posted!');
 
-    try {
-      const { error } = await supabase.from('comments').insert({
-        launch_id: launchId,
-        user_id: user?.id,
-        content: replyContent.trim(),
-        parent_id: parentId,
-      });
-
-      if (error) throw error;
-
-      setReplyContent('');
-      setReplyingTo(null);
-      fetchComments();
-      toast.success('Reply posted!');
-    } catch (error: any) {
-      toast.error('Failed to post reply');
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Perform DB operation in background
+    supabase.from('comments').insert({
+      launch_id: launchId,
+      user_id: user?.id,
+      content: replyText,
+      parent_id: parentId,
+    }).select().then(({ error }) => {
+      if (error) {
+        console.error('Reply error:', error);
+        toast.error('Failed to post reply - please try again');
+        // Refresh comments to remove failed optimistic update
+        fetchComments();
+      } else {
+        // Refresh to get real reply with proper ID
+        fetchComments();
+      }
+    });
   };
 
   const CommentItem = ({ comment, isReply = false }: { comment: Comment; isReply?: boolean }) => (

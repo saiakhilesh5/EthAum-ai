@@ -45,6 +45,12 @@ const enterpriseProfileSchema = z.object({
 
 type EnterpriseProfileFormData = z.infer<typeof enterpriseProfileSchema>;
 
+interface EnterpriseProfileCache {
+  profile: any;
+  preferredStages: string[];
+  preferredIndustries: string[];
+}
+
 export default function EnterpriseProfilePage() {
   const { user, profile, isLoading: userLoading } = useUser();
   const router = useRouter();
@@ -66,9 +72,21 @@ export default function EnterpriseProfilePage() {
 
   // Fetch existing profile
   useEffect(() => {
+    const populateForm = (data: any) => {
+      setValue('company_name', data.company_name);
+      setValue('industry', data.industry);
+      setValue('company_size', data.company_size);
+      setValue('website_url', data.website_url || '');
+      setValue('contact_person', data.contact_person);
+      setValue('job_title', data.job_title);
+      setValue('requirements', data.requirements);
+      setValue('budget_range', data.budget_range);
+    };
+
     const fetchProfile = async () => {
       if (!user) return;
 
+      setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from('enterprises')
@@ -78,15 +96,7 @@ export default function EnterpriseProfilePage() {
 
         if (data) {
           setExistingProfile(data);
-          // Populate form with existing data
-          setValue('company_name', data.company_name);
-          setValue('industry', data.industry);
-          setValue('company_size', data.company_size);
-          setValue('website_url', data.website_url || '');
-          setValue('contact_person', data.contact_person);
-          setValue('job_title', data.job_title);
-          setValue('requirements', data.requirements);
-          setValue('budget_range', data.budget_range);
+          populateForm(data);
           setPreferredStages(data.preferred_stages || []);
           setPreferredIndustries(data.preferred_industries || []);
         } else {
@@ -117,6 +127,7 @@ export default function EnterpriseProfilePage() {
     setIsSaving(true);
 
     try {
+
       const profileData = {
         user_id: user.id,
         company_name: data.company_name,
@@ -131,25 +142,26 @@ export default function EnterpriseProfilePage() {
         preferred_industries: preferredIndustries,
       };
 
+      // Perform DB operation
+      let result;
       if (existingProfile) {
-        // Update existing profile
-        const { error } = await supabase
+        result = await supabase
           .from('enterprises')
           .update(profileData)
-          .eq('id', existingProfile.id);
-
-        if (error) throw error;
-        toast.success('Profile updated successfully!');
+          .eq('id', existingProfile.id)
+          .select();
       } else {
-        // Create new profile
-        const { error } = await supabase
+        result = await supabase
           .from('enterprises')
-          .insert([profileData]);
-
-        if (error) throw error;
-        toast.success('Profile created successfully!');
+          .insert([profileData])
+          .select();
       }
 
+      if (result.error) throw result.error;
+
+      // Clear caches after successful save
+      toast.success(existingProfile ? 'Profile updated successfully!' : 'Profile created successfully!');
+      router.refresh(); // Invalidate Next.js cache so dashboard sees new data immediately
       router.push('/dashboard');
     } catch (error: any) {
       console.error('Error saving profile:', error);

@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get('secret');
   
-  if (secret !== process.env.SEED_SECRET && secret !== 'hackathon2024') {
+  if (!process.env.SEED_SECRET || secret !== process.env.SEED_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -255,13 +255,13 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get('secret');
   
-  if (secret === process.env.SEED_SECRET || secret === 'hackathon2024') {
+  if (process.env.SEED_SECRET && secret === process.env.SEED_SECRET) {
     // Redirect the request to POST handler
     return POST(request);
   }
 
   return NextResponse.json({
-    message: 'POST to this endpoint with ?secret=hackathon2024 to seed the database',
+    message: 'POST to this endpoint with ?secret=<SEED_SECRET> to seed the database',
     warning: 'This will add demo data to your database',
   });
 }

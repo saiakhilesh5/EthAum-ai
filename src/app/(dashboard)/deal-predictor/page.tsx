@@ -94,42 +94,24 @@ export default function DealPredictorPage() {
     if (!user) return;
 
     try {
-      // Check startup
-      const { data: startup } = await supabase
-        .from('startups')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Check both startup and enterprise profiles in parallel
+      const [startupResult, enterpriseResult] = await Promise.all([
+        supabase.from('startups').select('*').eq('user_id', user.id).single(),
+        supabase.from('enterprises').select('*').eq('user_id', user.id).single(),
+      ]);
 
-      if (startup) {
+      if (startupResult.data) {
         setUserType('startup');
-        setUserProfile(startup);
-        
+        setUserProfile(startupResult.data);
         // Fetch enterprises as potential partners
-        const { data: enterprises } = await supabase
-          .from('enterprises')
-          .select('*')
-          .limit(10);
+        const { data: enterprises } = await supabase.from('enterprises').select('*').limit(10);
         setPotentialPartners(enterprises || []);
-      } else {
-        // Check enterprise
-        const { data: enterprise } = await supabase
-          .from('enterprises')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (enterprise) {
-          setUserType('enterprise');
-          setUserProfile(enterprise);
-
-          // Fetch startups as potential partners
-          const { data: startups } = await supabase
-            .from('startups')
-            .select('*')
-            .limit(10);
-          setPotentialPartners(startups || []);
-        }
+      } else if (enterpriseResult.data) {
+        setUserType('enterprise');
+        setUserProfile(enterpriseResult.data);
+        // Fetch startups as potential partners
+        const { data: startups } = await supabase.from('startups').select('*').limit(10);
+        setPotentialPartners(startups || []);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);

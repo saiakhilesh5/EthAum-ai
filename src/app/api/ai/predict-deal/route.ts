@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+const groq = new Groq({
+  apiKey: process.env.GROK_API_KEY!,
+});
 
 export async function POST(request: NextRequest) {
   try {
     const { userProfile, partnerProfile, userType } = await request.json();
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `You are an expert B2B sales strategist and deal analyst. Analyze the compatibility between these two companies and predict the likelihood of a successful partnership.
 
@@ -44,11 +44,12 @@ Consider factors like:
 
 Be realistic and specific in your predictions.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const result = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = result.choices[0]?.message?.content || '';
 
-    // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('Failed to parse AI response');
@@ -57,11 +58,12 @@ Be realistic and specific in your predictions.`;
     const prediction = JSON.parse(jsonMatch[0]);
 
     return NextResponse.json(prediction);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error predicting deal:', error);
+    const is429 = error?.status === 429 || String(error?.message).includes('429') || String(error?.message).includes('quota');
     return NextResponse.json(
-      { error: 'Failed to predict deal' },
-      { status: 500 }
+      { error: is429 ? 'AI quota exceeded. Please try again in a few seconds.' : 'Failed to predict deal' },
+      { status: is429 ? 429 : 500 }
     );
   }
 }

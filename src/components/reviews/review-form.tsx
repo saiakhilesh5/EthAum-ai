@@ -159,7 +159,9 @@ export default function ReviewForm({
     }
 
     setIsSubmitting(true);
+    
     try {
+      // Perform DB operation
       const { error } = await supabase.from('reviews').insert({
         startup_id: startupId,
         user_id: userId,
@@ -176,10 +178,14 @@ export default function ReviewForm({
         pros,
         cons,
         sentiment_score: sentimentAnalysis?.confidence,
-        is_verified: false, // Will be verified by AI later
-      });
+        is_verified: false,
+      }).select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error submitting review:', error);
+        toast.error('Failed to submit review - please try again');
+        return;
+      }
 
       toast.success('Review submitted successfully!');
       onSuccess?.();

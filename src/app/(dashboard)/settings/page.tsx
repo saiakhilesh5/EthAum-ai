@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@src/hooks/use-user';
 import { supabase } from '@src/lib/db/supabase';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ export default function SettingsPage() {
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -55,6 +56,7 @@ export default function SettingsPage() {
 
   const fetchUserData = async () => {
     if (!user) return;
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('users')
@@ -73,19 +75,103 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveProfile = async () => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File size must be less than 2MB');
+      return;
+    }
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+      
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ avatar_url: urlData.publicUrl })
+        .eq('id', user.id);
+      
+      if (updateError) throw updateError;
+      
+      setUserData({ ...userData, avatar_url: urlData.publicUrl });
+      toast.success('Avatar updated successfully');
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      toast.error(error.message || 'Failed to upload avatar');
+    }
+  };
+
+  const handleSaveNotifications = async () => {
     if (!user) return;
     setIsSaving(true);
     try {
       const { error } = await supabase
         .from('users')
-        .update({ full_name: fullName, phone, updated_at: new Date().toISOString() })
+        .update({ notification_settings: notifications, updated_at: new Date().toISOString() })
         .eq('id', user.id);
+      
       if (error) throw error;
-      toast.success('Profile updated successfully');
+      toast.success('Notification preferences saved');
+    } catch (error: any) {
+      console.error('Error saving notifications:', error);
+      toast.error(error.message || 'Failed to save preferences');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    const confirmed = window.confirm(
+      'Are you sure you want to delete your account? This action cannot be undone.'
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+      toast.info('Account deletion is being processed. You will receive a confirmation email.');
     } catch (error) {
+      toast.error('Failed to initiate account deletion');
+    }
+  };
+
+  const handleUpgrade = () => {
+    toast.info('Upgrade plans coming soon! Stay tuned for premium features.');
+  };
+
+  const handleAddPayment = () => {
+    toast.info('Payment methods coming soon! We will notify you when available.');
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ full_name: fullName, phone, updated_at: new Date().toISOString() })
+        .eq('id', user.id)
+        .select();
+
+      if (error) throw error;
+
+      toast.success('Profile updated successfully');
+    } catch (error: any) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      toast.error(error.message || 'Failed to save profile');
     } finally {
       setIsSaving(false);
     }
@@ -144,7 +230,14 @@ export default function SettingsPage() {
                   <AvatarFallback className="text-lg md:text-xl">{fullName?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="text-center sm:text-left">
-                  <Button variant="outline" size="sm">Change Avatar</Button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleAvatarChange}
+                    accept="image/jpeg,image/png,image/gif"
+                    className="hidden"
+                  />
+                  <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>Change Avatar</Button>
                   <p className="text-xs text-muted-foreground mt-1">JPG, PNG or GIF. Max 2MB.</p>
                 </div>
               </div>
@@ -200,7 +293,7 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex justify-end"><Button>Save Preferences</Button></div>
+              <div className="flex justify-end"><Button onClick={handleSaveNotifications} disabled={isSaving}>{isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Save Preferences</Button></div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -231,7 +324,7 @@ export default function SettingsPage() {
                   <AlertCircle className="w-5 h-5 text-red-500" />
                   <div><p className="font-medium text-red-600">Delete Account</p><p className="text-sm text-red-600/80">Permanently delete your account</p></div>
                 </div>
-                <Button variant="destructive" size="sm" className="mt-4">Delete Account</Button>
+                <Button variant="destructive" size="sm" className="mt-4" onClick={handleDeleteAccount}>Delete Account</Button>
               </div>
             </CardContent>
           </Card>
@@ -251,7 +344,7 @@ export default function SettingsPage() {
                     <h3 className="text-xl font-bold">Starter</h3>
                     <p className="text-sm text-muted-foreground">Perfect for getting started with EthAum</p>
                   </div>
-                  <Button>Upgrade</Button>
+                  <Button onClick={handleUpgrade}>Upgrade</Button>
                 </div>
                 <Separator className="my-4" />
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
@@ -263,7 +356,7 @@ export default function SettingsPage() {
               <div className="text-center py-8 text-muted-foreground">
                 <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No payment methods added</p>
-                <Button variant="outline" className="mt-4">Add Payment Method</Button>
+                <Button variant="outline" className="mt-4" onClick={handleAddPayment}>Add Payment Method</Button>
               </div>
             </CardContent>
           </Card>

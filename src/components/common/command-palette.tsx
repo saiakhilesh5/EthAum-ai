@@ -123,7 +123,7 @@ export function CommandPalette() {
           type: 'startup' as const,
           title: s.name,
           subtitle: s.tagline,
-          link: `/startups/${s.slug}`,
+          link: `/startups/${s.slug || s.id}`,
           icon: Building2,
           badge: s.industry,
         })),

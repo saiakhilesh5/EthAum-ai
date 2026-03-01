@@ -1,17 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Bell,
   Star,
   Heart,
   MessageSquare,
-  UserPlus,
   Rocket,
   TrendingUp,
   Award,
@@ -26,6 +24,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import { supabase } from '@src/lib/db/supabase';
 
 interface ActivityItem {
   id: string;
@@ -45,80 +44,76 @@ interface ActivityItem {
   isNew?: boolean;
 }
 
-// Demo activities generator
-const generateDemoActivities = (): ActivityItem[] => {
-  const activities: ActivityItem[] = [
-    {
-      id: '1',
-      type: 'review',
-      user: { name: 'Sarah Chen', company: 'TechCorp', avatar: '' },
-      target: { name: 'CloudSync Pro', link: '/startups/1' },
-      content: 'Left a 5-star review',
-      metadata: { rating: 5 },
-      timestamp: new Date(Date.now() - 2 * 60 * 1000),
-      isNew: true,
-    },
-    {
-      id: '2',
-      type: 'match',
-      user: { name: 'DataFlow AI', company: 'Startup' },
-      target: { name: 'Enterprise Solutions Inc', link: '/matchmaking' },
-      content: 'New partnership match',
-      metadata: { compatibility: 94 },
-      timestamp: new Date(Date.now() - 5 * 60 * 1000),
-      isNew: true,
-    },
-    {
-      id: '3',
-      type: 'launch',
-      user: { name: 'SecureVault', company: 'Startup' },
-      target: { name: 'Product Hunt', link: '/launches/1' },
-      content: 'Launched on Product Hunt',
-      metadata: { upvotes: 127 },
-      timestamp: new Date(Date.now() - 15 * 60 * 1000),
-    },
-    {
-      id: '4',
-      type: 'upvote',
-      user: { name: 'Mike Johnson', company: 'InnovateCo' },
-      target: { name: 'AI Assistant Pro', link: '/startups/2' },
-      content: 'Upvoted',
-      timestamp: new Date(Date.now() - 22 * 60 * 1000),
-    },
-    {
-      id: '5',
-      type: 'funding',
-      user: { name: 'GrowthMetrics', company: 'Startup' },
-      content: 'Announced Series A funding',
-      metadata: { amount: '$5.2M' },
-      timestamp: new Date(Date.now() - 45 * 60 * 1000),
-    },
-    {
-      id: '6',
-      type: 'milestone',
-      user: { name: 'CloudSync Pro', company: 'Startup' },
-      content: 'Reached 1,000 customers',
-      metadata: { milestone: '1K customers' },
-      timestamp: new Date(Date.now() - 60 * 60 * 1000),
-    },
-    {
-      id: '7',
-      type: 'comment',
-      user: { name: 'Lisa Wang', company: 'DataFirst' },
-      target: { name: 'API Toolkit', link: '/startups/3' },
-      content: 'Commented on review',
-      timestamp: new Date(Date.now() - 90 * 60 * 1000),
-    },
-    {
-      id: '8',
-      type: 'feature',
-      user: { name: 'SmartDocs', company: 'Startup' },
-      content: 'Featured as Top Pick',
-      metadata: { category: 'Productivity' },
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    },
-  ];
-  return activities;
+const fetchActivities = async (): Promise<ActivityItem[]> => {
+  try {
+    const [launchesResult, reviewsResult, matchesResult] = await Promise.all([
+      supabase
+        .from('launches')
+        .select('id, title, created_at, upvote_count, startups(name, slug)')
+        .order('created_at', { ascending: false })
+        .limit(5),
+      supabase
+        .from('reviews')
+        .select('id, title, overall_rating, created_at, users(full_name), startups(name, slug)')
+        .order('created_at', { ascending: false })
+        .limit(5),
+      supabase
+        .from('matches')
+        .select('id, match_score, created_at, startups(name, slug), enterprises(company_name)')
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]);
+
+    const items: ActivityItem[] = [];
+
+    for (const launch of launchesResult.data || []) {
+      const s = (launch as any).startups;
+      items.push({
+        id: `launch-${launch.id}`,
+        type: 'launch',
+        user: { name: s?.name || 'A startup', company: 'Startup' },
+        target: { name: launch.title, link: `/launches/${launch.id}` },
+        content: 'Launched a new product',
+        metadata: { upvotes: (launch as any).upvote_count },
+        timestamp: new Date(launch.created_at),
+      });
+    }
+
+    for (const review of reviewsResult.data || []) {
+      const u = (review as any).users;
+      const s = (review as any).startups;
+      items.push({
+        id: `review-${review.id}`,
+        type: 'review',
+        user: { name: u?.full_name || 'Someone' },
+        target: { name: s?.name || 'a startup', link: s?.slug ? `/startups/${s.slug}` : '#' },
+        content: 'Left a review',
+        metadata: { rating: (review as any).overall_rating },
+        timestamp: new Date(review.created_at),
+      });
+    }
+
+    for (const match of matchesResult.data || []) {
+      const s = (match as any).startups;
+      const e = (match as any).enterprises;
+      if (s && e) {
+        items.push({
+          id: `match-${match.id}`,
+          type: 'match',
+          user: { name: s.name, company: 'Startup' },
+          target: { name: e.company_name, link: '/matchmaking' },
+          content: 'New partnership match',
+          metadata: { compatibility: (match as any).match_score },
+          timestamp: new Date(match.created_at),
+        });
+      }
+    }
+
+    return items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  } catch (err) {
+    console.error('Error fetching activities:', err);
+    return [];
+  }
 };
 
 const activityConfig = {
@@ -149,65 +144,47 @@ export default function ActivityFeed({
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [expanded, setExpanded] = useState(!compact);
   const [newCount, setNewCount] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Initial load
-    setTimeout(() => {
-      setActivities(generateDemoActivities());
+    // Fetch real activity data from DB
+    fetchActivities().then((data) => {
+      setActivities(data);
       setIsLoading(false);
-    }, 1000);
+    });
   }, []);
 
-  // Simulate real-time updates
+  // Real-time subscription for new launches
   useEffect(() => {
     if (!isLive) return;
 
-    const interval = setInterval(() => {
-      const newActivity: ActivityItem = {
-        id: Date.now().toString(),
-        type: ['review', 'upvote', 'match', 'launch', 'comment'][Math.floor(Math.random() * 5)] as any,
-        user: {
-          name: ['Alex Kim', 'Jordan Lee', 'Casey Smith', 'Morgan Chen'][Math.floor(Math.random() * 4)],
-          company: ['TechStart', 'InnovateLab', 'GrowthCo', 'DataDriven'][Math.floor(Math.random() * 4)],
-        },
-        target: {
-          name: ['CloudSync', 'DataFlow', 'SecureVault', 'AI Tools'][Math.floor(Math.random() * 4)],
-          link: '/startups/1',
-        },
-        content: 'Just happened',
-        timestamp: new Date(),
-        isNew: true,
-      };
+    const channel = supabase
+      .channel('activity-feed')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'launches' }, () => {
+        fetchActivities().then((data) => {
+          setActivities(data);
+          setNewCount((prev) => prev + 1);
+        });
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'reviews' }, () => {
+        fetchActivities().then((data) => {
+          setActivities(data);
+          setNewCount((prev) => prev + 1);
+        });
+      })
+      .subscribe();
 
-      setActivities((prev) => [newActivity, ...prev.slice(0, maxItems - 1)]);
-      setNewCount((prev) => prev + 1);
-
-      // Play sound if enabled
-      if (soundEnabled && audioRef.current) {
-        audioRef.current.play().catch(() => {});
-      }
-
-      // Remove "new" flag after 5 seconds
-      setTimeout(() => {
-        setActivities((prev) =>
-          prev.map((a) =>
-            a.id === newActivity.id ? { ...a, isNew: false } : a
-          )
-        );
-      }, 5000);
-    }, 15000); // New activity every 15 seconds
-
-    return () => clearInterval(interval);
-  }, [isLive, soundEnabled, maxItems]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isLive]);
 
   const refreshFeed = () => {
     setIsLoading(true);
     setNewCount(0);
-    setTimeout(() => {
-      setActivities(generateDemoActivities());
+    fetchActivities().then((data) => {
+      setActivities(data);
       setIsLoading(false);
-    }, 500);
+    });
   };
 
   const displayedActivities = expanded ? activities.slice(0, maxItems) : activities.slice(0, 3);
@@ -238,9 +215,6 @@ export default function ActivityFeed({
 
   return (
     <Card className="relative overflow-hidden">
-      {/* Notification sound (silent by default) */}
-      <audio ref={audioRef} src="/notification.mp3" preload="auto" />
-
       {showHeader && (
         <CardHeader className="pb-3 p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

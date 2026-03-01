@@ -34,34 +34,48 @@ export function UpvoteButton({
       return;
     }
 
+    // Optimistic update - update UI immediately
+    const wasUpvoted = upvoted;
+    const previousCount = count;
+    
+    setUpvoted(!wasUpvoted);
+    setCount(wasUpvoted ? previousCount - 1 : previousCount + 1);
     setIsLoading(true);
+    onUpvote?.();
 
-    try {
-      if (upvoted) {
-        const { error } = await supabase
-          .from('upvotes')
-          .delete()
-          .eq('launch_id', launchId)
-          .eq('user_id', user?.id);
-
-        if (error) throw error;
-        setUpvoted(false);
-        setCount((prev) => prev - 1);
-      } else {
-        const { error } = await supabase
-          .from('upvotes')
-          .insert({ launch_id: launchId, user_id: user?.id });
-
-        if (error) throw error;
-        setUpvoted(true);
-        setCount((prev) => prev + 1);
-      }
-      onUpvote?.();
-    } catch (error: any) {
-      toast.error('Failed to update vote');
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+    // Perform DB operation in background
+    if (wasUpvoted) {
+      supabase
+        .from('upvotes')
+        .delete()
+        .eq('launch_id', launchId)
+        .eq('user_id', user?.id)
+        .select()
+        .then(({ error }) => {
+          setIsLoading(false);
+          if (error) {
+            console.error('Upvote error:', error);
+            // Revert on error
+            setUpvoted(wasUpvoted);
+            setCount(previousCount);
+            toast.error('Failed to update vote');
+          }
+        });
+    } else {
+      supabase
+        .from('upvotes')
+        .insert({ launch_id: launchId, user_id: user?.id })
+        .select()
+        .then(({ error }) => {
+          setIsLoading(false);
+          if (error) {
+            console.error('Upvote error:', error);
+            // Revert on error
+            setUpvoted(wasUpvoted);
+            setCount(previousCount);
+            toast.error('Failed to update vote');
+          }
+        });
     }
   };
 

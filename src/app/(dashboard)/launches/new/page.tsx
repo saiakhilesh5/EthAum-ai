@@ -11,17 +11,20 @@ import { ArrowLeft, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NewLaunchPage() {
-  const { user, isStartup, isLoading: userLoading } = useUser();
+  const { user, profile, isStartup, isLoading: userLoading } = useUser();
   const router = useRouter();
   const [startup, setStartup] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStartup = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('startups')
           .select('*')
           .eq('user_id', user.id)
@@ -37,12 +40,14 @@ export default function NewLaunchPage() {
       }
     };
 
-    if (user) {
+    if (!userLoading) {
       fetchStartup();
     }
-  }, [user]);
+  }, [user, userLoading]);
 
-  if (userLoading || isLoading) {
+  // Show skeleton while auth loads, startup data loads,
+  // or while user is known but profile hasn't arrived yet (background fetch race)
+  if (userLoading || isLoading || (user && !profile)) {
     return (
       <div className="p-4 md:p-6 space-y-4 md:space-y-6">
         <Skeleton className="h-8 w-48" />

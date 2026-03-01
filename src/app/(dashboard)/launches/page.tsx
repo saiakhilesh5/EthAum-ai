@@ -11,44 +11,45 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, Rocket, Calendar, TrendingUp, Award } from 'lucide-react';
 
+interface LaunchesStats {
+  totalLaunches: number;
+  totalUpvotes: number;
+  featuredCount: number;
+}
+
 export default function LaunchesPage() {
   const { isStartup, isLoading: userLoading } = useUser();
   const [activeTab, setActiveTab] = useState('today');
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<LaunchesStats>({
     totalLaunches: 0,
     totalUpvotes: 0,
     featuredCount: 0,
   });
+  const [statsLoaded, setStatsLoaded] = useState(false);
 
   useEffect(() => {
+    // Always fetch fresh data
     fetchStats();
   }, []);
 
   const fetchStats = async () => {
     try {
-      const { count: totalLaunches } = await supabase
-        .from('launches')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'live');
+      // Run all stats queries in parallel
+      const [totalLaunchesResult, upvoteDataResult, featuredCountResult] = await Promise.all([
+        supabase.from('launches').select('*', { count: 'exact', head: true }).eq('status', 'live'),
+        supabase.from('launches').select('upvote_count').eq('status', 'live'),
+        supabase.from('launches').select('*', { count: 'exact', head: true }).eq('status', 'live').eq('is_featured', true),
+      ]);
 
-      const { data: upvoteData } = await supabase
-        .from('launches')
-        .select('upvote_count')
-        .eq('status', 'live');
+      const totalUpvotes = upvoteDataResult.data?.reduce((acc, l) => acc + (l.upvote_count || 0), 0) || 0;
 
-      const totalUpvotes = upvoteData?.reduce((acc, l) => acc + (l.upvote_count || 0), 0) || 0;
-
-      const { count: featuredCount } = await supabase
-        .from('launches')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'live')
-        .eq('is_featured', true);
-
-      setStats({
-        totalLaunches: totalLaunches || 0,
+      const newStats = {
+        totalLaunches: totalLaunchesResult.count || 0,
         totalUpvotes,
-        featuredCount: featuredCount || 0,
-      });
+        featuredCount: featuredCountResult.count || 0,
+      };
+      setStats(newStats);
+      setStatsLoaded(true);
     } catch (error) {
       console.error('Error fetching stats:', error);
       setStats({
@@ -56,6 +57,7 @@ export default function LaunchesPage() {
         totalUpvotes: 0,
         featuredCount: 0,
       });
+      setStatsLoaded(true);
     }
   };
 

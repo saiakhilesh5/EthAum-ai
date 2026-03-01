@@ -1,11 +1,13 @@
-'use client';
+﻿'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@src/lib/db/supabase';
 import { useRouter } from 'next/navigation';
 
-interface UserProfile {
+// ─── Types ─────────────────────────────────────────────────────────────────
+
+export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
@@ -24,270 +26,230 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// ─── Profile cache (localStorage) ─────────────────────────────────────────
+// Used only for instant first-render while DB fetch is in-flight.
+// Never treated as source-of-truth — always verified against DB after init.
 
-// Cache keys for session storage
-const PROFILE_CACHE_KEY = 'ethaum_profile_cache';
-const CACHE_EXPIRY_KEY = 'ethaum_cache_expiry';
-const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes (shorter for fresher data)
+const CACHE_KEY = 'ethaum_profile_v2';
 
-// Get cached profile from sessionStorage
-const getCachedProfile = (): UserProfile | null => {
+function readCache(): UserProfile | null {
   if (typeof window === 'undefined') return null;
   try {
-    const expiry = sessionStorage.getItem(CACHE_EXPIRY_KEY);
-    if (expiry && Date.now() > parseInt(expiry)) {
-      sessionStorage.removeItem(PROFILE_CACHE_KEY);
-      sessionStorage.removeItem(CACHE_EXPIRY_KEY);
-      return null;
-    }
-    const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
-    return cached ? JSON.parse(cached) : null;
-  } catch {
-    return null;
-  }
-};
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? (JSON.parse(raw) as UserProfile) : null;
+  } catch { return null; }
+}
 
-// Cache profile to sessionStorage
-const setCachedProfile = (profile: UserProfile | null) => {
+function writeCache(p: UserProfile | null) {
   if (typeof window === 'undefined') return;
   try {
-    if (profile) {
-      sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
-      sessionStorage.setItem(CACHE_EXPIRY_KEY, String(Date.now() + CACHE_DURATION));
-    } else {
-      sessionStorage.removeItem(PROFILE_CACHE_KEY);
-      sessionStorage.removeItem(CACHE_EXPIRY_KEY);
-    }
-  } catch {
-    // Ignore storage errors
-  }
-};
+    if (p) localStorage.setItem(CACHE_KEY, JSON.stringify(p));
+    else localStorage.removeItem(CACHE_KEY);
+  } catch {}
+}
+
+// ─── Context ───────────────────────────────────────────────────────────────
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// ─── Provider ──────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Initialize with cached profile for faster hydration
+  const [profile, setProfile] = useState<UserProfile | null>(() => readCache());
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(() => getCachedProfile());
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const router = useRouter();
 
-  // Fetch user profile from database
-  const fetchProfile = useCallback(async (userId: string) => {
+  const router = useRouter();
+  const fetchingForRef = useRef<string | null>(null);
+
+  // ── fetchProfile ──────────────────────────────────────────────────────────
+  const fetchProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select('id, email, full_name, avatar_url, user_type')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error || !data) return null;
+
+      writeCache(data);
       setProfile(data);
-      setCachedProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      setProfile(null);
-      setCachedProfile(null);
-    }
+      return data;
+    } catch { return null; }
   }, []);
 
-  // Refresh profile data
-  const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
-    }
-  };
+  const refreshProfile = useCallback(async () => {
+    if (user) await fetchProfile(user.id);
+  }, [user, fetchProfile]);
 
-  // Initialize auth state - optimized for speed
+  // ── Initialization ────────────────────────────────────────────────────────
+  // Pattern: getSession() (local read, no network) -> fetch profile -> set isLoading=false
+  // isLoading stays true until BOTH session check AND profile fetch are done.
   useEffect(() => {
-    let mounted = true;
+    let cancelled = false;
 
-    const initializeAuth = async () => {
+    async function init() {
       try {
-        // Check for cached profile first - show immediately
-        const cachedProfile = getCachedProfile();
-        if (cachedProfile && mounted) {
-          setProfile(cachedProfile);
-          // If we have cached profile, we can assume user is logged in
-          // Set loading false early for better UX
-          setIsLoading(false);
-        }
+        const { data: { session: s } } = await supabase.auth.getSession();
+        if (cancelled) return;
 
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!mounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Only fetch fresh profile if no cache or cache expired
-          if (!cachedProfile) {
-            await fetchProfile(session.user.id);
-          } else {
-            // Refresh profile in background
-            fetchProfile(session.user.id);
-          }
+        if (s?.user) {
+          setSession(s);
+          setUser(s.user);
+          fetchingForRef.current = s.user.id;
+          await fetchProfile(s.user.id);
         } else {
-          // No session, clear cache
+          setUser(null);
+          setSession(null);
           setProfile(null);
-          setCachedProfile(null);
+          writeCache(null);
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
+      } catch (err) {
+        console.error('[auth] init error:', err);
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        writeCache(null);
       } finally {
-        if (mounted) {
-          setIsLoading(false);
-          setIsInitialized(true);
-        }
+        if (!cancelled) setIsLoading(false);
       }
-    };
+    }
 
-    initializeAuth();
+    init();
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Listen for auth changes
+  // ── Auth state change listener ────────────────────────────────────────────
+  // RULE: this listener ONLY updates state variables — it NEVER navigates.
+  // Navigation on SIGNED_OUT caused: "clear site data -> auto-redirect away from /login"
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
+      async (event, newSession) => {
+        if (event === 'INITIAL_SESSION') return; // handled in init()
 
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-          setCachedProfile(null);
+        if (event === 'TOKEN_REFRESHED') {
+          setSession(newSession);
+          setUser(newSession?.user ?? null);
+          return;
         }
 
-        // Refresh router to update server components on auth changes
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          router.refresh();
+        if (event === 'SIGNED_IN') {
+          if (newSession?.user && fetchingForRef.current !== newSession.user.id) {
+            setSession(newSession);
+            setUser(newSession.user);
+            fetchingForRef.current = newSession.user.id;
+            await fetchProfile(newSession.user.id);
+          }
+          return;
         }
 
         if (event === 'SIGNED_OUT') {
-          setCachedProfile(null);
-          router.refresh();
-          router.push('/');
+          setUser(null);
+          setSession(null);
+          setProfile(null);
+          writeCache(null);
+          fetchingForRef.current = null;
+          // No navigation — only signOut() function navigates
+          return;
         }
       }
     );
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, [router, fetchProfile]);
+    return () => subscription.unsubscribe();
+  }, [fetchProfile]);
 
-  // Sign up function
-  const signUp = async (email: string, password: string, fullName: string, userType: string) => {
+  // ── signUp ────────────────────────────────────────────────────────────────
+  const signUp = useCallback(async (
+    email: string, password: string, fullName: string, userType: string
+  ): Promise<{ error: any }> => {
     try {
-      // Get the current origin for email redirect (works for both localhost and production)
-      const redirectUrl = typeof window !== 'undefined' 
-        ? `${window.location.origin}/login?confirmed=true`
-        : process.env.NEXT_PUBLIC_SITE_URL 
-          ? `${process.env.NEXT_PUBLIC_SITE_URL}/login?confirmed=true`
-          : 'http://localhost:3000/login?confirmed=true';
+      const redirectUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/login?confirmed=true`
+          : `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/login?confirmed=true`;
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-            user_type: userType,
-          },
-        },
+        options: { emailRedirectTo: redirectUrl, data: { full_name: fullName, user_type: userType } },
       });
 
-      if (error) return { error };
-
-      return { error: null };
-    } catch (error) {
-      return { error };
+      return { error: error ? { message: toFriendlyError(error.message) } : null };
+    } catch (err: any) {
+      return { error: { message: toFriendlyError(err?.message) } };
     }
-  };
+  }, []);
 
-  // Sign in function
-  const signIn = async (email: string, password: string, expectedUserType?: string) => {
+  // ── signIn ────────────────────────────────────────────────────────────────
+  const signIn = useCallback(async (
+    email: string, password: string, expectedUserType?: string
+  ): Promise<{ error: any }> => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) return { error };
+      if (error) return { error: { message: toFriendlyError(error.message) } };
+      if (!data.session || !data.user) return { error: { message: 'Sign in failed. Please try again.' } };
 
-      // Validate user type if expected type is provided
-      if (expectedUserType && data.user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('user_type')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profile && profile.user_type !== expectedUserType) {
+      if (expectedUserType) {
+        const { data: p } = await supabase.from('users').select('user_type').eq('id', data.user.id).single();
+        if (p && p.user_type !== expectedUserType) {
           await supabase.auth.signOut();
-          return { 
-            error: { 
-              message: `This email is registered as a ${profile.user_type}. Please use the correct login option.` 
-            } 
-          };
+          return { error: { message: `This account is a ${p.user_type} account. Please use the correct sign-in option.` } };
         }
       }
 
-      // Update state immediately so UI reflects logged-in state
-      if (data.session && data.user) {
-        setSession(data.session);
-        setUser(data.user);
-        // Fetch and set profile immediately
-        await fetchProfile(data.user.id);
-      }
-
-      // Refresh router to update server components after sign in
-      router.refresh();
+      // Set state immediately so UI responds before redirect
+      fetchingForRef.current = data.user.id;
+      setSession(data.session);
+      setUser(data.user);
+      await fetchProfile(data.user.id);
 
       return { error: null };
-    } catch (error) {
-      return { error };
+    } catch (err: any) {
+      return { error: { message: toFriendlyError(err?.message) } };
     }
-  };
+  }, [fetchProfile]);
 
-  // Sign out function
+  // ── signOut ───────────────────────────────────────────────────────────────
   const signOut = useCallback(async () => {
-    setCachedProfile(null);
-    await supabase.auth.signOut();
     setUser(null);
-    setProfile(null);
     setSession(null);
-    router.refresh();
+    setProfile(null);
+    writeCache(null);
+    fetchingForRef.current = null;
+    try { await supabase.auth.signOut(); } catch {}
     router.push('/');
   }, [router]);
 
-  const value = {
-    user,
-    profile,
-    session,
-    isLoading,
-    signUp,
-    signIn,
-    signOut,
-    refreshProfile,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, profile, session, isLoading, signUp, signIn, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
+}
+
+// ─── Error helpers ─────────────────────────────────────────────────────────
+
+function toFriendlyError(msg?: string): string {
+  if (!msg) return 'Something went wrong. Please try again.';
+  const m = msg.toLowerCase();
+  if (m.includes('fetch') || m.includes('network') || m.includes('failed to fetch') || m.includes('econnrefused'))
+    return 'Cannot reach the server. Please check your connection and try again.';
+  if (m.includes('invalid login credentials') || m.includes('invalid_grant'))
+    return 'Incorrect email or password.';
+  if (m.includes('email not confirmed'))
+    return 'Please confirm your email before signing in.';
+  if (m.includes('too many requests'))
+    return 'Too many attempts. Please wait a moment and try again.';
+  if (m.includes('user already registered'))
+    return 'An account with this email already exists. Please sign in instead.';
+  return msg;
 }

@@ -64,10 +64,13 @@ export default function ReviewsPage() {
   const [pendingReviews, setPendingReviews] = useState(0);
 
   useEffect(() => {
+    // Always fetch fresh data
     if (user) {
       fetchStartupData();
+    } else if (!userLoading) {
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [user, userLoading]);
 
   const fetchStartupData = async () => {
     if (!user) {
@@ -93,12 +96,22 @@ export default function ReviewsPage() {
 
       setStartup(startupData);
 
-      // Fetch review statistics
-      const { data: reviews } = await supabase
-        .from('reviews')
-        .select('overall_rating, ease_of_use_rating, value_for_money_rating, customer_support_rating, features_rating, recommend_likelihood')
-        .eq('startup_id', startupData.id);
+      // Fetch reviews and pending count in parallel
+      const [reviewsResult, pendingResult] = await Promise.all([
+        supabase
+          .from('reviews')
+          .select('overall_rating, ease_of_use_rating, value_for_money_rating, customer_support_rating, features_rating, recommend_likelihood')
+          .eq('startup_id', startupData.id),
+        supabase
+          .from('reviews')
+          .select('id', { count: 'exact', head: true })
+          .eq('startup_id', startupData.id)
+          .eq('is_verified', false),
+      ]);
 
+      const reviews = reviewsResult.data;
+      let newReviewSummary: ReviewSummary | null = null;
+      
       if (reviews && reviews.length > 0) {
         const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         let totalOverall = 0;
@@ -119,7 +132,7 @@ export default function ReviewsPage() {
         });
 
         const count = reviews.length;
-        setReviewSummary({
+        newReviewSummary = {
           averageRating: totalOverall / count,
           totalReviews: count,
           ratingDistribution: distribution,
@@ -130,17 +143,12 @@ export default function ReviewsPage() {
             features: totalFeatures / count,
           },
           recommendationRate: Math.round((totalRecommend / count) * 10),
-        });
+        };
+        setReviewSummary(newReviewSummary);
       }
 
-      // Count pending reviews (unverified)
-      const { count: pending } = await supabase
-        .from('reviews')
-        .select('id', { count: 'exact', head: true })
-        .eq('startup_id', startupData.id)
-        .eq('is_verified', false);
-
-      setPendingReviews(pending || 0);
+      const newPendingReviews = pendingResult.count || 0;
+      setPendingReviews(newPendingReviews);
     } catch (error) {
       console.error('Error:', error);
     } finally {

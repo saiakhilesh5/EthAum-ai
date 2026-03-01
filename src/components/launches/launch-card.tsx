@@ -63,36 +63,45 @@ export function LaunchCard({ launch, userUpvoted = false, rank, onUpvote }: Laun
       return;
     }
 
-    setIsLoading(true);
+    // Optimistic update - update UI immediately
+    const wasUpvoted = upvoted;
+    const previousCount = upvoteCount;
+    
+    setUpvoted(!wasUpvoted);
+    setUpvoteCount(wasUpvoted ? previousCount - 1 : previousCount + 1);
+    onUpvote?.();
 
-    try {
-      if (upvoted) {
-        // Remove upvote
-        const { error } = await supabase
-          .from('upvotes')
-          .delete()
-          .eq('launch_id', launch.id)
-          .eq('user_id', user?.id);
-
-        if (error) throw error;
-        setUpvoted(false);
-        setUpvoteCount((prev) => prev - 1);
-      } else {
-        // Add upvote
-        const { error } = await supabase
-          .from('upvotes')
-          .insert({ launch_id: launch.id, user_id: user?.id });
-
-        if (error) throw error;
-        setUpvoted(true);
-        setUpvoteCount((prev) => prev + 1);
-      }
-      onUpvote?.();
-    } catch (error: any) {
-      toast.error('Failed to update vote');
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+    // Perform DB operation in background
+    if (wasUpvoted) {
+      supabase
+        .from('upvotes')
+        .delete()
+        .eq('launch_id', launch.id)
+        .eq('user_id', user?.id)
+        .select()
+        .then(({ error }) => {
+          if (error) {
+            console.error('Upvote error:', error);
+            // Revert on error
+            setUpvoted(wasUpvoted);
+            setUpvoteCount(previousCount);
+            toast.error('Failed to update vote');
+          }
+        });
+    } else {
+      supabase
+        .from('upvotes')
+        .insert({ launch_id: launch.id, user_id: user?.id })
+        .select()
+        .then(({ error }) => {
+          if (error) {
+            console.error('Upvote error:', error);
+            // Revert on error
+            setUpvoted(wasUpvoted);
+            setUpvoteCount(previousCount);
+            toast.error('Failed to update vote');
+          }
+        });
     }
   };
 

@@ -62,92 +62,58 @@ export default function ExplorePage() {
   const [sortBy, setSortBy] = useState('credibility');
 
   useEffect(() => {
-    fetchStartups();
-    fetchFeaturedStartups();
-    fetchTrendingStartups();
+    // Run all fetches in parallel for faster loading
+    const fetchAllData = async () => {
+      setIsLoading(true);
+      try {
+        // Select only the fields we need for better performance
+        const selectFields = 'id, name, slug, tagline, logo_url, industry, stage, arr_range, credibility_score, total_upvotes, total_reviews, is_verified, is_featured';
+        
+        // Build main query
+        let mainQuery = supabase.from('startups').select(selectFields);
+        
+        if (industryFilter !== 'all') {
+          mainQuery = mainQuery.eq('industry', industryFilter);
+        }
+        if (stageFilter !== 'all') {
+          mainQuery = mainQuery.eq('stage', stageFilter);
+        }
+        
+        switch (sortBy) {
+          case 'credibility':
+            mainQuery = mainQuery.order('credibility_score', { ascending: false });
+            break;
+          case 'reviews':
+            mainQuery = mainQuery.order('total_reviews', { ascending: false });
+            break;
+          case 'upvotes':
+            mainQuery = mainQuery.order('total_upvotes', { ascending: false });
+            break;
+          case 'newest':
+            mainQuery = mainQuery.order('created_at', { ascending: false });
+            break;
+        }
+        mainQuery = mainQuery.limit(20);
+
+        // Run all queries in parallel
+        const [startupsResult, featuredResult, trendingResult] = await Promise.all([
+          mainQuery,
+          supabase.from('startups').select(selectFields).eq('is_featured', true).limit(5),
+          supabase.from('startups').select(selectFields).order('total_upvotes', { ascending: false }).limit(5),
+        ]);
+
+        if (startupsResult.data) setStartups(startupsResult.data);
+        if (featuredResult.data) setFeaturedStartups(featuredResult.data);
+        if (trendingResult.data) setTrendingStartups(trendingResult.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllData();
   }, [industryFilter, stageFilter, sortBy]);
-
-  const fetchStartups = async () => {
-    try {
-      // Always try to fetch real data first
-      let query = supabase
-        .from('startups')
-        .select('*');
-
-      if (industryFilter !== 'all') {
-        query = query.eq('industry', industryFilter);
-      }
-
-      if (stageFilter !== 'all') {
-        query = query.eq('stage', stageFilter);
-      }
-
-      switch (sortBy) {
-        case 'credibility':
-          query = query.order('credibility_score', { ascending: false });
-          break;
-        case 'reviews':
-          query = query.order('total_reviews', { ascending: false });
-          break;
-        case 'upvotes':
-          query = query.order('total_upvotes', { ascending: false });
-          break;
-        case 'newest':
-          query = query.order('created_at', { ascending: false });
-          break;
-      }
-
-      const { data, error } = await query.limit(20);
-
-      // Use real data from database
-      if (!error && data) {
-        setStartups(data);
-      } else {
-        setStartups([]);
-      }
-    } catch (error) {
-      console.error('Error fetching startups:', error);
-      setStartups([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchFeaturedStartups = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('startups')
-        .select('*')
-        .eq('is_featured', true)
-        .limit(5);
-
-      if (!error && data) {
-        setFeaturedStartups(data);
-      } else {
-        setFeaturedStartups([]);
-      }
-    } catch {
-      setFeaturedStartups([]);
-    }
-  };
-
-  const fetchTrendingStartups = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('startups')
-        .select('*')
-        .order('total_upvotes', { ascending: false })
-        .limit(5);
-
-      if (!error && data) {
-        setTrendingStartups(data);
-      } else {
-        setTrendingStartups([]);
-      }
-    } catch {
-      setTrendingStartups([]);
-    }
-  };
 
   const filteredStartups = startups.filter((startup) =>
     startup.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -174,7 +140,7 @@ export default function ExplorePage() {
   };
 
   const StartupCard = ({ startup }: { startup: Startup }) => (
-    <Link href={`/startups/${startup.slug}`}>
+    <Link href={`/startups/${startup.slug || startup.id}`}>
       <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 h-full relative overflow-hidden">
         {/* Credibility Score Badge - Prominent */}
         <div className="absolute top-3 right-3 z-10">
@@ -321,7 +287,7 @@ export default function ExplorePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[...startups].sort((a, b) => b.credibility_score - a.credibility_score).slice(0, 3).map((startup, index) => (
-                  <Link key={startup.id} href={`/startups/${startup.slug}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                  <Link key={startup.id} href={`/startups/${startup.slug || startup.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
                       index === 0 ? 'bg-yellow-500 text-white' : 
                       index === 1 ? 'bg-gray-400 text-white' : 
@@ -352,7 +318,7 @@ export default function ExplorePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[...startups].sort((a, b) => b.total_reviews - a.total_reviews).slice(0, 3).map((startup, index) => (
-                  <Link key={startup.id} href={`/startups/${startup.slug}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                  <Link key={startup.id} href={`/startups/${startup.slug || startup.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
                       index === 0 ? 'bg-yellow-500 text-white' : 
                       index === 1 ? 'bg-gray-400 text-white' : 
@@ -383,7 +349,7 @@ export default function ExplorePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[...startups].sort((a, b) => b.total_upvotes - a.total_upvotes).slice(0, 3).map((startup, index) => (
-                  <Link key={startup.id} href={`/startups/${startup.slug}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
+                  <Link key={startup.id} href={`/startups/${startup.slug || startup.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm ${
                       index === 0 ? 'bg-yellow-500 text-white' : 
                       index === 1 ? 'bg-gray-400 text-white' : 
