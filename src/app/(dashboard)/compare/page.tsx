@@ -72,12 +72,12 @@ const mapStartupToComparison = (s: any): ComparisonStartup => ({
   tagline: s.tagline || '',
   category: s.industry || '',
   score: s.credibility_score || 0,
-  features: [...(s.tech_stack || []), ...(s.use_cases || [])].slice(0, 5),
+  features: [...(s.technologies || []), ...(s.features || [])].slice(0, 5),
   pricing: s.arr_range || 'Contact for pricing',
-  founded: String(s.founding_year || ''),
+  founded: String(s.founded_year || ''),
   teamSize: s.team_size || 'Unknown',
   funding: s.stage?.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || '',
-  pros: s.use_cases?.slice(0, 3) || [],
+  pros: (s.features || []).slice(0, 3),
   cons: [],
   ratings: {
     overall: Math.min(5, (s.credibility_score || 50) / 20),
@@ -103,9 +103,9 @@ export default function CompareToolPage() {
   useEffect(() => {
     supabase
       .from('startups')
-      .select('id, name, tagline, logo_url, industry, stage, arr_range, team_size, founding_year, credibility_score, tech_stack, use_cases, is_verified')
-      .order('credibility_score', { ascending: false })
-      .limit(20)
+      .select('id, name, tagline, logo_url, industry, stage, arr_range, team_size, founded_year, credibility_score, technologies, features, is_verified')
+      .order('name', { ascending: true })
+      .limit(50)
       .then(({ data }) => {
         setAvailableStartups((data || []).map(mapStartupToComparison));
         setIsLoadingStartups(false);
@@ -255,7 +255,7 @@ export default function CompareToolPage() {
                 isLoadingStartups ? (
                   <Skeleton className="h-10 w-[200px]" />
                 ) : (
-                <Select onValueChange={addStartup}>
+                <Select key={selectedStartups.length} onValueChange={addStartup}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Add startup..." />
                   </SelectTrigger>

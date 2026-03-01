@@ -69,9 +69,10 @@ export default function ExecutiveBriefPage() {
     supabase
       .from('startups')
       .select('id, name, industry')
-      .order('credibility_score', { ascending: false })
-      .limit(20)
-      .then(({ data }) => {
+      .order('name', { ascending: true })
+      .limit(50)
+      .then(({ data, error }) => {
+        if (error) console.error('Failed to load startups for brief:', error);
         setStartupsList((data || []).map((s: any) => ({ id: s.id, name: s.name, category: s.industry || '' })));
       });
   }, []);

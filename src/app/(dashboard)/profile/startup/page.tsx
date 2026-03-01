@@ -98,11 +98,14 @@ export default function StartupProfilePage() {
 
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data: startupRows } = await supabase
           .from('startups')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        const data = startupRows?.[0] ?? null;
 
         if (data) {
           setExistingProfile(data);

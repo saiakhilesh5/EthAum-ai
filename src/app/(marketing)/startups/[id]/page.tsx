@@ -4,6 +4,8 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter, notFound } from 'next/navigation';
 import { supabase } from '@src/lib/db/supabase';
+import { useUser } from '@src/hooks/use-user';
+import ReviewForm from '@src/components/reviews/review-form';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -97,15 +99,27 @@ interface CredibilityScore {
 export default function StartupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const { user } = useUser();
   const [startup, setStartup] = useState<StartupDetails | null>(null);
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [credibility, setCredibility] = useState<CredibilityScore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   const handleWriteReview = () => {
-    toast.info('Please log in to write a review');
-    router.push('/login');
+    if (!user) {
+      toast.info('Please log in to write a review');
+      router.push(`/login?redirectTo=/startups/${resolvedParams.id}`);
+      return;
+    }
+    setShowReviewForm(true);
+  };
+
+  const handleReviewSuccess = () => {
+    setShowReviewForm(false);
+    toast.success('Review submitted! Thank you.');
+    fetchStartup(); // Refresh reviews
   };
 
   useEffect(() => {
@@ -313,9 +327,9 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </a>
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleWriteReview}>
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Write a Review
+                {user ? 'Write a Review' : 'Login to Review'}
               </Button>
             </div>
           </div>
@@ -459,16 +473,46 @@ export default function StartupDetailPage({ params }: { params: Promise<{ id: st
               </TabsContent>
 
               <TabsContent value="reviews" className="mt-6">
+                {showReviewForm && user && startup && (
+                  <div className="mb-6">
+                    <ReviewForm
+                      startupId={startup.id}
+                      userId={user.id}
+                      onSuccess={handleReviewSuccess}
+                      onCancel={() => setShowReviewForm(false)}
+                    />
+                  </div>
+                )}
                 {reviews.length === 0 ? (
                   <Card>
                     <CardContent className="p-12 text-center">
                       <Star className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                       <p className="text-muted-foreground">No reviews yet</p>
-                      <Button className="mt-4" onClick={handleWriteReview}>Write the first review</Button>
+                      {!showReviewForm && (
+                        <Button className="mt-4" onClick={handleWriteReview}>
+                          {user ? 'Write the first review' : 'Login to write a review'}
+                        </Button>
+                      )}
                     </CardContent>
                   </Card>
                 ) : (
                   <div className="space-y-4">
+                    {!showReviewForm && (
+                      <div className="flex justify-end">
+                        <Button variant="outline" size="sm" onClick={handleWriteReview}>
+                          <MessageSquare className="w-4 h-4 mr-2" />
+                          {user ? 'Write a Review' : 'Login to Review'}
+                        </Button>
+                      </div>
+                    )}
+                    {showReviewForm && user && startup && (
+                      <ReviewForm
+                        startupId={startup.id}
+                        userId={user.id}
+                        onSuccess={handleReviewSuccess}
+                        onCancel={() => setShowReviewForm(false)}
+                      />
+                    )}
                     {reviews.map((review) => (
                       <Card key={review.id}>
                         <CardContent className="p-6">

@@ -234,13 +234,15 @@ export default function MatchList({
 
   if (matches.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 border rounded-lg bg-muted/30">
         <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-        <p className="text-lg text-muted-foreground">No matches found</p>
-        <p className="text-sm text-muted-foreground mt-2">
-          {status === 'pending'
-            ? 'Check back later for new matches!'
-            : 'Try adjusting your filters'}
+        <p className="text-lg font-medium text-muted-foreground">No matches yet</p>
+        <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+          {status === 'all'
+            ? 'Click "Find New Matches" above to let AI discover your best partners.'
+            : status === 'pending'
+            ? 'No pending matches. Generate new ones with "Find New Matches".'
+            : `No ${status} matches yet.`}
         </p>
       </div>
     );

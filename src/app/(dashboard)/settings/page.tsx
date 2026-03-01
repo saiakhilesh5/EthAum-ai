@@ -26,6 +26,7 @@ import {
   Loader2,
   Check,
   AlertCircle,
+  Trash2,
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -33,6 +34,7 @@ export default function SettingsPage() {
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState('');
@@ -132,17 +134,34 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     if (!user) return;
-    
+
     const confirmed = window.confirm(
-      'Are you sure you want to delete your account? This action cannot be undone.'
+      'Are you absolutely sure? This will permanently delete your account, all launches, reviews, and matches. Type DELETE to confirm.'
     );
-    
     if (!confirmed) return;
-    
+
+    const typed = window.prompt('Type DELETE to confirm permanent account deletion:');
+    if (typed !== 'DELETE') {
+      toast.error('Deletion cancelled — confirmation text did not match');
+      return;
+    }
+
+    setIsDeletingAccount(true);
     try {
-      toast.info('Account deletion is being processed. You will receive a confirmation email.');
-    } catch (error) {
-      toast.error('Failed to initiate account deletion');
+      const res = await fetch('/api/auth/delete-account', { method: 'DELETE' });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error || 'Deletion failed');
+      }
+      // Sign out and redirect
+      await supabase.auth.signOut();
+      toast.success('Account deleted successfully. Goodbye!');
+      window.location.href = '/';
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast.error(error.message || 'Failed to delete account. Please try again.');
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -322,9 +341,26 @@ export default function SettingsPage() {
               <div className="p-4 border border-red-200 rounded-lg bg-red-50 dark:bg-red-900/10">
                 <div className="flex items-center gap-3">
                   <AlertCircle className="w-5 h-5 text-red-500" />
-                  <div><p className="font-medium text-red-600">Delete Account</p><p className="text-sm text-red-600/80">Permanently delete your account</p></div>
+                  <div>
+                    <p className="font-medium text-red-600">Delete Account</p>
+                    <p className="text-sm text-red-600/80">
+                      Permanently deletes your account, startup profile, all launches, reviews, and matches. This cannot be undone.
+                    </p>
+                  </div>
                 </div>
-                <Button variant="destructive" size="sm" className="mt-4" onClick={handleDeleteAccount}>Delete Account</Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="mt-4"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeletingAccount}
+                >
+                  {isDeletingAccount ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Deleting everything...</>
+                  ) : (
+                    <><Trash2 className="w-4 h-4 mr-2" />Delete My Account</>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>

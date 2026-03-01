@@ -59,18 +59,21 @@ export default function InsightsPage() {
     }
 
     try {
-      // Fetch startup
-      const { data: startupData, error: startupError } = await supabase
+      // Fetch startup — use limit(1) to gracefully handle duplicate rows
+      const { data: startupRows, error: startupError } = await supabase
         .from('startups')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (startupError && startupError.code !== 'PGRST116') {
+      if (startupError) {
         console.error('Error fetching startup:', startupError);
         setIsLoading(false);
         return;
       }
+
+      const startupData = startupRows?.[0] ?? null;
 
       if (!startupData) {
         // No startup found
