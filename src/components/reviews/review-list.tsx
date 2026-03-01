@@ -77,11 +77,7 @@ export default function ReviewList({
         .from('reviews')
         .select(`
           id,
-          overall_rating,
-          ease_of_use_rating,
-          value_for_money_rating,
-          customer_support_rating,
-          features_rating,
+          rating,
           title,
           content,
           pros,
@@ -89,7 +85,7 @@ export default function ReviewList({
           is_verified,
           helpful_count,
           created_at,
-          users (full_name, avatar_url),
+          reviewer_id,
           enterprises (company_name, industry)
         `)
         .eq('startup_id', startupId)
@@ -97,7 +93,7 @@ export default function ReviewList({
 
       // Apply rating filter
       if (filterRating !== 'all') {
-        query = query.eq('overall_rating', parseInt(filterRating));
+        query = query.eq('rating', parseInt(filterRating));
       }
 
       // Apply sorting
@@ -109,10 +105,10 @@ export default function ReviewList({
           query = query.order('created_at', { ascending: true });
           break;
         case 'highest':
-          query = query.order('overall_rating', { ascending: false });
+          query = query.order('rating', { ascending: false });
           break;
         case 'lowest':
-          query = query.order('overall_rating', { ascending: true });
+          query = query.order('rating', { ascending: true });
           break;
         case 'helpful':
           query = query.order('helpful_count', { ascending: false });
@@ -123,9 +119,25 @@ export default function ReviewList({
 
       // Use data from database
       if (!error && data) {
+        // Fetch reviewer profiles from public users table
+        const reviewerIds = [...new Set(data.map((r: any) => r.reviewer_id).filter(Boolean))];
+        let usersMap: Record<string, { full_name: string; avatar_url: string | null }> = {};
+
+        if (reviewerIds.length > 0) {
+          const { data: usersData } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url')
+            .in('id', reviewerIds);
+
+          if (usersData) {
+            usersData.forEach((u: any) => { usersMap[u.id] = u; });
+          }
+        }
+
         const formattedReviews = data.map((review: any) => ({
           ...review,
-          user: review.users || { full_name: 'Anonymous', avatar_url: null },
+          overall_rating: review.rating,
+          user: usersMap[review.reviewer_id] || { full_name: 'Anonymous', avatar_url: null },
           enterprise: review.enterprises || null,
         }));
 
